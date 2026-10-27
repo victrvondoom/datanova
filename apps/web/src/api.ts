@@ -1,20 +1,33 @@
 import { ReplayBatchResponse, SubgraphResponse, PredictionResult } from "./types";
 
-const API_BASE = "http://127.0.0.1:8000/api";
+const CANDIDATE_PORTS = [8002, 8000, 8001];
+let detectedPort = 8002;
+
+export function getApiBase() {
+  return `http://127.0.0.1:${detectedPort}/api`;
+}
 
 export async function checkHealth() {
-  try {
-    const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(2000) });
-    if (!res.ok) throw new Error("Health check failed");
-    return await res.json();
-  } catch (e) {
-    return { status: "offline", model_id: "AEGIS-LightGBM-Graph-v1.2", active_policy: { policy_name: "Cost-Aware-Optimized" } };
+  for (const port of CANDIDATE_PORTS) {
+    try {
+      const res = await fetch(`http://127.0.0.1:${port}/api/health`, { signal: AbortSignal.timeout(1500) });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.service && data.service.includes("AEGIS")) {
+          detectedPort = port;
+          return data;
+        }
+      }
+    } catch {
+      // try next port
+    }
   }
+  return { status: "offline", model_id: "AEGIS-LightGBM-Graph-v1.2", active_policy: { policy_name: "Cost-Aware-Optimized" } };
 }
 
 export async function fetchBenchmarks() {
   try {
-    const res = await fetch(`${API_BASE}/benchmarks`);
+    const res = await fetch(`${getApiBase()}/benchmarks`);
     if (!res.ok) throw new Error("Benchmarks failed");
     return await res.json();
   } catch (e) {
@@ -44,7 +57,7 @@ export async function fetchBenchmarks() {
 
 export async function fetchReplayBatch(offset: number = 0, limit: number = 30): Promise<ReplayBatchResponse> {
   try {
-    const res = await fetch(`${API_BASE}/stream/replay-batch?offset=${offset}&limit=${limit}`);
+    const res = await fetch(`${getApiBase()}/stream/replay-batch?offset=${offset}&limit=${limit}`);
     if (!res.ok) throw new Error("Replay batch failed");
     return await res.json();
   } catch (e) {
@@ -111,7 +124,7 @@ export async function fetchReplayBatch(offset: number = 0, limit: number = 30): 
 
 export async function fetchGraphSubgraph(): Promise<SubgraphResponse> {
   try {
-    const res = await fetch(`${API_BASE}/graph/subgraph?limit_nodes=35`);
+    const res = await fetch(`${getApiBase()}/graph/subgraph?limit_nodes=35`);
     if (!res.ok) throw new Error("Subgraph fetch failed");
     return await res.json();
   } catch (e) {
@@ -150,7 +163,7 @@ export async function optimizePolicy(params: {
   review_capacity_daily: number;
 }) {
   try {
-    const res = await fetch(`${API_BASE}/optimize-policy`, {
+    const res = await fetch(`${getApiBase()}/optimize-policy`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(params),
@@ -175,7 +188,7 @@ export async function optimizePolicy(params: {
 
 export async function evaluateDrift() {
   try {
-    const res = await fetch(`${API_BASE}/drift/evaluate`, { method: "POST" });
+    const res = await fetch(`${getApiBase()}/drift/evaluate`, { method: "POST" });
     if (!res.ok) throw new Error("Drift check failed");
     return await res.json();
   } catch (e) {
@@ -193,7 +206,7 @@ export async function evaluateDrift() {
 
 export async function scoreTransaction(tx: any): Promise<PredictionResult> {
   try {
-    const res = await fetch(`${API_BASE}/score`, {
+    const res = await fetch(`${getApiBase()}/score`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(tx),
@@ -235,7 +248,7 @@ export async function injectTransaction(req: {
   is_fraud_simulated: number;
 }) {
   try {
-    const res = await fetch(`${API_BASE}/stream/inject`, {
+    const res = await fetch(`${getApiBase()}/stream/inject`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(req),
@@ -285,7 +298,7 @@ export async function injectTransaction(req: {
 
 export async function simulateStress(scenario: "smurfing" | "spoofing" | "volume_surge" | "none") {
   try {
-    const res = await fetch(`${API_BASE}/drift/simulate-stress`, {
+    const res = await fetch(`${getApiBase()}/drift/simulate-stress`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ scenario }),
@@ -332,7 +345,7 @@ export async function simulateStress(scenario: "smurfing" | "spoofing" | "volume
 
 export async function verifyReceipt(receipt: any) {
   try {
-    const res = await fetch(`${API_BASE}/receipts/verify`, {
+    const res = await fetch(`${getApiBase()}/receipts/verify`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ receipt }),
