@@ -1,9 +1,12 @@
 """Unit tests for cost engine and policy optimizer."""
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import numpy as np
-from packages.data.schemas import CostConfiguration, DecisionPolicy, OperationalAction
+
+from packages.data.schemas import CostConfiguration, OperationalAction
 from packages.optimization.cost_engine import CostEngine
 from packages.optimization.optimizer import PolicyOptimizer
 

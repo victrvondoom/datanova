@@ -4,12 +4,17 @@ Translates mathematical feature contributions into auditable regulatory explanat
 """
 
 from typing import Any, Dict, List, Optional
+
 import numpy as np
 import shap
 
 from packages.data.schemas import FeatureContribution
 from packages.models.base import BaseFraudClassifier
-from packages.models.classifiers import LightGBMFraudModel, XGBoostFraudModel, LogisticRegressionFraudModel
+from packages.models.classifiers import (
+    LightGBMFraudModel,
+    LogisticRegressionFraudModel,
+    XGBoostFraudModel,
+)
 
 
 class ExplainabilityEngine:

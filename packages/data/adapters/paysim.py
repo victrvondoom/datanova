@@ -8,6 +8,7 @@ Ideal for account-relationship graph construction, mule ring detection, and tran
 import os
 from datetime import datetime, timedelta
 from typing import Optional
+
 import pandas as pd
 
 from packages.data.schemas import DatasetDesignation
@@ -37,7 +38,7 @@ class PaySimAdapter:
             )
 
         df = pd.read_csv(self.data_path, nrows=sample_limit)
-        
+
         required = {"step", "type", "amount", "nameOrig", "nameDest", "isFraud"}
         if not required.issubset(df.columns):
             raise ValueError(f"PaySim missing required columns: {required - set(df.columns)}")

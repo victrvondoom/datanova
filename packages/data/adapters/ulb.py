@@ -7,7 +7,8 @@ Strict rule: Does NOT invent fake account identities or relationships for ULB.
 
 import os
 from datetime import datetime, timedelta
-from typing import Optional, Tuple
+from typing import Optional
+
 import pandas as pd
 
 from packages.data.schemas import DatasetDesignation
@@ -42,7 +43,7 @@ class ULBCreditCardAdapter:
             )
 
         df = pd.read_csv(self.data_path, nrows=sample_limit)
-        
+
         # Check required columns
         required = {"Time", "Amount", "Class"}
         if not required.issubset(df.columns):
@@ -52,16 +53,16 @@ class ULBCreditCardAdapter:
         df["timestamp"] = [base_timestamp + timedelta(seconds=float(s)) for s in df["Time"]]
         df["is_fraud"] = df["Class"].astype(int)
         df["amount"] = df["Amount"].astype(float)
-        
+
         # Create stable synthetic transaction IDs
         df["transaction_id"] = [f"ulb_tx_{i:07d}" for i in range(len(df))]
-        
+
         # Sender/receiver: ULB is card-level anonymized without merchant identifiers
         df["sender_id"] = [f"ulb_card_{i % 5000:05d}" for i in range(len(df))]
         df["receiver_id"] = "anonymized_merchant"
         df["channel"] = "pos"
         df["dataset_designation"] = DatasetDesignation.ULB_CREDIT_CARD.value
-        
+
         # Ensure chronological ordering
         df = df.sort_values("timestamp").reset_index(drop=True)
         return df

@@ -7,7 +7,8 @@ Calculates expected financial loss, manual review expense, and customer friction
 - BLOCK: Immediate decline (prevents fraud loss, but causes high churn/friction if legitimate)
 """
 
-from typing import Dict, List, Tuple
+from typing import Dict, Optional
+
 import numpy as np
 
 from packages.data.schemas import CostConfiguration, DecisionPolicy, OperationalAction
@@ -16,8 +17,8 @@ from packages.data.schemas import CostConfiguration, DecisionPolicy, Operational
 class CostEngine:
     """Evaluates the economic outcomes of operational actions."""
 
-    def __init__(self, config: CostConfiguration = CostConfiguration()):
-        self.config = config
+    def __init__(self, config: Optional[CostConfiguration] = None):
+        self.config = config or CostConfiguration()
 
     def calculate_action_cost(
         self,

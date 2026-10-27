@@ -7,7 +7,8 @@ Implements:
 Strict guarantee: Calibrators are fitted exclusively on Validation split, NEVER on Test data.
 """
 
-from typing import Dict, Tuple
+from typing import Dict
+
 import numpy as np
 from sklearn.isotonic import IsotonicRegression
 from sklearn.linear_model import LogisticRegression
@@ -70,7 +71,7 @@ class ProbabilityCalibrator:
             bin_lower = bin_boundaries[i]
             bin_upper = bin_boundaries[i + 1]
             mask = (probs >= bin_lower) & (probs < bin_upper) if i < n_bins - 1 else (probs >= bin_lower) & (probs <= bin_upper)
-            
+
             bin_size = np.sum(mask)
             if bin_size > 0:
                 bin_acc = float(np.mean(labels[mask]))

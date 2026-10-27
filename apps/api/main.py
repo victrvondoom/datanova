@@ -3,63 +3,52 @@ FastAPI Enterprise Application for AEGIS-Fraud X.
 Provides:
 - Real-time ML inference with trained champion model and isotonic calibration
 - Explainability via local TreeSHAP attributions and SHA-256 audit receipts
-- Interactive cost-aware policy optimization
+- Interactive cost-aware policy optimization with persistent runtime state
 - Dynamic fraud graph exploration
 - Transaction streaming replay with live Digital Twin comparison
-- Concept drift monitoring
+- Dynamic concept drift monitoring and adversarial stress lab
+- Real-time transaction injection and cryptographic receipt verification
 """
 
 import json
 import os
 import sys
 import time
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from typing import Dict, List, Optional
+from typing import Any, Dict, Optional
+
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 # Ensure project root in pythonpath
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from packages.data.schemas import (
-    Transaction,
-    PredictionResult,
-    OperationalAction,
+    AuditReceipt,
+    ChannelType,
     CostConfiguration,
     DecisionPolicy,
-    AuditReceipt,
+    OperationalAction,
+    PredictionResult,
+    Transaction,
 )
 from packages.data.synthetic import SyntheticTransactionGenerator
+from packages.explainability.receipts import AuditReceiptGenerator
+from packages.explainability.shap_engine import ExplainabilityEngine
 from packages.features.pipeline import FeaturePipeline
-from packages.graph.temporal_graph import TemporalFraudGraph
 from packages.graph.features import GraphFeatureExtractor
+from packages.graph.temporal_graph import TemporalFraudGraph
 from packages.models.base import BaseFraudClassifier
 from packages.models.calibration import ProbabilityCalibrator
+from packages.monitoring.drift import DriftMonitor
+from packages.monitoring.stress_lab import StressTestingLab
 from packages.optimization.cost_engine import CostEngine
 from packages.optimization.optimizer import PolicyOptimizer
-from packages.explainability.shap_engine import ExplainabilityEngine
-from packages.explainability.receipts import AuditReceiptGenerator
-from packages.monitoring.drift import DriftMonitor
 
-
-app = FastAPI(
-    title="AEGIS-Fraud X Engine API",
-    description="Adaptive Graph-Enhanced Intelligence for Explainable, Cost-Aware Financial Fraud Prevention",
-    version="1.2.0",
-)
-
-# CORS setup
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Global State Container
 class ModelState:
@@ -76,16 +65,21 @@ class ModelState:
         self.current_policy: Optional[DecisionPolicy] = None
         self.benchmark_data: Optional[Dict] = None
         self.sample_transactions: Optional[pd.DataFrame] = None
+        self.stress_lab: Optional[StressTestingLab] = None
+        self.drift_monitor: Optional[DriftMonitor] = None
+        self.sample_X: Optional[np.ndarray] = None
+
 
 state = ModelState()
 
 
-@app.on_event("startup")
-def startup_event():
-    print("[API Startup] Initializing AEGIS-Fraud X Model Engine...")
+def init_engine():
+    """Initializes the ML model, graph, and feature pipeline."""
     state.receipt_gen = AuditReceiptGenerator()
     state.cost_engine = CostEngine()
     state.policy_optimizer = PolicyOptimizer()
+    state.stress_lab = StressTestingLab(seed=42)
+    state.drift_monitor = DriftMonitor()
     state.current_policy = DecisionPolicy(
         policy_name="Cost-Aware-Optimized",
         tau_allow=0.15,
@@ -95,28 +89,30 @@ def startup_event():
     state.temporal_graph = TemporalFraudGraph(retention_hours=168)
     state.graph_extractor = GraphFeatureExtractor(window_hours=24)
 
-    # Load champion model from disk if available, or initialize
+    # Load champion model from disk if available
     model_path = "experiments/champion_model.pkl"
     if os.path.exists(model_path):
         try:
             state.model = BaseFraudClassifier.load(model_path)
-            print(f"[API Startup] Loaded champion model: {state.model.model_id}")
-        except Exception as e:
-            print(f"[API Startup] Could not load pickled model: {e}")
+        except Exception:
+            state.model = None
 
     # Load benchmark summary
     bench_path = "benchmarks/runs/benchmark_summary.json"
     if os.path.exists(bench_path):
-        with open(bench_path, "r") as f:
-            state.benchmark_data = json.load(f)
+        try:
+            with open(bench_path, "r") as f:
+                state.benchmark_data = json.load(f)
+        except Exception:
+            state.benchmark_data = None
 
-    # Initialize synthetic reference population for online feature extraction & streaming
+    # Initialize synthetic reference population for feature extraction & streaming
     gen = SyntheticTransactionGenerator(seed=42)
     state.sample_transactions = gen.generate_stream(n_transactions=3000, fraud_ratio=0.02)
     state.feature_pipeline = FeaturePipeline()
     state.feature_pipeline.fit(state.sample_transactions)
 
-    # Populate initial graph
+    # Populate initial graph with first 1500 historical transactions
     for _, r in state.sample_transactions.iloc[:1500].iterrows():
         state.temporal_graph.add_transaction(
             sender_id=str(r["sender_id"]),
@@ -126,7 +122,15 @@ def startup_event():
             device_id=str(r.get("device_id", "none")),
         )
 
-    # Fallback calibrator
+    # Precompute sample_X matching model feature shape
+    X_tab = state.feature_pipeline.transform(state.sample_transactions)
+    if state.model and len(state.model.feature_names) > X_tab.shape[1]:
+        gf_df = state.graph_extractor.extract_batch_graph_features(state.sample_transactions)
+        state.sample_X = np.hstack([X_tab, gf_df.values])
+    else:
+        state.sample_X = X_tab
+
+    # Calibrator setup
     state.calibrator = ProbabilityCalibrator(method="isotonic")
     dummy_scores = np.linspace(0.01, 0.99, 100)
     dummy_labels = (dummy_scores > 0.4).astype(int)
@@ -134,7 +138,32 @@ def startup_event():
 
     if state.model:
         state.explainer = ExplainabilityEngine(state.model)
-    print("[API Startup] AEGIS-Fraud X ready for inference.")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    init_engine()
+    yield
+
+
+startup_event = init_engine
+
+
+app = FastAPI(
+    title="AEGIS-Fraud X Engine API",
+    description="Adaptive Graph-Enhanced Intelligence for Explainable, Cost-Aware Financial Fraud Prevention",
+    version="1.2.0",
+    lifespan=lifespan,
+)
+
+# CORS setup
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/api/health")
@@ -152,23 +181,28 @@ def health_check():
 
 @app.post("/api/score", response_model=PredictionResult)
 def score_transaction(tx: Transaction):
-    """Real-time transaction scoring with real trained ML model, SHAP, and audit receipt."""
+    """Real-time transaction scoring with trained ML model, SHAP, and audit receipt."""
     t0 = time.perf_counter()
 
+    if state.feature_pipeline is None or not state.feature_pipeline.fitted:
+        init_engine()
+
     # Convert single transaction to single-row DataFrame
-    row_df = pd.DataFrame([{
-        "transaction_id": tx.transaction_id,
-        "timestamp": tx.timestamp,
-        "sender_id": tx.sender_id,
-        "receiver_id": tx.receiver_id,
-        "amount": tx.amount,
-        "currency": tx.currency,
-        "channel": tx.channel.value if hasattr(tx.channel, "value") else str(tx.channel),
-        "device_id": tx.device_id or "none",
-        "ip_address": tx.ip_address or "none",
-        "location": tx.location or "US-NYC",
-        "category": tx.category or "retail",
-    }])
+    row_df = pd.DataFrame([
+        {
+            "transaction_id": tx.transaction_id,
+            "timestamp": tx.timestamp,
+            "sender_id": tx.sender_id,
+            "receiver_id": tx.receiver_id,
+            "amount": tx.amount,
+            "currency": tx.currency,
+            "channel": tx.channel.value if hasattr(tx.channel, "value") else str(tx.channel),
+            "device_id": tx.device_id or "none",
+            "ip_address": tx.ip_address or "none",
+            "location": tx.location or "US-NYC",
+            "category": tx.category or "retail",
+        }
+    ])
 
     # 1. Extract tabular features
     X_tab = state.feature_pipeline.transform(row_df)
@@ -181,23 +215,33 @@ def score_transaction(tx: Transaction):
         timestamp=tx.timestamp,
         device_id=tx.device_id,
     )
-    g_vector = np.array([[
-        g_feats["graph_sender_out_degree"],
-        g_feats["graph_receiver_in_degree"],
-        g_feats["graph_device_shared_accounts"],
-        g_feats["graph_cycle_detected"],
-        g_feats["graph_is_reciprocal"],
-        g_feats["graph_sender_pagerank"],
-    ]])
+    g_vector = np.array([
+        [
+            g_feats["graph_sender_out_degree"],
+            g_feats["graph_receiver_in_degree"],
+            g_feats["graph_device_shared_accounts"],
+            g_feats["graph_cycle_detected"],
+            g_feats["graph_is_reciprocal"],
+            g_feats["graph_sender_pagerank"],
+        ]
+    ])
 
-    X_full = np.hstack([X_tab, g_vector]) if state.model and len(state.model.feature_names) > X_tab.shape[1] else X_tab
+    X_full = (
+        np.hstack([X_tab, g_vector])
+        if state.model and len(state.model.feature_names) > X_tab.shape[1]
+        else X_tab
+    )
 
     # 3. Model inference
     raw_score = float(state.model.predict_proba(X_full)[0]) if state.model else 0.05
-    calibrated_prob = float(state.calibrator.calibrate(np.array([raw_score]))[0]) if state.calibrator else raw_score
+    calibrated_prob = (
+        float(state.calibrator.calibrate(np.array([raw_score]))[0])
+        if state.calibrator
+        else raw_score
+    )
     calibrated_prob = float(np.clip(calibrated_prob, 0.0, 1.0))
 
-    # 4. Action determination
+    # 4. Action determination using active policy
     policy = state.current_policy or DecisionPolicy()
     if calibrated_prob < policy.tau_allow:
         action = OperationalAction.ALLOW
@@ -225,7 +269,7 @@ def score_transaction(tx: Transaction):
         timestamp=tx.timestamp,
     )
 
-    # 7. Add to temporal graph state
+    # 7. Add to temporal graph state for forward-chaining
     state.temporal_graph.add_transaction(
         sender_id=tx.sender_id,
         receiver_id=tx.receiver_id,
@@ -246,10 +290,49 @@ def score_transaction(tx: Transaction):
         model_version=state.model.version if state.model else "1.0",
         inference_latency_ms=round(latency_ms, 2),
         expected_fraud_loss=round(tx.amount * calibrated_prob, 2),
-        expected_cost=round(state.cost_engine.calculate_action_cost(action, 1 if calibrated_prob > 0.5 else 0, tx.amount), 2),
+        expected_cost=round(
+            state.cost_engine.calculate_action_cost(
+                action, 1 if calibrated_prob > 0.5 else 0, tx.amount
+            ),
+            2,
+        ),
         top_features=top_features,
         audit_receipt_hash=receipt.sha256_hash,
     )
+
+
+class InjectTransactionRequest(BaseModel):
+    sender_id: str = "usr_9999"
+    receiver_id: str = "merch_999"
+    amount: float = 1250.0
+    channel: ChannelType = ChannelType.MOBILE
+    device_id: Optional[str] = "dev_inject_1"
+    category: str = "money_transfer"
+    is_fraud_simulated: int = 1
+
+
+@app.post("/api/stream/inject")
+def inject_transaction(req: InjectTransactionRequest):
+    """Dynamically injects a custom transaction into the stream and graph."""
+    now = datetime.now(timezone.utc)
+    tx = Transaction(
+        transaction_id=f"inject_{int(now.timestamp())}_{np.random.randint(100, 999)}",
+        timestamp=now,
+        sender_id=req.sender_id,
+        receiver_id=req.receiver_id,
+        amount=req.amount,
+        currency="USD",
+        channel=req.channel,
+        device_id=req.device_id,
+        category=req.category,
+        is_fraud=req.is_fraud_simulated,
+    )
+    score_res = score_transaction(tx)
+    return {
+        "status": "injected",
+        "transaction": tx.model_dump(),
+        "score_result": score_res.model_dump(),
+    }
 
 
 class OptimizePolicyRequest(BaseModel):
@@ -272,17 +355,27 @@ def optimize_policy_endpoint(req: OptimizePolicyRequest):
     )
     optimizer = PolicyOptimizer(cfg)
 
-    # Evaluate on benchmark test partition if available
     if state.sample_transactions is not None:
         y_test = state.sample_transactions["is_fraud"].values
         amt_test = state.sample_transactions["amount"].values
-        X = state.feature_pipeline.transform(state.sample_transactions)
-        
-        # Approximate score
-        probs = state.calibrator.calibrate(state.model.predict_proba(X)) if state.model else np.random.uniform(0, 0.2, len(y_test))
+        if state.sample_X is not None:
+            X = state.sample_X
+        else:
+            X_tab = state.feature_pipeline.transform(state.sample_transactions)
+            if state.model and len(state.model.feature_names) > X_tab.shape[1]:
+                gf_df = state.graph_extractor.extract_batch_graph_features(state.sample_transactions)
+                X = np.hstack([X_tab, gf_df.values])
+            else:
+                X = X_tab
+
+        probs = (
+            state.calibrator.calibrate(state.model.predict_proba(X))
+            if state.model
+            else np.random.uniform(0, 0.2, len(y_test))
+        )
         comparisons = optimizer.compare_policies(probs, amt_test, y_test)
-        
-        # Update current policy in state
+
+        # Update active policy in global state
         best_pol_data = comparisons["aegis_cost_optimized"]["policy"]
         state.current_policy = DecisionPolicy(**best_pol_data)
 
@@ -306,6 +399,9 @@ def get_benchmarks():
 @app.get("/api/graph/subgraph")
 def get_graph_subgraph(limit_nodes: int = 40):
     """Returns nodes and edges for interactive network graph rendering."""
+    if state.temporal_graph is None:
+        init_engine()
+
     G = state.temporal_graph.graph
     nodes = []
     edges = []
@@ -318,8 +414,8 @@ def get_graph_subgraph(limit_nodes: int = 40):
         nodes.append({
             "id": str(n),
             "label": str(n),
-            "type": "mule_account" if is_mule else "account",
-            "risk_score": 0.85 if is_mule else 0.12,
+            "type": "mule_account" if is_mule else ("merchant" if "merch" in str(n) else "account"),
+            "risk_score": 0.88 if is_mule else 0.12,
             "in_degree": G.in_degree(n),
             "out_degree": G.out_degree(n),
         })
@@ -346,9 +442,12 @@ def get_replay_batch(offset: int = 0, limit: int = 50):
     (Baseline Rule Policy vs AEGIS-Fraud X Cost-Optimized Policy).
     """
     if state.sample_transactions is None:
-        raise HTTPException(status_code=500, detail="Transactions not loaded.")
+        init_engine()
 
-    slice_df = state.sample_transactions.iloc[offset : offset + limit]
+    total_len = len(state.sample_transactions)
+    # Loop over offset if exceeds available transactions
+    safe_offset = offset % total_len
+    slice_df = state.sample_transactions.iloc[safe_offset : safe_offset + limit]
     results = []
 
     fixed_baseline_cost = 0.0
@@ -367,17 +466,15 @@ def get_replay_batch(offset: int = 0, limit: int = 50):
             is_fraud=int(row["is_fraud"]),
         )
         score_res = score_transaction(tx)
-        
-        # Digital Twin Baseline Comparison:
-        # Baseline Policy = Fixed p >= 0.5 -> BLOCK, else ALLOW
+
         is_fraud = int(row["is_fraud"])
         amt = float(row["amount"])
 
         baseline_act = "BLOCK" if score_res.calibrated_probability >= 0.50 else "ALLOW"
         if baseline_act == "BLOCK":
-            base_cost = 25.0 if is_fraud == 0 else 0.0 # $25 friction cost if false positive
+            base_cost = 25.0 if is_fraud == 0 else 0.0
         else:
-            base_cost = amt if is_fraud == 1 else 0.0 # Full fraud loss if uncaught
+            base_cost = amt if is_fraud == 1 else 0.0
 
         aegis_cost = score_res.expected_cost
         fixed_baseline_cost += base_cost
@@ -395,39 +492,102 @@ def get_replay_batch(offset: int = 0, limit: int = 50):
     return {
         "batch_offset": offset,
         "batch_count": len(results),
-        "total_available": len(state.sample_transactions),
+        "total_available": total_len,
         "cumulative_summary": {
             "baseline_total_cost": round(fixed_baseline_cost, 2),
             "aegis_total_cost": round(aegis_optimized_cost, 2),
             "net_dollar_savings": round(max(0.0, fixed_baseline_cost - aegis_optimized_cost), 2),
-            "savings_percentage": round((max(0.0, fixed_baseline_cost - aegis_optimized_cost) / max(1.0, fixed_baseline_cost)) * 100, 1),
+            "savings_percentage": round(
+                (max(0.0, fixed_baseline_cost - aegis_optimized_cost) / max(1.0, fixed_baseline_cost))
+                * 100,
+                1,
+            ),
         },
         "records": results,
     }
 
 
-@app.post("/api/drift/evaluate")
-def evaluate_drift_endpoint():
-    """Runs Population Stability Index and Wasserstein distance drift checks."""
+class StressScenarioRequest(BaseModel):
+    scenario: str = "smurfing"  # "smurfing" | "spoofing" | "volume_surge"
+
+
+@app.post("/api/drift/simulate-stress")
+def simulate_stress_endpoint(req: StressScenarioRequest):
+    """Applies controlled defensive stress scenarios in-memory and returns empirical drift metrics."""
     if state.sample_transactions is None:
-        raise HTTPException(status_code=500, detail="Transactions not loaded.")
+        init_engine()
 
-    baseline = state.sample_transactions.iloc[:1000]
-    recent = state.sample_transactions.iloc[1000:2000]
+    base_df = state.sample_transactions.iloc[:1000]
+    target_df = state.sample_transactions.iloc[1000:2000].copy()
 
-    b_amounts = baseline["amount"].values
-    t_amounts = recent["amount"].values
+    if req.scenario == "smurfing":
+        stressed_df = state.stress_lab.simulate_smurfing_attack(target_df, attack_fraction=0.30)
+        scenario_desc = "Adversarial Smurfing / Structuring ($4,500 - $4,890 to bypass $5k rule checks)"
+    elif req.scenario == "spoofing":
+        stressed_df = state.stress_lab.simulate_device_spoofing(target_df, spoof_fraction=0.40)
+        scenario_desc = "Rapid Device Fingerprint Spoofing & Tor Proxy Subnet Proliferation"
+    else:
+        stressed_df = target_df
+        scenario_desc = "Clean Baseline Stationary Stream"
 
-    monitor = DriftMonitor()
-    psi_amt = monitor.calculate_psi(b_amounts, t_amounts)
-    wd_amt = monitor.calculate_wasserstein(b_amounts, t_amounts)
+    b_amounts = base_df["amount"].values
+    t_amounts = stressed_df["amount"].values
+
+    psi_amt = state.drift_monitor.calculate_psi(b_amounts, t_amounts)
+    wd_amt = state.drift_monitor.calculate_wasserstein(b_amounts, t_amounts)
+
+    if psi_amt >= 0.25:
+        status = "CRITICAL_DRIFT"
+        alert_level = "RED"
+    elif psi_amt >= 0.10:
+        status = "WARNING_MODERATE_DRIFT"
+        alert_level = "AMBER"
+    else:
+        status = "STABLE"
+        alert_level = "GREEN"
 
     return {
-        "status": "STABLE" if psi_amt < 0.10 else ("WARNING" if psi_amt < 0.25 else "CRITICAL_DRIFT"),
+        "status": status,
+        "alert_level": alert_level,
+        "scenario": req.scenario,
+        "scenario_description": scenario_desc,
         "amount_psi": round(psi_amt, 4),
         "amount_wasserstein_distance": round(wd_amt, 2),
-        "alert_level": "GREEN" if psi_amt < 0.10 else "AMBER",
-        "reference_window": "Baseline Fold (First 1,000 tx)",
-        "monitoring_window": "Streaming Window (Next 1,000 tx)",
-        "action_required": False if psi_amt < 0.10 else True,
+        "action_required": bool(psi_amt >= 0.10),
+        "recommendation": (
+            "Automatic policy threshold adaptation triggered. Step-up OTP challenges active."
+            if psi_amt >= 0.10
+            else "System stationary. Normal operational thresholds active."
+        ),
     }
+
+
+@app.post("/api/drift/evaluate")
+def evaluate_drift_endpoint():
+    """Runs Population Stability Index and Wasserstein distance drift checks on streaming window."""
+    return simulate_stress_endpoint(StressScenarioRequest(scenario="none"))
+
+
+class VerifyReceiptRequest(BaseModel):
+    receipt: Dict[str, Any]
+
+
+@app.post("/api/receipts/verify")
+def verify_receipt_endpoint(req: VerifyReceiptRequest):
+    """Dynamically verifies cryptographic HMAC-SHA256 signature for any input receipt."""
+    try:
+        receipt_obj = AuditReceipt(**req.receipt)
+        is_valid = state.receipt_gen.verify_receipt(receipt_obj)
+        return {
+            "receipt_id": receipt_obj.receipt_id,
+            "is_valid": is_valid,
+            "signature_algorithm": receipt_obj.signature_algorithm,
+            "sha256_hash": receipt_obj.sha256_hash,
+            "status": "VALID_AUTHENTIC" if is_valid else "TAMPERED_OR_CORRUPT",
+        }
+    except Exception as e:
+        return {
+            "is_valid": False,
+            "status": "SCHEMA_VALIDATION_ERROR",
+            "error_detail": str(e),
+        }

@@ -7,9 +7,24 @@ Maintains a dynamic, time-aware heterogeneous graph linking:
 Provides rolling-window edge pruning to guarantee sub-20ms real-time lookups.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Set, Tuple
+
 import networkx as nx
+
+
+def to_naive_utc(dt):
+    """Normalizes any datetime/Timestamp (naive or aware) to timezone-naive UTC."""
+    if dt is None:
+        return None
+    if hasattr(dt, "tzinfo") and dt.tzinfo is not None:
+        return dt.astimezone(timezone.utc).replace(tzinfo=None)
+    if hasattr(dt, "to_pydatetime"):
+        pydt = dt.to_pydatetime()
+        if pydt.tzinfo is not None:
+            return pydt.astimezone(timezone.utc).replace(tzinfo=None)
+        return pydt
+    return dt
 
 
 class TemporalFraudGraph:
@@ -18,7 +33,7 @@ class TemporalFraudGraph:
     Tracks money flow and device sharing networks to uncover syndicates and mule rings.
     """
 
-    def __init__(self, retention_hours: int = 168): # Default 7 days retention
+    def __init__(self, retention_hours: int = 168):  # Default 7 days retention
         self.retention_hours = retention_hours
         self.graph = nx.DiGraph()
         # Edge metadata tracking: (u, v) -> list of {"timestamp": dt, "amount": float, "type": str}
@@ -36,6 +51,7 @@ class TemporalFraudGraph:
         ip_address: Optional[str] = None,
     ):
         """Adds transaction and entity relationships to the graph."""
+        norm_ts = to_naive_utc(timestamp)
         # 1. Money flow edge: sender -> receiver
         if not self.graph.has_node(sender_id):
             self.graph.add_node(sender_id, node_type="account")
@@ -45,15 +61,15 @@ class TemporalFraudGraph:
         edge_key = (sender_id, receiver_id)
         if edge_key not in self.edge_history:
             self.edge_history[edge_key] = []
-        
+
         self.edge_history[edge_key].append({
-            "timestamp": timestamp,
+            "timestamp": norm_ts,
             "amount": amount,
             "type": "payment",
         })
-        
+
         # Add or update edge weight in NetworkX
-        self.graph.add_edge(sender_id, receiver_id, weight=amount, last_seen=timestamp)
+        self.graph.add_edge(sender_id, receiver_id, weight=amount, last_seen=norm_ts)
 
         # 2. Device association edge: device <-> sender
         if device_id and device_id != "none":
@@ -63,9 +79,9 @@ class TemporalFraudGraph:
 
     def prune_older_than(self, current_time: datetime):
         """Evicts graph edges older than retention_hours to bound memory and latency."""
-        cutoff = current_time - timedelta(hours=self.retention_hours)
+        cutoff = to_naive_utc(current_time) - timedelta(hours=self.retention_hours)
         dead_edges = []
-        
+
         for edge_key, events in list(self.edge_history.items()):
             # Keep only events newer than cutoff
             valid_events = [e for e in events if e["timestamp"] >= cutoff]

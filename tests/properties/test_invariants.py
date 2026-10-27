@@ -13,24 +13,30 @@ Enforces the 15 mandatory scientific and engineering invariants:
 10. Input validation rejects invalid amounts.
 """
 
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
+from datetime import datetime, timezone
 
 import numpy as np
 import pytest
-from datetime import datetime
 from pydantic import ValidationError
 
-from packages.data.schemas import Transaction, CostConfiguration, FeatureContribution, OperationalAction
-from packages.data.synthetic import SyntheticTransactionGenerator
+from packages.data.schemas import (
+    CostConfiguration,
+    FeatureContribution,
+    OperationalAction,
+    Transaction,
+)
 from packages.data.splitters import ChronologicalSplitter
-from packages.features.pipeline import FeaturePipeline
-from packages.graph.temporal_graph import TemporalFraudGraph
+from packages.data.synthetic import SyntheticTransactionGenerator
+from packages.explainability.receipts import AuditReceiptGenerator
 from packages.graph.features import GraphFeatureExtractor
-from packages.models.classifiers import LightGBMFraudModel
+from packages.graph.temporal_graph import TemporalFraudGraph
 from packages.models.calibration import ProbabilityCalibrator
 from packages.optimization.optimizer import PolicyOptimizer
-from packages.explainability.receipts import AuditReceiptGenerator
 
 
 def test_invariant_1_no_test_labels_in_training():
@@ -127,7 +133,7 @@ def test_invariant_11_invalid_input_rejected():
     with pytest.raises(ValidationError):
         Transaction(
             transaction_id="tx_err",
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
             sender_id="usr_1",
             receiver_id="rec_1",
             amount=-99.99,

@@ -8,11 +8,12 @@ Implements:
 """
 
 from typing import List, Optional
-import numpy as np
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
+
 import lightgbm as lgb
+import numpy as np
 import xgboost as xgb
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 
 from packages.models.base import BaseFraudClassifier
 

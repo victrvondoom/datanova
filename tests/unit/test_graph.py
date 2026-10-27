@@ -1,10 +1,13 @@
 """Unit tests for temporal graph and cycle detection."""
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from datetime import datetime, timedelta
-from packages.graph.temporal_graph import TemporalFraudGraph
+
 from packages.graph.features import GraphFeatureExtractor
+from packages.graph.temporal_graph import TemporalFraudGraph
 
 
 def test_temporal_graph_and_cycle_detection():

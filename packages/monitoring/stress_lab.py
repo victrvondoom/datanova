@@ -8,11 +8,12 @@ Simulates non-operational defensive stress scenarios:
 Tracks detection latency, degraded calibration, and retraining impact.
 """
 
-from typing import Dict, List, Tuple
+from typing import Dict, Optional
+
 import numpy as np
 import pandas as pd
 
-from packages.data.schemas import CostConfiguration, DecisionPolicy
+from packages.data.schemas import CostConfiguration
 from packages.evaluation.metrics import FraudEvaluationMetrics
 from packages.models.base import BaseFraudClassifier
 from packages.models.calibration import ProbabilityCalibrator
@@ -36,7 +37,7 @@ class StressTestingLab:
         stressed = df.copy()
         fraud_mask = (stressed["is_fraud"] == 1)
         fraud_indices = stressed[fraud_mask].index.tolist()
-        
+
         target_indices = self.rng.choice(fraud_indices, size=int(len(fraud_indices) * attack_fraction), replace=False)
         for idx in target_indices:
             # Structuring: amounts between $4,500 and $4,890
@@ -71,11 +72,12 @@ class StressTestingLab:
         feature_transform_fn,
         clean_test_df: pd.DataFrame,
         stressed_test_df: pd.DataFrame,
-        cost_config: CostConfiguration = CostConfiguration(),
+        cost_config: Optional[CostConfiguration] = None,
     ) -> Dict[str, Dict]:
         """
         Compares model performance on clean vs stressed data to measure degradation.
         """
+        cfg = cost_config or CostConfiguration()
         # 1. Clean evaluation
         X_clean = feature_transform_fn(clean_test_df)
         y_clean = clean_test_df["is_fraud"].values
@@ -83,7 +85,7 @@ class StressTestingLab:
 
         raw_clean = model.predict_proba(X_clean)
         prob_clean = calibrator.calibrate(raw_clean)
-        res_clean = FraudEvaluationMetrics.evaluate(y_clean, prob_clean, amt_clean, cost_config=cost_config)
+        res_clean = FraudEvaluationMetrics.evaluate(y_clean, prob_clean, amt_clean, cost_config=cfg)
 
         # 2. Stressed evaluation
         X_stress = feature_transform_fn(stressed_test_df)
@@ -92,7 +94,7 @@ class StressTestingLab:
 
         raw_stress = model.predict_proba(X_stress)
         prob_stress = calibrator.calibrate(raw_stress)
-        res_stress = FraudEvaluationMetrics.evaluate(y_stress, prob_stress, amt_stress, cost_config=cost_config)
+        res_stress = FraudEvaluationMetrics.evaluate(y_stress, prob_stress, amt_stress, cost_config=cfg)
 
         # Calculate degradation deltas
         delta_pr_auc = round(res_stress["pr_auc"] - res_clean["pr_auc"], 4)

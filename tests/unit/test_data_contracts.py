@@ -1,14 +1,17 @@
 """Unit tests for data contracts and chronological splitting."""
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-import pytest
 from datetime import datetime
+
+import pytest
 from pydantic import ValidationError
 
-from packages.data.schemas import Transaction, ChannelType, DatasetDesignation
-from packages.data.synthetic import SyntheticTransactionGenerator
+from packages.data.schemas import ChannelType, DatasetDesignation, Transaction
 from packages.data.splitters import ChronologicalSplitter
+from packages.data.synthetic import SyntheticTransactionGenerator
 
 
 def test_transaction_schema_validation():

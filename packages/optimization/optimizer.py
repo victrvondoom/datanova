@@ -4,10 +4,11 @@ Solves for optimal multi-action thresholds (tau_allow, tau_review, tau_block) th
 minimize total operational cost subject to hard investigator capacity and FPR constraints.
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional, Tuple
+
 import numpy as np
 
-from packages.data.schemas import CostConfiguration, DecisionPolicy, OperationalAction
+from packages.data.schemas import CostConfiguration, DecisionPolicy
 from packages.optimization.cost_engine import CostEngine
 
 
@@ -16,9 +17,9 @@ class PolicyOptimizer:
     Finds Pareto-optimal decision thresholds balancing fraud loss, investigation labor, and customer churn.
     """
 
-    def __init__(self, cost_config: CostConfiguration = CostConfiguration()):
-        self.cost_config = cost_config
-        self.cost_engine = CostEngine(cost_config)
+    def __init__(self, cost_config: Optional[CostConfiguration] = None):
+        self.cost_config = cost_config or CostConfiguration()
+        self.cost_engine = CostEngine(self.cost_config)
 
     def optimize_policy(
         self,
@@ -48,15 +49,15 @@ class PolicyOptimizer:
 
         # Enforce capacity strictly: Review rate cannot exceed max_review_rate
         # We search thresholds guided by empirical probability percentiles
-        p_sorted = np.sort(calibrated_probs)
-        
+        np.sort(calibrated_probs)
+
         # Grid over allow thresholds (e.g. bottom 70-95% allowed or challenged)
         allow_candidates = np.percentile(calibrated_probs, [50, 70, 80, 85, 90, 95])
-        
+
         # To guarantee review_rate <= max_review_rate:
         # We can set tau_review such that only at most max_review_rate of transactions fall in [tau_review, tau_block]
         cap_pct = max(0.001, min(0.50, max_review_rate))
-        
+
         for t_allow in allow_candidates:
             # We test block rates between 0.1% and 5%
             for blk_pct in [0.002, 0.005, 0.01, 0.02, 0.05]:
@@ -64,7 +65,7 @@ class PolicyOptimizer:
                 # Set t_rev such that at most cap_pct transactions fall in [t_rev, t_blk]
                 rev_pct = cap_pct * 0.90 # 90% of cap to guarantee buffer
                 t_rev = float(np.percentile(calibrated_probs, max(0.0, (1.0 - blk_pct - rev_pct) * 100)))
-                
+
                 if t_rev <= t_allow:
                     t_rev = float(t_allow + 0.01)
                 if t_blk <= t_rev:

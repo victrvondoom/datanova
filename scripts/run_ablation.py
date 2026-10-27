@@ -11,10 +11,10 @@ Generates reports/ABLATION_STUDY.md quantifying the incremental contribution of 
 import json
 import os
 import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from datetime import datetime
-import numpy as np
 
 
 def generate_ablation_report():
@@ -38,9 +38,9 @@ def generate_ablation_report():
 
     report = f"""# AEGIS-Fraud X — Independent Red-Team Review & Ablation Study
 
-**Status:** Completed & Verified  
-**Date:** {datetime.utcnow().strftime('%Y-%m-%d')}  
-**Evaluation Standard:** Zero Lookahead Chronological Partition (60/20/20) on 10,000 Transactions  
+**Status:** Completed & Verified
+**Date:** {datetime.utcnow().strftime('%Y-%m-%d')}
+**Evaluation Standard:** Zero Lookahead Chronological Partition (60/20/20) on 10,000 Transactions
 
 ---
 
@@ -48,7 +48,7 @@ def generate_ablation_report():
 
 The purpose of this ablation study is to rigorously test project claims and determine the precise scientific value added by each architectural layer.
 
-| Configuration ID | Architecture & Component Stack | PR-AUC | $\Delta$ PR-AUC | Recall@1%FPR | Total Cost ($) | Net Savings ($) |
+| Configuration ID | Architecture & Component Stack | PR-AUC | $\\Delta$ PR-AUC | Recall@1%FPR | Total Cost ($) | Net Savings ($) |
 |:---|:---|:---:|:---:|:---:|:---:|:---:|
 | **Cfg-A** | Baseline Logistic Regression (Linear) | {lr['pr_auc']:.4f} | Baseline | {lr['recall_at_fpr_1pct']*100:.1f}% | ${lr['financial_outcomes']['total_operational_cost']:,.2f} | ${lr['financial_outcomes']['estimated_net_savings']:,.2f} |
 | **Cfg-B** | LightGBM Tabular Only | {lgbm_tab['pr_auc']:.4f} | +{delta_tree_pr:.1f}% | {lgbm_tab['recall_at_fpr_1pct']*100:.1f}% | ${lgbm_tab['financial_outcomes']['total_operational_cost']:,.2f} | ${lgbm_tab['financial_outcomes']['estimated_net_savings']:,.2f} |
@@ -68,8 +68,8 @@ The purpose of this ablation study is to rigorously test project claims and dete
 - **Finding:** The inclusion of `graph_cycle_detected` and `graph_device_shared_accounts` specifically uncovers coordinated mule rings where individual transaction amounts are structured to look unremarkable, but money moves in rapid directed cycles across accounts.
 
 ### 2.3 Contribution of Cost-Aware Policy Optimization (Cfg-C $\to$ Cfg-D)
-- **Observed Delta:** Operational cost plummeted from **${fixed_pol['total_cost']:,.2f}** (fixed $p \ge 0.5$ rule) to **${opt_pol['total_cost']:,.2f}** (a **{delta_policy_cost:.1f}% cost reduction**).
-- **Finding:** Fixed binary thresholds treat a \$20 fraud the same as a \$2,500 fraud. The AEGIS 4-tier policy dynamically routes borderline risks to automated verification (OTP challenge) and high-value risks to investigators, eliminating unnecessary customer churn and stopping major losses.
+- **Observed Delta:** Operational cost plummeted from **${fixed_pol['total_cost']:,.2f}** (fixed $p \\ge 0.5$ rule) to **${opt_pol['total_cost']:,.2f}** (a **{delta_policy_cost:.1f}% cost reduction**).
+- **Finding:** Fixed binary thresholds treat a \\$20 fraud the same as a \\$2,500 fraud. The AEGIS 4-tier policy dynamically routes borderline risks to automated verification (OTP challenge) and high-value risks to investigators, eliminating unnecessary customer churn and stopping major losses.
 
 ---
 
@@ -77,7 +77,7 @@ The purpose of this ablation study is to rigorously test project claims and dete
 
 1. **Risk of Synthetic Leakage:** Overfitting avoided by ensuring legitimate and fraudulent transactions share identical feature schema, overlapping merchant categories, and natural Benford amount variance.
 2. **Lookahead Audit:** Invariant tests confirm that feature extraction and temporal graph edges strictly query past transactions ($	au < t$).
-3. **Capacity Budget Audit:** The optimizer enforces hard capacity constraints (investigator reviews $\le K$), ensuring operations are never overloaded with alert queues.
+3. **Capacity Budget Audit:** The optimizer enforces hard capacity constraints (investigator reviews $\\le K$), ensuring operations are never overloaded with alert queues.
 """
     with open("reports/ABLATION_STUDY.md", "w") as f:
         f.write(report)

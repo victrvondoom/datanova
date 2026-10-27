@@ -1,13 +1,13 @@
 """Models package."""
 from packages.models.base import BaseFraudClassifier
-from packages.models.rule_based import RuleBasedFraudClassifier
+from packages.models.calibration import ProbabilityCalibrator
 from packages.models.classifiers import (
+    LightGBMFraudModel,
     LogisticRegressionFraudModel,
     RandomForestFraudModel,
-    LightGBMFraudModel,
     XGBoostFraudModel,
 )
-from packages.models.calibration import ProbabilityCalibrator
+from packages.models.rule_based import RuleBasedFraudClassifier
 
 __all__ = [
     "BaseFraudClassifier",

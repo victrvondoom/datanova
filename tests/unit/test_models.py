@@ -1,11 +1,18 @@
 """Unit tests for ML models and probability calibrator."""
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import numpy as np
-from packages.models.rule_based import RuleBasedFraudClassifier
-from packages.models.classifiers import LogisticRegressionFraudModel, LightGBMFraudModel, XGBoostFraudModel
+
 from packages.models.calibration import ProbabilityCalibrator
+from packages.models.classifiers import (
+    LightGBMFraudModel,
+    LogisticRegressionFraudModel,
+    XGBoostFraudModel,
+)
+from packages.models.rule_based import RuleBasedFraudClassifier
 
 
 def test_models_fit_and_predict():

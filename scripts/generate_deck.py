@@ -8,10 +8,10 @@ import json
 import os
 import sys
 from datetime import datetime
+
 from pptx import Presentation
-from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN
+from pptx.util import Inches, Pt
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -25,7 +25,7 @@ def create_presentation():
     bench = bench_data["benchmark_summary"]
     pols = bench_data["policy_comparisons"]
     ci = bench_data["champion_confidence_intervals_95"]
-    champ_name = bench_data["champion_model_name"]
+    bench_data["champion_model_name"]
 
     prs = Presentation()
     # Set slide dimensions to widescreen 16:9
@@ -39,7 +39,7 @@ def create_presentation():
     C_TEAL = RGBColor(0, 180, 216)
     C_WHITE = RGBColor(255, 255, 255)
     C_SLATE = RGBColor(148, 163, 184)
-    C_AMBER = RGBColor(245, 158, 11)
+    RGBColor(245, 158, 11)
     C_CARD = RGBColor(27, 38, 59)
 
     slides_content = [

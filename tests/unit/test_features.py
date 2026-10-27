@@ -1,10 +1,13 @@
 """Unit tests for feature extraction and pipeline."""
-import sys, os
+import os
+import sys
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import numpy as np
-from packages.data.synthetic import SyntheticTransactionGenerator
+
 from packages.data.splitters import ChronologicalSplitter
+from packages.data.synthetic import SyntheticTransactionGenerator
 from packages.features.pipeline import FeaturePipeline
 from packages.features.temporal import TemporalFeatureExtractor
 

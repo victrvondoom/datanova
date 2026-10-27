@@ -3,12 +3,10 @@ Non-Parametric Bootstrap Uncertainty Engine.
 Computes 95% empirical confidence intervals for discrimination metrics and expected cost.
 """
 
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
+
 import numpy as np
 from sklearn.metrics import average_precision_score, roc_auc_score
-
-from packages.data.schemas import CostConfiguration
-from packages.evaluation.metrics import FraudEvaluationMetrics
 
 
 class BootstrapConfidenceEvaluator:
@@ -33,9 +31,8 @@ class BootstrapConfidenceEvaluator:
 
         pr_aucs = []
         roc_aucs = []
-        recalls_1pct = []
 
-        amt_arr = amounts if amounts is not None else np.ones(n, dtype=float) * 100.0
+        amounts if amounts is not None else np.ones(n, dtype=float) * 100.0
 
         for _ in range(self.n_bootstraps):
             indices = self.rng.integers(0, n, size=n)

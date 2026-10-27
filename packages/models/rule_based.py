@@ -9,7 +9,9 @@ Rules include:
 """
 
 from typing import List, Optional
+
 import numpy as np
+
 from packages.models.base import BaseFraudClassifier
 
 

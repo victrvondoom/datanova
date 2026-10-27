@@ -8,7 +8,8 @@ Models realistic financial characteristics:
 """
 
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple
+from typing import List
+
 import numpy as np
 import pandas as pd
 
@@ -45,7 +46,7 @@ class SyntheticTransactionGenerator:
         merchants = [f"merch_{i:03d}" for i in range(n_merchants)]
         devices = [f"dev_{i:04d}" for i in range(n_legit_users * 2)]
         ips = [f"192.168.{self.rng.integers(1, 255)}.{self.rng.integers(1, 255)}" for _ in range(n_legit_users * 2)]
-        
+
         # User home attributes
         user_profiles = {
             u: {
@@ -66,11 +67,9 @@ class SyntheticTransactionGenerator:
 
         # Calculate counts
         n_fraud = int(n_transactions * fraud_ratio)
-        n_legit = n_transactions - n_fraud
+        n_transactions - n_fraud
 
         # Timestamp generation with circadian rhythm over a 30-day window
-        records: List[Dict] = []
-        current_time = start_time
 
         # Inter-arrival times in seconds (mean ~ 250s for 10k tx in 30 days)
         mean_interval = (30 * 86400) / n_transactions
@@ -96,11 +95,11 @@ class SyntheticTransactionGenerator:
             sender = self.rng.choice(users)
             profile = user_profiles[sender]
             receiver = self.rng.choice(merchants)
-            
+
             # Amount: Log-normal distribution centered around user profile mean with natural variance
             amount = max(2.50, float(self.rng.lognormal(np.log(max(15.0, profile["mean_amount"])), 0.65)))
             amount = round(amount, 2)
-            
+
             # 12% chance of guest device or roaming IP for normal users
             if self.rng.random() < 0.12:
                 dev = f"dev_guest_{self.rng.integers(100, 999)}"

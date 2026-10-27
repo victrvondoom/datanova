@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Play,
   Pause,
   RotateCcw,
-  FastForward,
   ShieldAlert,
   ShieldCheck,
   CheckCircle,
   AlertCircle,
-  Sliders,
   DollarSign,
   Fingerprint,
-  Info,
+  PlusCircle,
+  X,
+  Send,
+  Zap,
+  Filter,
 } from "lucide-react";
-import { fetchReplayBatch } from "../api";
+import { fetchReplayBatch, injectTransaction } from "../api";
 import { ReplayRecord } from "../types";
 
 export const TransactionStream: React.FC = () => {
@@ -22,6 +24,8 @@ export const TransactionStream: React.FC = () => {
   const [records, setRecords] = useState<ReplayRecord[]>([]);
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [selectedTx, setSelectedTx] = useState<ReplayRecord | null>(null);
+  const [currentOffset, setCurrentOffset] = useState<number>(0);
+  const [streamFilter, setStreamFilter] = useState<string>("all");
 
   // Cumulative metrics
   const [cumulativeSavings, setCumulativeSavings] = useState<number>(0);
@@ -29,15 +33,32 @@ export const TransactionStream: React.FC = () => {
   const [aegisCostTotal, setAegisCostTotal] = useState<number>(0);
   const [preventedLossTotal, setPreventedLossTotal] = useState<number>(0);
 
-  useEffect(() => {
-    // Initial fetch of replay batch
-    fetchReplayBatch(0, 50).then((data) => {
-      setRecords(data.records);
-      if (data.records.length > 0) {
+  // Injection Modal State
+  const [isInjectOpen, setIsInjectOpen] = useState<boolean>(false);
+  const [injectSender, setInjectSender] = useState<string>("usr_mule_88");
+  const [injectReceiver, setInjectReceiver] = useState<string>("mule_001");
+  const [injectAmount, setInjectAmount] = useState<number>(4850.0);
+  const [injectChannel, setInjectChannel] = useState<string>("p2p");
+  const [injectCategory, setInjectCategory] = useState<string>("money_transfer");
+  const [injectDevice, setInjectDevice] = useState<string>("dev_tor_exit_99");
+  const [injectIsFraud, setInjectIsFraud] = useState<number>(1);
+  const [injecting, setInjecting] = useState<boolean>(false);
+  const [injectSuccessMsg, setInjectSuccessMsg] = useState<string | null>(null);
+
+  // Load next batch
+  const loadBatch = useCallback(async (offset: number) => {
+    const data = await fetchReplayBatch(offset, 50);
+    if (data.records && data.records.length > 0) {
+      setRecords((prev) => (offset === 0 ? data.records : [...prev, ...data.records]));
+      if (offset === 0 && data.records.length > 0) {
         setSelectedTx(data.records[0]);
       }
-    });
+    }
   }, []);
+
+  useEffect(() => {
+    loadBatch(0);
+  }, [loadBatch]);
 
   // Streaming ticker loop
   useEffect(() => {
@@ -45,24 +66,31 @@ export const TransactionStream: React.FC = () => {
 
     const timer = setInterval(() => {
       setCurrentIndex((prev) => {
-        const next = (prev + 1) % records.length;
-        const currentRec = records[next];
-
-        // Incrementally update live financial tally
-        setBaselineCostTotal((b) => b + currentRec.baseline_cost);
-        setAegisCostTotal((a) => a + currentRec.aegis_cost);
-        setCumulativeSavings((s) => s + Math.max(0, currentRec.baseline_cost - currentRec.aegis_cost));
-        if (currentRec.ground_truth_fraud === 1 && currentRec.aegis_result.recommended_action !== "ALLOW") {
-          setPreventedLossTotal((l) => l + currentRec.transaction.amount);
+        const next = prev + 1;
+        // Dynamically fetch next batch when 10 transactions from end
+        if (next >= records.length - 10) {
+          const newOffset = currentOffset + 50;
+          setCurrentOffset(newOffset);
+          loadBatch(newOffset);
         }
 
-        setSelectedTx(currentRec);
-        return next;
+        const safeIdx = next % records.length;
+        const currentRec = records[safeIdx];
+        if (currentRec) {
+          setBaselineCostTotal((b) => b + currentRec.baseline_cost);
+          setAegisCostTotal((a) => a + currentRec.aegis_cost);
+          setCumulativeSavings((s) => s + Math.max(0, currentRec.baseline_cost - currentRec.aegis_cost));
+          if (currentRec.ground_truth_fraud === 1 && currentRec.aegis_result.recommended_action !== "ALLOW") {
+            setPreventedLossTotal((l) => l + currentRec.transaction.amount);
+          }
+          setSelectedTx(currentRec);
+        }
+        return safeIdx;
       });
     }, speed);
 
     return () => clearInterval(timer);
-  }, [isPlaying, records, speed]);
+  }, [isPlaying, records, speed, currentOffset, loadBatch]);
 
   const handleReset = () => {
     setCurrentIndex(0);
@@ -71,6 +99,90 @@ export const TransactionStream: React.FC = () => {
     setCumulativeSavings(0);
     setPreventedLossTotal(0);
     if (records.length > 0) setSelectedTx(records[0]);
+  };
+
+  const handleApplyPreset = (type: "smurfing" | "mule_chain" | "legit" | "high_risk_cnp") => {
+    if (type === "smurfing") {
+      setInjectSender("usr_struct_01");
+      setInjectReceiver("merch_crypto_desk");
+      setInjectAmount(4890.0);
+      setInjectChannel("p2p");
+      setInjectCategory("money_transfer");
+      setInjectDevice("dev_proxy_01");
+      setInjectIsFraud(1);
+    } else if (type === "mule_chain") {
+      setInjectSender("mule_004");
+      setInjectReceiver("mule_001");
+      setInjectAmount(2400.0);
+      setInjectChannel("p2p");
+      setInjectCategory("money_transfer");
+      setInjectDevice("dev_shared_ring");
+      setInjectIsFraud(1);
+    } else if (type === "legit") {
+      setInjectSender("usr_alice_regular");
+      setInjectReceiver("merch_starbucks");
+      setInjectAmount(14.75);
+      setInjectChannel("mobile");
+      setInjectCategory("food_dining");
+      setInjectDevice("dev_iphone_15_trusted");
+      setInjectIsFraud(0);
+    } else {
+      setInjectSender("usr_compromised_acct");
+      setInjectReceiver("merch_luxury_electronics");
+      setInjectAmount(1850.0);
+      setInjectChannel("web");
+      setInjectCategory("retail");
+      setInjectDevice("dev_unknown_browser");
+      setInjectIsFraud(1);
+    }
+  };
+
+  const handleInjectSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setInjecting(true);
+    setInjectSuccessMsg(null);
+    try {
+      const res = await injectTransaction({
+        sender_id: injectSender,
+        receiver_id: injectReceiver,
+        amount: injectAmount,
+        channel: injectChannel,
+        device_id: injectDevice,
+        category: injectCategory,
+        is_fraud_simulated: injectIsFraud,
+      });
+
+      const scoreRes = res.score_result;
+      const tx = res.transaction;
+
+      const baselineAct = scoreRes.calibrated_probability >= 0.5 ? "BLOCK" : "ALLOW";
+      const baseCost = baselineAct === "BLOCK" && injectIsFraud === 0 ? 25.0 : (baselineAct === "ALLOW" && injectIsFraud === 1 ? injectAmount : 0);
+      const aegisCost = scoreRes.expected_cost;
+
+      const newRecord: ReplayRecord = {
+        transaction: tx,
+        aegis_result: scoreRes,
+        baseline_action: baselineAct,
+        baseline_cost: baseCost,
+        aegis_cost: aegisCost,
+        ground_truth_fraud: injectIsFraud,
+      };
+
+      // Prepend to live stream and select immediately
+      setRecords((prev) => [newRecord, ...prev]);
+      setSelectedTx(newRecord);
+      setCurrentIndex(0);
+      setInjectSuccessMsg(`Transaction ${tx.transaction_id} scored live (${scoreRes.recommended_action}, P=${scoreRes.calibrated_probability}) and committed to temporal graph!`);
+
+      setTimeout(() => {
+        setIsInjectOpen(false);
+        setInjectSuccessMsg(null);
+      }, 1500);
+    } catch (err: any) {
+      alert("Failed to inject transaction: " + err.message);
+    } finally {
+      setInjecting(false);
+    }
   };
 
   const getActionBadge = (action: string) => {
@@ -88,14 +200,24 @@ export const TransactionStream: React.FC = () => {
     }
   };
 
+  const filteredRecords = records.filter((r) => {
+    if (streamFilter === "fraud") return r.ground_truth_fraud === 1;
+    if (streamFilter === "block") return r.aegis_result.recommended_action === "BLOCK";
+    if (streamFilter === "review") return r.aegis_result.recommended_action === "REVIEW";
+    if (streamFilter === "challenge") return r.aegis_result.recommended_action === "CHALLENGE";
+    return true;
+  });
+
   return (
     <div className="space-y-6">
-      {/* Header and Live Digital Twin Ticker */}
+      {/* Header and Live Digital Twin Metric Ticker */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm">
         <div>
           <div className="flex items-center space-x-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 radar-glow"></span>
-            <span className="text-xs font-bold tracking-wider uppercase text-emerald-500">
+            <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500">
+              <Zap className="w-4 h-4" />
+            </span>
+            <span className="text-xs font-bold uppercase tracking-wider text-emerald-500">
               Live Digital Twin Replay Engine
             </span>
           </div>
@@ -103,7 +225,7 @@ export const TransactionStream: React.FC = () => {
             Real-Time Transaction Stream &amp; Policy Comparator
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            Comparing standard industry baseline policy vs. AEGIS-Fraud X cost-aware optimization on identical transactions.
+            Comparing standard industry baseline policy vs. AEGIS-Fraud X cost-aware optimization on live streaming transactions.
           </p>
         </div>
 
@@ -132,8 +254,8 @@ export const TransactionStream: React.FC = () => {
         </div>
       </div>
 
-      {/* Replay Controls Toolbar */}
-      <div className="flex items-center justify-between p-3.5 rounded-xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 text-sm">
+      {/* Replay Controls & Injection Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 text-sm">
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
@@ -152,30 +274,64 @@ export const TransactionStream: React.FC = () => {
             className="flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-navy-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-700"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset Replay</span>
+            <span>Reset</span>
+          </button>
+
+          {/* Inject Transaction Modal Trigger */}
+          <button
+            onClick={() => setIsInjectOpen(true)}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-accent-teal text-navy-950 hover:bg-accent-cyan shadow-sm transition-all"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>Inject Live Transaction</span>
           </button>
         </div>
 
-        {/* Speed Controls */}
-        <div className="flex items-center space-x-2">
-          <span className="text-xs text-slate-400">Speed:</span>
-          {[
-            { label: "1x", delay: 1200 },
-            { label: "2x", delay: 600 },
-            { label: "5x", delay: 250 },
-          ].map((sp) => (
-            <button
-              key={sp.label}
-              onClick={() => setSpeed(sp.delay)}
-              className={`px-2.5 py-1 rounded text-xs font-bold ${
-                speed === sp.delay
-                  ? "bg-accent-teal text-navy-900"
-                  : "bg-slate-100 dark:bg-navy-700 text-slate-600 dark:text-slate-300"
-              }`}
-            >
-              {sp.label}
-            </button>
-          ))}
+        {/* Filter Controls & Speed Controls */}
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-1 bg-slate-100 dark:bg-navy-900 p-1 rounded-lg text-xs">
+            <Filter className="w-3.5 h-3.5 text-slate-400 ml-1.5 mr-1" />
+            {[
+              { id: "all", label: "All" },
+              { id: "fraud", label: "Fraud (Ground Truth)" },
+              { id: "block", label: "Blocks" },
+              { id: "review", label: "Reviews" },
+              { id: "challenge", label: "OTP Challenges" },
+            ].map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setStreamFilter(f.id)}
+                className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
+                  streamFilter === f.id
+                    ? "bg-white dark:bg-navy-800 text-slate-900 dark:text-white shadow-xs"
+                    : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center space-x-1.5">
+            <span className="text-xs text-slate-400">Speed:</span>
+            {[
+              { label: "1x", delay: 1200 },
+              { label: "2x", delay: 600 },
+              { label: "5x", delay: 250 },
+            ].map((sp) => (
+              <button
+                key={sp.label}
+                onClick={() => setSpeed(sp.delay)}
+                className={`px-2 py-1 rounded text-xs font-bold ${
+                  speed === sp.delay
+                    ? "bg-accent-teal text-navy-900"
+                    : "bg-slate-100 dark:bg-navy-700 text-slate-600 dark:text-slate-300"
+                }`}
+              >
+                {sp.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -186,14 +342,14 @@ export const TransactionStream: React.FC = () => {
           <div className="px-5 py-3.5 border-b border-slate-200 dark:border-navy-700 flex items-center justify-between">
             <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2">
               <span>Streaming Event Queue</span>
-              <span className="text-xs font-normal text-slate-400">({records.length} transactions in buffer)</span>
+              <span className="text-xs font-normal text-slate-400">({filteredRecords.length} visible in memory)</span>
             </h2>
             <div className="text-xs text-accent-teal font-mono">
               Live Tx #{currentIndex + 1}
             </div>
           </div>
 
-          <div className="overflow-x-auto flex-1 max-h-[500px]">
+          <div className="overflow-x-auto flex-1 max-h-[520px]">
             <table className="w-full text-left text-xs">
               <thead className="sticky top-0 bg-slate-50 dark:bg-navy-900/90 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-navy-700">
                 <tr>
@@ -207,7 +363,7 @@ export const TransactionStream: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-navy-700/50">
-                {records.map((rec, i) => {
+                {filteredRecords.map((rec, i) => {
                   const isCurrent = i === currentIndex;
                   const isSelected = selectedTx?.transaction.transaction_id === rec.transaction.transaction_id;
                   const isFraud = rec.ground_truth_fraud === 1;
@@ -218,48 +374,59 @@ export const TransactionStream: React.FC = () => {
                       onClick={() => setSelectedTx(rec)}
                       className={`cursor-pointer transition-colors ${
                         isCurrent
-                          ? "bg-accent-teal/15 font-semibold"
+                          ? "bg-accent-teal/10 dark:bg-accent-teal/15 border-l-4 border-accent-teal"
                           : isSelected
                           ? "bg-slate-100 dark:bg-navy-700/60"
                           : "hover:bg-slate-50 dark:hover:bg-navy-900/40"
                       }`}
                     >
-                      <td className="px-4 py-3 font-mono text-slate-900 dark:text-slate-200">
+                      <td className="px-4 py-2.5 font-mono font-medium text-slate-900 dark:text-white">
                         {rec.transaction.transaction_id}
                       </td>
-                      <td className="px-4 py-3 font-bold text-slate-900 dark:text-white">
+                      <td className="px-4 py-2.5 font-semibold text-slate-800 dark:text-slate-200">
                         ${rec.transaction.amount.toFixed(2)}
                       </td>
-                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
+                      <td className="px-4 py-2.5 text-slate-500 font-mono text-[11px]">
                         {rec.transaction.sender_id} &rarr; {rec.transaction.receiver_id}
                       </td>
-                      <td className="px-4 py-3 font-mono">
+                      <td className="px-4 py-2.5 font-mono">
                         <span
-                          className={`px-2 py-0.5 rounded text-[11px] font-bold ${
-                            rec.aegis_result.calibrated_probability > 0.5
-                              ? "bg-rose-500/10 text-rose-500"
-                              : rec.aegis_result.calibrated_probability > 0.15
-                              ? "bg-amber-500/10 text-amber-500"
-                              : "bg-emerald-500/10 text-emerald-500"
+                          className={`font-bold ${
+                            rec.aegis_result.calibrated_probability >= 0.5
+                              ? "text-rose-500"
+                              : rec.aegis_result.calibrated_probability >= 0.15
+                              ? "text-amber-500"
+                              : "text-emerald-500"
                           }`}
                         >
                           {(rec.aegis_result.calibrated_probability * 100).toFixed(1)}%
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-slate-600 dark:text-slate-400">
-                        {rec.baseline_action}
+                      <td className="px-4 py-2.5">
+                        <span
+                          className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                            rec.baseline_action === "BLOCK"
+                              ? "bg-rose-500/10 text-rose-500 border border-rose-500/20"
+                              : "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                          }`}
+                        >
+                          {rec.baseline_action}
+                        </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-2.5">
                         {getActionBadge(rec.aegis_result.recommended_action)}
                       </td>
-                      <td className="px-4 py-3 font-semibold">
+                      <td className="px-4 py-2.5">
                         {isFraud ? (
-                          <span className="text-rose-500 flex items-center space-x-1">
+                          <span className="flex items-center space-x-1 text-rose-500 font-semibold text-[11px]">
                             <ShieldAlert className="w-3.5 h-3.5" />
                             <span>FRAUD</span>
                           </span>
                         ) : (
-                          <span className="text-slate-400">Legit</span>
+                          <span className="flex items-center space-x-1 text-slate-400 text-[11px]">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                            <span>Legit</span>
+                          </span>
                         )}
                       </td>
                     </tr>
@@ -270,13 +437,13 @@ export const TransactionStream: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Col: Selected Transaction Inspection & Explainability */}
+        {/* Right Col: Live Inspection Card */}
         {selectedTx && (
           <div className="rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm p-5 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-navy-700">
+            <div className="pb-3 border-b border-slate-100 dark:border-navy-700 flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
-                  Transaction Deep Dive
+                  Transaction Deep-Dive
                 </span>
                 <div className="text-sm font-bold font-mono text-slate-900 dark:text-white">
                   {selectedTx.transaction.transaction_id}
@@ -285,17 +452,25 @@ export const TransactionStream: React.FC = () => {
               <div>{getActionBadge(selectedTx.aegis_result.recommended_action)}</div>
             </div>
 
-            {/* Risk Probability Gauge */}
-            <div className="p-3.5 rounded-xl border border-slate-100 dark:border-navy-700 bg-slate-50 dark:bg-navy-900/60 space-y-2">
-              <div className="flex items-center justify-between text-xs font-semibold">
-                <span className="text-slate-500">Calibrated P(Fraud):</span>
-                <span className="text-base font-black text-rose-500 font-mono">
+            {/* Probability Gauge Bar */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-xs">
+                <span className="text-slate-500 font-medium">Calibrated Fraud Likelihood:</span>
+                <span className="font-mono font-bold text-slate-900 dark:text-white">
                   {(selectedTx.aegis_result.calibrated_probability * 100).toFixed(2)}%
                 </span>
               </div>
-              <div className="w-full bg-slate-200 dark:bg-navy-700 h-2 rounded-full overflow-hidden">
+              <div className="w-full bg-slate-100 dark:bg-navy-900 h-2.5 rounded-full overflow-hidden flex">
                 <div
-                  className="h-full bg-gradient-to-r from-emerald-500 via-amber-500 to-rose-500 transition-all duration-300"
+                  className={`h-full transition-all duration-300 ${
+                    selectedTx.aegis_result.calibrated_probability >= 0.75
+                      ? "bg-rose-500"
+                      : selectedTx.aegis_result.calibrated_probability >= 0.42
+                      ? "bg-amber-500"
+                      : selectedTx.aegis_result.calibrated_probability >= 0.15
+                      ? "bg-blue-500"
+                      : "bg-emerald-500"
+                  }`}
                   style={{ width: `${selectedTx.aegis_result.calibrated_probability * 100}%` }}
                 />
               </div>
@@ -336,23 +511,27 @@ export const TransactionStream: React.FC = () => {
                 <span className="text-[10px] text-slate-400 font-normal">Exact Shapley Values</span>
               </div>
               <div className="space-y-1.5">
-                {selectedTx.aegis_result.top_features.map((feat, i) => (
-                  <div key={i} className="text-xs p-2 rounded-lg bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700 flex items-center justify-between">
-                    <div>
-                      <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono text-[11px]">
-                        {feat.feature_name}
+                {selectedTx.aegis_result.top_features && selectedTx.aegis_result.top_features.length > 0 ? (
+                  selectedTx.aegis_result.top_features.map((feat, i) => (
+                    <div key={i} className="text-xs p-2 rounded-lg bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700 flex items-center justify-between">
+                      <div>
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono text-[11px]">
+                          {feat.feature_name}
+                        </span>
+                        <span className="text-[10px] text-slate-400 block">Val: {String(feat.feature_value)}</span>
+                      </div>
+                      <span
+                        className={`font-mono text-xs font-bold ${
+                          feat.shap_value > 0 ? "text-rose-500" : "text-emerald-500"
+                        }`}
+                      >
+                        {feat.shap_value > 0 ? `+${feat.shap_value.toFixed(3)}` : feat.shap_value.toFixed(3)}
                       </span>
-                      <span className="text-[10px] text-slate-400 block">Val: {String(feat.feature_value)}</span>
                     </div>
-                    <span
-                      className={`font-mono text-xs font-bold ${
-                        feat.shap_value > 0 ? "text-rose-500" : "text-emerald-500"
-                      }`}
-                    >
-                      {feat.shap_value > 0 ? `+${feat.shap_value.toFixed(3)}` : feat.shap_value.toFixed(3)}
-                    </span>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <div className="text-xs text-slate-400 italic p-2">Zero anomalous feature deviations.</div>
+                )}
               </div>
             </div>
 
@@ -372,6 +551,179 @@ export const TransactionStream: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Dynamic Inject Transaction Modal */}
+      {isInjectOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="w-full max-w-xl rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-2xl p-6 space-y-5 animate-in fade-in zoom-in-95">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-navy-700">
+              <div className="flex items-center space-x-2">
+                <span className="p-1.5 rounded-lg bg-accent-teal/10 text-accent-teal">
+                  <PlusCircle className="w-5 h-5" />
+                </span>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    Inject Dynamic Test Transaction
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Live inference via LightGBM + NetworkX Temporal Graph &amp; TreeSHAP.
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsInjectOpen(false)}
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Presets Row */}
+            <div className="space-y-1.5">
+              <span className="text-xs font-semibold text-slate-500">Fast Attack Presets:</span>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleApplyPreset("smurfing")}
+                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 text-center"
+                >
+                  Smurfing $4,890
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleApplyPreset("mule_chain")}
+                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-purple-500/30 bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 text-center"
+                >
+                  Mule Ring Flow
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleApplyPreset("high_risk_cnp")}
+                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 text-center"
+                >
+                  Account Takeover
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleApplyPreset("legit")}
+                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 text-center"
+                >
+                  Legitimate $14.75
+                </button>
+              </div>
+            </div>
+
+            {/* Form Fields */}
+            <form onSubmit={handleInjectSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                    Sender Account ID
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={injectSender}
+                    onChange={(e) => setInjectSender(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                    Receiver Account ID
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={injectReceiver}
+                    onChange={(e) => setInjectReceiver(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                    Transaction Amount ($)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    required
+                    value={injectAmount}
+                    onChange={(e) => setInjectAmount(parseFloat(e.target.value))}
+                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white font-mono font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                    Payment Channel
+                  </label>
+                  <select
+                    value={injectChannel}
+                    onChange={(e) => setInjectChannel(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white"
+                  >
+                    <option value="mobile">Mobile App</option>
+                    <option value="p2p">P2P Instant Transfer</option>
+                    <option value="web">Web Browser</option>
+                    <option value="pos">Point of Sale (POS)</option>
+                    <option value="atm">ATM Withdrawal</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                    Device Fingerprint
+                  </label>
+                  <input
+                    type="text"
+                    value={injectDevice}
+                    onChange={(e) => setInjectDevice(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                    Ground Truth (Simulation)
+                  </label>
+                  <select
+                    value={injectIsFraud}
+                    onChange={(e) => setInjectIsFraud(parseInt(e.target.value))}
+                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white"
+                  >
+                    <option value={1}>1 - Actual Fraud</option>
+                    <option value={0}>0 - Legitimate Transaction</option>
+                  </select>
+                </div>
+              </div>
+
+              {injectSuccessMsg && (
+                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-semibold flex items-center space-x-2">
+                  <CheckCircle className="w-4 h-4 shrink-0" />
+                  <span>{injectSuccessMsg}</span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-navy-700">
+                <button
+                  type="button"
+                  onClick={() => setIsInjectOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-navy-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={injecting}
+                  className="flex items-center space-x-2 px-5 py-2 rounded-xl text-xs font-bold bg-accent-teal text-navy-950 hover:bg-accent-cyan transition-all shadow-md disabled:opacity-50"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>{injecting ? "Scoring & Committing..." : "Score & Commit to Graph"}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

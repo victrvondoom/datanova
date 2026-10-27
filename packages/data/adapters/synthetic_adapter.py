@@ -5,7 +5,7 @@ and failure-injection experiments without requiring external files.
 """
 
 from datetime import datetime
-from typing import Optional
+
 import pandas as pd
 
 from packages.data.synthetic import SyntheticTransactionGenerator

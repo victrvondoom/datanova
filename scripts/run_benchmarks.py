@@ -14,23 +14,22 @@ from datetime import datetime
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import numpy as np
-import pandas as pd
 
-from packages.data.synthetic import SyntheticTransactionGenerator
 from packages.data.splitters import ChronologicalSplitter
+from packages.data.synthetic import SyntheticTransactionGenerator
+from packages.evaluation.bootstrap import BootstrapConfidenceEvaluator
+from packages.evaluation.metrics import FraudEvaluationMetrics
 from packages.features.pipeline import FeaturePipeline
 from packages.graph.features import GraphFeatureExtractor
-from packages.models.rule_based import RuleBasedFraudClassifier
+from packages.models.calibration import ProbabilityCalibrator
 from packages.models.classifiers import (
+    LightGBMFraudModel,
     LogisticRegressionFraudModel,
     RandomForestFraudModel,
-    LightGBMFraudModel,
     XGBoostFraudModel,
 )
-from packages.models.calibration import ProbabilityCalibrator
+from packages.models.rule_based import RuleBasedFraudClassifier
 from packages.optimization.optimizer import PolicyOptimizer
-from packages.evaluation.metrics import FraudEvaluationMetrics
-from packages.evaluation.bootstrap import BootstrapConfidenceEvaluator
 
 
 def run_benchmark_suite():
@@ -53,7 +52,7 @@ def run_benchmark_suite():
     splitter = ChronologicalSplitter(train_ratio=0.60, val_ratio=0.20, test_ratio=0.20)
     train_df, val_df, test_df = splitter.split(df)
     manifest = splitter.create_manifest(df, "Synthetic_Bench_10k", "SyntheticTransactionGenerator(seed=42)", train_df, val_df, test_df)
-    
+
     with open("datasets/manifests/synthetic_10k_manifest.json", "w") as f:
         json.dump(manifest.model_dump(), f, indent=2, default=str)
     print(f"Train: {len(train_df):,} tx | Val: {len(val_df):,} tx | Test: {len(test_df):,} tx")
@@ -64,12 +63,11 @@ def run_benchmark_suite():
     X_train = pipe.fit_transform(train_df)
     X_val = pipe.transform(val_df)
     X_test = pipe.transform(test_df)
-    
+
     y_train = train_df["is_fraud"].values
     y_val = val_df["is_fraud"].values
     y_test = test_df["is_fraud"].values
 
-    amt_val = val_df["amount"].values
     amt_test = test_df["amount"].values
 
     print(f"Features Engineered: {len(pipe.feature_names)} features")
@@ -147,7 +145,7 @@ def run_benchmark_suite():
     # 6. Policy Optimization on Champion Model
     print(f"\n[Step 6/6] Optimizing Operational Policy on Champion Model ({champion_name})...")
     optimizer = PolicyOptimizer()
-    
+
     # Evaluate champion probs on test set
     if "Graph" in champion_name:
         champ_probs = champion_calibrator.calibrate(champion_model.predict_proba(X_test_graph))
@@ -155,7 +153,7 @@ def run_benchmark_suite():
         champ_probs = champion_calibrator.calibrate(champion_model.predict_proba(X_test))
 
     policy_comparisons = optimizer.compare_policies(champ_probs, amt_test, y_test)
-    
+
     # Bootstrap Confidence Intervals for Champion
     bootstrap_eval = BootstrapConfidenceEvaluator(n_bootstraps=200, random_seed=42)
     ci_results = bootstrap_eval.compute_intervals(y_test, champ_probs, amt_test)
@@ -186,9 +184,9 @@ def run_benchmark_suite():
 def generate_markdown_report(benchmarks, champion_name, ci_results, policy_comparisons):
     md = f"""# AEGIS-Fraud X — Comprehensive Benchmark & Empirical Evidence Report
 
-**Generated:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}  
-**Evaluation Protocol:** Strict Chronological Train (60%) -> Val (20%) -> Test (20%)  
-**Dataset:** Deterministic Synthetic Benchmark (10,000 transactions, 2% ground truth fraud)  
+**Generated:** {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')}
+**Evaluation Protocol:** Strict Chronological Train (60%) -> Val (20%) -> Test (20%)
+**Dataset:** Deterministic Synthetic Benchmark (10,000 transactions, 2% ground truth fraud)
 
 ---
 
@@ -218,7 +216,7 @@ def generate_markdown_report(benchmarks, champion_name, ci_results, policy_compa
 | Operational Regime | Allow ($\tau_{{allow}}$) | Review ($\tau_{{rev}}$) | Block ($\tau_{{blk}}$) | False Alarm Rate (FPR) | Total Cost ($) | Net Dollar Savings ($) |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|
 """
-    for regime_key, data in policy_comparisons.items():
+    for _regime_key, data in policy_comparisons.items():
         pol = data["policy"]
         met = data["metrics"]
         md += f"| {pol['policy_name']} | {pol['tau_allow']:.2f} | {pol['tau_review']:.2f} | {pol['tau_block']:.2f} | {met['false_positive_rate']*100:.2f}% | ${met['total_cost']:,.2f} | **${met['estimated_savings']:,.2f}** ({met['savings_ratio']*100:.1f}%) |\n"

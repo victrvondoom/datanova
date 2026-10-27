@@ -8,12 +8,12 @@ Computes local topological indicators at transaction time:
 """
 
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, Optional
+
 import networkx as nx
-import numpy as np
 import pandas as pd
 
-from packages.graph.temporal_graph import TemporalFraudGraph
+from packages.graph.temporal_graph import TemporalFraudGraph, to_naive_utc
 
 
 class GraphFeatureExtractor:
@@ -33,7 +33,8 @@ class GraphFeatureExtractor:
         """
         Calculates graph features for a single candidate transaction relative to graph state up to timestamp.
         """
-        cutoff = timestamp - timedelta(hours=self.window_hours)
+        norm_ts = to_naive_utc(timestamp)
+        cutoff = norm_ts - timedelta(hours=self.window_hours)
         G = graph.graph
 
         feats: Dict[str, float] = {

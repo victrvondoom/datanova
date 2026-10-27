@@ -6,7 +6,8 @@ Guarantees:
 - Validates that no target labels are used in unsupervised transforms.
 """
 
-from typing import List, Optional, Tuple
+from typing import List
+
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -31,7 +32,7 @@ class FeaturePipeline:
     def fit(self, df: pd.DataFrame) -> "FeaturePipeline":
         """Fits scalers and category vocabulary on training partition ONLY."""
         temp_feats = self.temporal_extractor.extract_batch_features(df)
-        
+
         # Collect categorical vocabularies
         if "category" in df:
             self.known_categories = sorted(df["category"].dropna().unique().tolist())
@@ -40,7 +41,7 @@ class FeaturePipeline:
 
         cat_matrix = self._encode_categoricals(df)
         combined = pd.concat([temp_feats, cat_matrix], axis=1)
-        
+
         self.scaler.fit(combined.values)
         self.feature_names = combined.columns.tolist()
         self.fitted = True
@@ -50,11 +51,11 @@ class FeaturePipeline:
         """Transforms validation or test DataFrame using fitted pipeline."""
         if not self.fitted:
             raise RuntimeError("FeaturePipeline must be fitted on training data before transform.")
-        
+
         temp_feats = self.temporal_extractor.extract_batch_features(df)
         cat_matrix = self._encode_categoricals(df)
         combined = pd.concat([temp_feats, cat_matrix], axis=1)
-        
+
         # Ensure column alignment with training features
         for col in self.feature_names:
             if col not in combined:
@@ -71,7 +72,7 @@ class FeaturePipeline:
     def _encode_categoricals(self, df: pd.DataFrame) -> pd.DataFrame:
         """One-hot encodes categories and channels with out-of-vocabulary handling."""
         encoded = pd.DataFrame(index=df.index)
-        
+
         # Channel
         if "channel" in df:
             for ch in self.known_channels:

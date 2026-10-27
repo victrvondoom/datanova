@@ -9,7 +9,8 @@ Extracts:
 - Circadian time features (hour of day, day of week, cyclical sine/cosine encodings)
 """
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Tuple
+
 import numpy as np
 import pandas as pd
 
@@ -41,19 +42,19 @@ class TemporalFeatureExtractor:
             df = df.sort_values(time_col).reset_index(drop=True)
 
         features = pd.DataFrame(index=df.index)
-        
+
         # 1. Base log amount
         features["log_amount"] = np.log1p(df[amount_col].values)
-        
+
         # 2. Circadian features
         ts = pd.to_datetime(df[time_col])
         hour = ts.dt.hour.values
         dow = ts.dt.dayofweek.values
-        
+
         features["hour_of_day"] = hour
         features["day_of_week"] = dow
         features["is_weekend"] = (dow >= 5).astype(int)
-        
+
         # Cyclical sine/cosine transformation for continuous periodic signals
         features["hour_sin"] = np.sin(2 * np.pi * hour / 24.0)
         features["hour_cos"] = np.cos(2 * np.pi * hour / 24.0)
@@ -96,7 +97,7 @@ class TemporalFeatureExtractor:
                 # Filter events strictly prior to current t within 24h (86400s)
                 cutoff_24h = t - 86400
                 cutoff_1h = t - 3600
-                
+
                 # Prune very old events (> 7 days) to bound memory
                 cutoff_7d = t - (7 * 86400)
                 while hist and hist[0][0] < cutoff_7d:
@@ -108,7 +109,7 @@ class TemporalFeatureExtractor:
 
                 c_1h = len(events_1h)
                 c_24h = len(events_24h)
-                
+
                 tx_count_1h[i] = c_1h
                 tx_count_24h[i] = c_24h
 
@@ -117,11 +118,11 @@ class TemporalFeatureExtractor:
                     mean_amt = sum_amt / c_24h
                     tx_amount_sum_24h[i] = sum_amt
                     amount_ratio_24h[i] = amt / max(1.0, mean_amt)
-                    
+
                     devs = {e[2] for e in events_24h if e[2] != "none"}
                     devs.add(dev)
                     distinct_devices_24h[i] = len(devs)
-                    
+
                     ips_set = {e[3] for e in events_24h if e[3] != "none"}
                     ips_set.add(ip)
                     distinct_ips_24h[i] = len(ips_set)

@@ -9,17 +9,17 @@ Calculates:
 - Modeled Financial Loss & Operational Cost
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, Optional
+
 import numpy as np
 from sklearn.metrics import (
     average_precision_score,
-    roc_auc_score,
+    confusion_matrix,
+    f1_score,
     precision_score,
     recall_score,
-    f1_score,
-    confusion_matrix,
+    roc_auc_score,
     roc_curve,
-    precision_recall_curve,
 )
 
 from packages.data.schemas import CostConfiguration
@@ -72,13 +72,13 @@ class FraudEvaluationMetrics:
 
         # 6. Financial cost calculation
         amt_arr = amounts if amounts is not None else np.ones(n, dtype=float) * 100.0
-        
+
         # Uncaught fraud loss (False Negatives)
         fraud_losses = float(np.sum(amt_arr[(y_true == 1) & (y_pred == 0)]))
-        
+
         # Operational investigation costs (All positive flags: TP + FP)
         investigation_costs = float((tp + fp) * cost_cfg.investigation_cost)
-        
+
         # False alert friction costs (False Positives)
         friction_costs = float(fp * cost_cfg.customer_friction_cost)
 
