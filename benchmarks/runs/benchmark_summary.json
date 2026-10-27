@@ -1,0 +1,289 @@
+{
+  "timestamp": "2026-10-27T11:54:41.451238",
+  "dataset_manifest": {
+    "dataset_name": "Synthetic_Bench_10k",
+    "source_url_or_origin": "SyntheticTransactionGenerator(seed=42)",
+    "record_count": 10000,
+    "fraud_count": 199,
+    "fraud_prevalence": 0.0199,
+    "start_timestamp": "2026-01-01 00:14:21.367355",
+    "end_timestamp": "2026-02-18 13:53:44.981759",
+    "sha256_checksum": "f8e57f97c769eb9d0c9441bdbe05f67210ece4b6ead8fb5993496ecd0d1df7ef",
+    "split_strategy": "Chronological_60_20_20",
+    "train_count": 6000,
+    "val_count": 2000,
+    "test_count": 2000
+  },
+  "benchmark_summary": {
+    "Rule-Based Heuristic": {
+      "pr_auc": 0.09488,
+      "roc_auc": 0.60915,
+      "precision": 1.0,
+      "recall": 0.04651,
+      "f1": 0.08889,
+      "false_positive_rate": 0.0,
+      "recall_at_fpr_1pct": 0.12453,
+      "recall_at_fpr_05pct": 0.08552,
+      "recall_at_fpr_01pct": 0.05431,
+      "precision_at_k100": 0.12,
+      "recall_at_k100": 0.27907,
+      "brier_score": 0.01978,
+      "expected_calibration_error": 0.004126,
+      "confusion_matrix": {
+        "true_positives": 2,
+        "false_positives": 0,
+        "true_negatives": 1957,
+        "false_negatives": 41
+      },
+      "financial_outcomes": {
+        "uncaught_fraud_loss": 35720.07,
+        "investigation_labor_cost": 30.0,
+        "customer_friction_cost": 0.0,
+        "total_operational_cost": 35750.07,
+        "baseline_cost_no_detection": 38577.83,
+        "estimated_net_savings": 2827.76
+      },
+      "training_time_seconds": 0.0,
+      "inference_latency_ms_per_tx": 0.001
+    },
+    "Logistic Regression": {
+      "pr_auc": 0.45055,
+      "roc_auc": 0.96461,
+      "precision": 0.88889,
+      "recall": 0.18605,
+      "f1": 0.30769,
+      "false_positive_rate": 0.00051,
+      "recall_at_fpr_1pct": 0.43033,
+      "recall_at_fpr_05pct": 0.30522,
+      "recall_at_fpr_01pct": 0.19903,
+      "precision_at_k100": 0.33,
+      "recall_at_k100": 0.76744,
+      "brier_score": 0.014296,
+      "expected_calibration_error": 0.003696,
+      "confusion_matrix": {
+        "true_positives": 8,
+        "false_positives": 1,
+        "true_negatives": 1956,
+        "false_negatives": 35
+      },
+      "financial_outcomes": {
+        "uncaught_fraud_loss": 27704.57,
+        "investigation_labor_cost": 135.0,
+        "customer_friction_cost": 5.0,
+        "total_operational_cost": 27844.57,
+        "baseline_cost_no_detection": 38577.83,
+        "estimated_net_savings": 10733.26
+      },
+      "training_time_seconds": 0.018,
+      "inference_latency_ms_per_tx": 0.0
+    },
+    "Random Forest": {
+      "pr_auc": 0.75695,
+      "roc_auc": 0.96772,
+      "precision": 1.0,
+      "recall": 0.39535,
+      "f1": 0.56667,
+      "false_positive_rate": 0.0,
+      "recall_at_fpr_1pct": 0.72009,
+      "recall_at_fpr_05pct": 0.60465,
+      "recall_at_fpr_01pct": 0.51163,
+      "precision_at_k100": 0.39,
+      "recall_at_k100": 0.90698,
+      "brier_score": 0.009153,
+      "expected_calibration_error": 0.00355,
+      "confusion_matrix": {
+        "true_positives": 17,
+        "false_positives": 0,
+        "true_negatives": 1957,
+        "false_negatives": 26
+      },
+      "financial_outcomes": {
+        "uncaught_fraud_loss": 10734.04,
+        "investigation_labor_cost": 255.0,
+        "customer_friction_cost": 0.0,
+        "total_operational_cost": 10989.04,
+        "baseline_cost_no_detection": 38577.83,
+        "estimated_net_savings": 27588.79
+      },
+      "training_time_seconds": 0.22,
+      "inference_latency_ms_per_tx": 0.013
+    },
+    "LightGBM (Tabular)": {
+      "pr_auc": 0.79765,
+      "roc_auc": 0.99276,
+      "precision": 0.95652,
+      "recall": 0.51163,
+      "f1": 0.66667,
+      "false_positive_rate": 0.00051,
+      "recall_at_fpr_1pct": 0.78736,
+      "recall_at_fpr_05pct": 0.66323,
+      "recall_at_fpr_01pct": 0.54501,
+      "precision_at_k100": 0.4,
+      "recall_at_k100": 0.93023,
+      "brier_score": 0.008169,
+      "expected_calibration_error": 0.003625,
+      "confusion_matrix": {
+        "true_positives": 22,
+        "false_positives": 1,
+        "true_negatives": 1956,
+        "false_negatives": 21
+      },
+      "financial_outcomes": {
+        "uncaught_fraud_loss": 7061.32,
+        "investigation_labor_cost": 345.0,
+        "customer_friction_cost": 5.0,
+        "total_operational_cost": 7411.32,
+        "baseline_cost_no_detection": 38577.83,
+        "estimated_net_savings": 31166.51
+      },
+      "training_time_seconds": 0.054,
+      "inference_latency_ms_per_tx": 0.001
+    },
+    "XGBoost": {
+      "pr_auc": 0.77548,
+      "roc_auc": 0.98116,
+      "precision": 0.96,
+      "recall": 0.55814,
+      "f1": 0.70588,
+      "false_positive_rate": 0.00051,
+      "recall_at_fpr_1pct": 0.73753,
+      "recall_at_fpr_05pct": 0.66391,
+      "recall_at_fpr_01pct": 0.59152,
+      "precision_at_k100": 0.39,
+      "recall_at_k100": 0.90698,
+      "brier_score": 0.007935,
+      "expected_calibration_error": 0.003626,
+      "confusion_matrix": {
+        "true_positives": 24,
+        "false_positives": 1,
+        "true_negatives": 1956,
+        "false_negatives": 19
+      },
+      "financial_outcomes": {
+        "uncaught_fraud_loss": 5604.46,
+        "investigation_labor_cost": 375.0,
+        "customer_friction_cost": 5.0,
+        "total_operational_cost": 5984.46,
+        "baseline_cost_no_detection": 38577.83,
+        "estimated_net_savings": 32593.37
+      },
+      "training_time_seconds": 0.163,
+      "inference_latency_ms_per_tx": 0.001
+    },
+    "AEGIS LightGBM + Graph": {
+      "pr_auc": 0.80041,
+      "roc_auc": 0.99034,
+      "precision": 0.92,
+      "recall": 0.53488,
+      "f1": 0.67647,
+      "false_positive_rate": 0.00102,
+      "recall_at_fpr_1pct": 0.81062,
+      "recall_at_fpr_05pct": 0.69002,
+      "recall_at_fpr_01pct": 0.53338,
+      "precision_at_k100": 0.4,
+      "recall_at_k100": 0.93023,
+      "brier_score": 0.008279,
+      "expected_calibration_error": 0.00381,
+      "confusion_matrix": {
+        "true_positives": 23,
+        "false_positives": 2,
+        "true_negatives": 1955,
+        "false_negatives": 20
+      },
+      "financial_outcomes": {
+        "uncaught_fraud_loss": 5607.95,
+        "investigation_labor_cost": 375.0,
+        "customer_friction_cost": 10.0,
+        "total_operational_cost": 5992.95,
+        "baseline_cost_no_detection": 38577.83,
+        "estimated_net_savings": 32584.88
+      },
+      "training_time_seconds": 0.052,
+      "inference_latency_ms_per_tx": 0.001
+    }
+  },
+  "champion_model_name": "AEGIS LightGBM + Graph",
+  "champion_confidence_intervals_95": {
+    "pr_auc": {
+      "mean": 0.80136,
+      "ci_lower": 0.67372,
+      "ci_upper": 0.90668
+    },
+    "roc_auc": {
+      "mean": 0.9905,
+      "ci_lower": 0.9814,
+      "ci_upper": 0.99764
+    }
+  },
+  "policy_comparisons": {
+    "fixed_threshold_baseline": {
+      "policy": {
+        "policy_name": "Fixed-Threshold (p>=0.5)",
+        "tau_allow": 0.5,
+        "tau_review": 0.5,
+        "tau_block": 0.5,
+        "use_challenge": false
+      },
+      "metrics": {
+        "total_cost": 5657.95,
+        "baseline_unmitigated_loss": 38577.83,
+        "estimated_savings": 32919.88,
+        "savings_ratio": 0.8533,
+        "false_positive_rate": 0.00102,
+        "review_rate": 0.0,
+        "action_counts": {
+          "ALLOW": 1975,
+          "CHALLENGE": 0,
+          "REVIEW": 0,
+          "BLOCK": 25
+        }
+      }
+    },
+    "conservative_baseline": {
+      "policy": {
+        "policy_name": "Conservative Heuristic",
+        "tau_allow": 0.3,
+        "tau_review": 0.7,
+        "tau_block": 0.95,
+        "use_challenge": false
+      },
+      "metrics": {
+        "total_cost": 5017.05,
+        "baseline_unmitigated_loss": 38577.83,
+        "estimated_savings": 33560.78,
+        "savings_ratio": 0.8699,
+        "false_positive_rate": 0.00358,
+        "review_rate": 0.007,
+        "action_counts": {
+          "ALLOW": 1966,
+          "CHALLENGE": 0,
+          "REVIEW": 14,
+          "BLOCK": 20
+        }
+      }
+    },
+    "aegis_cost_optimized": {
+      "policy": {
+        "policy_name": "Cost-Aware-Optimized",
+        "tau_allow": 0.15,
+        "tau_review": 0.42,
+        "tau_block": 0.75,
+        "use_challenge": true
+      },
+      "metrics": {
+        "total_cost": 3061.44,
+        "baseline_unmitigated_loss": 38577.83,
+        "estimated_savings": 35516.39,
+        "savings_ratio": 0.9206,
+        "false_positive_rate": 0.00869,
+        "review_rate": 0.0,
+        "action_counts": {
+          "ALLOW": 1949,
+          "CHALLENGE": 26,
+          "REVIEW": 0,
+          "BLOCK": 25
+        }
+      }
+    }
+  }
+}
