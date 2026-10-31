@@ -1,0 +1,304 @@
+{
+  "run_id": "bench_20261031T081621_42_10000",
+  "model_id": "xgboost_fraud_detector",
+  "feature_count": 33,
+  "features": [
+    {
+      "name": "log_amount",
+      "definition": "Natural log of (transaction amount + 1) via np.log1p; compresses the heavy-tailed amount distribution for scale-sensitive models.",
+      "unit": "log(1 + currency units)",
+      "family": "amount",
+      "derived_from": [
+        "packages/features/temporal.py: np.log1p(df[amount_col])"
+      ]
+    },
+    {
+      "name": "hour_of_day",
+      "definition": "Local calendar hour of the transaction timestamp (0-23).",
+      "unit": "hours [0, 23]",
+      "family": "time",
+      "derived_from": [
+        "packages/features/temporal.py: ts.dt.hour"
+      ]
+    },
+    {
+      "name": "day_of_week",
+      "definition": "ISO weekday of the transaction timestamp (Monday=0 ... Sunday=6).",
+      "unit": "weekday index [0, 6]",
+      "family": "time",
+      "derived_from": [
+        "packages/features/temporal.py: ts.dt.dayofweek"
+      ]
+    },
+    {
+      "name": "is_weekend",
+      "definition": "1 when the transaction falls on Saturday or Sunday, else 0.",
+      "unit": "binary {0, 1}",
+      "family": "time",
+      "derived_from": [
+        "packages/features/temporal.py: dow >= 5"
+      ]
+    },
+    {
+      "name": "hour_sin",
+      "definition": "Cyclical sine encoding of hour_of_day (period 24) so 23:00 and 00:00 are close in feature space.",
+      "unit": "dimensionless [-1, 1]",
+      "family": "time",
+      "derived_from": [
+        "packages/features/temporal.py: sin(2*pi*hour/24)"
+      ]
+    },
+    {
+      "name": "hour_cos",
+      "definition": "Cyclical cosine encoding of hour_of_day (period 24); paired with hour_sin to make the daily cycle unambiguous.",
+      "unit": "dimensionless [-1, 1]",
+      "family": "time",
+      "derived_from": [
+        "packages/features/temporal.py: cos(2*pi*hour/24)"
+      ]
+    },
+    {
+      "name": "dow_sin",
+      "definition": "Cyclical sine encoding of day_of_week (period 7).",
+      "unit": "dimensionless [-1, 1]",
+      "family": "time",
+      "derived_from": [
+        "packages/features/temporal.py: sin(2*pi*dow/7)"
+      ]
+    },
+    {
+      "name": "dow_cos",
+      "definition": "Cyclical cosine encoding of day_of_week (period 7); paired with dow_sin.",
+      "unit": "dimensionless [-1, 1]",
+      "family": "time",
+      "derived_from": [
+        "packages/features/temporal.py: cos(2*pi*dow/7)"
+      ]
+    },
+    {
+      "name": "tx_count_1h",
+      "definition": "Count of the sender's prior transactions in the trailing 1 hour (strictly prior events only; causal).",
+      "unit": "count",
+      "family": "velocity",
+      "derived_from": [
+        "packages/features/temporal.py: events_1h"
+      ]
+    },
+    {
+      "name": "tx_count_24h",
+      "definition": "Count of the sender's prior transactions in the trailing 24 hours (strictly prior events only; causal).",
+      "unit": "count",
+      "family": "velocity",
+      "derived_from": [
+        "packages/features/temporal.py: events_24h"
+      ]
+    },
+    {
+      "name": "tx_amount_sum_24h",
+      "definition": "Sum of the sender's prior transaction amounts in the trailing 24 hours (0 when no prior history).",
+      "unit": "currency units",
+      "family": "velocity",
+      "derived_from": [
+        "packages/features/temporal.py: sum(e[1] for e in events_24h)"
+      ]
+    },
+    {
+      "name": "amount_ratio_24h",
+      "definition": "Current amount divided by the sender's mean prior 24h amount (floored denominator of 1.0; 1.0 when no prior history). Values > 1 mean the current transaction is larger than the sender's recent average.",
+      "unit": "ratio (dimensionless)",
+      "family": "velocity",
+      "derived_from": [
+        "packages/features/temporal.py: amt / max(1.0, mean_amt)"
+      ]
+    },
+    {
+      "name": "time_since_prev_sec",
+      "definition": "Seconds since the sender's previous transaction (default 86400.0 when this is the first observed transaction).",
+      "unit": "seconds",
+      "family": "velocity",
+      "derived_from": [
+        "packages/features/temporal.py: default 86400"
+      ]
+    },
+    {
+      "name": "log_time_since_prev",
+      "definition": "Natural log of (time_since_prev_sec + 1) via np.log1p; compresses the inter-arrival time scale.",
+      "unit": "log(1 + seconds)",
+      "family": "velocity",
+      "derived_from": [
+        "packages/features/temporal.py: np.log1p(time_since_prev_sec)"
+      ]
+    },
+    {
+      "name": "distinct_devices_24h",
+      "definition": "Distinct non-missing device identifiers used by the sender in the trailing 24 hours, including the current device (1 when no prior history).",
+      "unit": "count",
+      "family": "diversity",
+      "derived_from": [
+        "packages/features/temporal.py: device set union"
+      ]
+    },
+    {
+      "name": "distinct_ips_24h",
+      "definition": "Distinct non-missing IP addresses used by the sender in the trailing 24 hours, including the current IP (1 when no prior history).",
+      "unit": "count",
+      "family": "diversity",
+      "derived_from": [
+        "packages/features/temporal.py: ip set union"
+      ]
+    },
+    {
+      "name": "distinct_receivers_24h",
+      "definition": "Distinct receivers paid by the sender in the trailing 24 hours, including the current receiver (1 when no prior history).",
+      "unit": "count",
+      "family": "diversity",
+      "derived_from": [
+        "packages/features/temporal.py: receiver set union"
+      ]
+    },
+    {
+      "name": "is_velocity_surge",
+      "definition": "1 when the sender shows a velocity surge: at least 3 prior transactions in the last hour OR at least 2 distinct devices in 24 hours; else 0.",
+      "unit": "binary {0, 1}",
+      "family": "velocity",
+      "derived_from": [
+        "packages/features/temporal.py: (tx_count_1h >= 3) | (distinct_devices_24h >= 2)"
+      ]
+    },
+    {
+      "name": "ch_mobile",
+      "definition": "Payment channel indicator: 1 when the transaction channel is 'mobile', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "ch_p2p",
+      "definition": "Payment channel indicator: 1 when the transaction channel is 'p2p', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "ch_pos",
+      "definition": "Payment channel indicator: 1 when the transaction channel is 'pos', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "ch_web",
+      "definition": "Payment channel indicator: 1 when the transaction channel is 'web', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "ch_wire",
+      "definition": "Payment channel indicator: 1 when the transaction channel is 'wire', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "cat_crypto_exchange",
+      "definition": "Merchant category indicator: 1 when the merchant category is 'crypto_exchange', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "cat_dining",
+      "definition": "Merchant category indicator: 1 when the merchant category is 'dining', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "cat_entertainment",
+      "definition": "Merchant category indicator: 1 when the merchant category is 'entertainment', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "cat_gaming",
+      "definition": "Merchant category indicator: 1 when the merchant category is 'gaming', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "cat_groceries",
+      "definition": "Merchant category indicator: 1 when the merchant category is 'groceries', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "cat_money_transfer",
+      "definition": "Merchant category indicator: 1 when the merchant category is 'money_transfer', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "cat_retail",
+      "definition": "Merchant category indicator: 1 when the merchant category is 'retail', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "cat_travel",
+      "definition": "Merchant category indicator: 1 when the merchant category is 'travel', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "cat_utilities",
+      "definition": "Merchant category indicator: 1 when the merchant category is 'utilities', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "cat_wire_service",
+      "definition": "Merchant category indicator: 1 when the merchant category is 'wire_service', else 0.",
+      "unit": "binary {0, 1}",
+      "family": "categorical-indicator",
+      "derived_from": [
+        "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 # AEGIS-Fraud X — Feature Catalog (900+)
 
-**Generated:** 2026-10-31 09:01:07 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
+**Generated:** 2026-10-31 09:08:37 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
 
 This catalog is GENERATED and VALIDATED by `scripts/generate_feature_catalog.py`
 (uniqueness, domain counts, status vocabulary, and evidence-file existence are
@@ -9,7 +9,7 @@ sources: repository inspection, fraud-domain practice, workflow failure
 analysis, and risk analysis. Acceptance criteria are outcome-derived — no
 invented numeric targets. Field policy is documented in the generator.
 
-Status distribution: {"verified": 195, "missing": 558, "partial": 140, "blocked": 2, "not_applicable": 6}
+Status distribution: {"verified": 201, "missing": 553, "partial": 138, "blocked": 2, "not_applicable": 6, "implemented_unverified": 1}
 
 ## D01 — Data Ingestion and Connectors
 
@@ -143,7 +143,7 @@ Status distribution: {"verified": 195, "missing": 558, "partial": 140, "blocked"
 - **AFX-F0114 Cold-Start Feature Path** [P2 · partial] — Defined features for new entities. Problem: New accounts lack history. Outcome: Documented fallback features for tenure-0 entities. Evidence: `LIMITATIONS.md` Reason: Limitation documented; no explicit feature contract
 - **AFX-F0115 Feature Feasibility Bounds** [P2 · missing] — Bound features to documented ranges. Problem: Unbounded features destabilize models. Outcome: Clipping bounds recorded in contracts. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0116 Drift-Resilient Feature Subset** [P3 · missing] — Identify stable features under drift. Problem: Some features degrade faster than others. Outcome: Stability-ranked feature report. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0117 Feature Semantic Registry** [P2 · partial] — Meaning and units per feature. Problem: Unnamed features invite misuse. Outcome: Registry with definition and unit per feature. Evidence: `packages/features/pipeline.py` Reason: feature_names exist; no semantic/units registry
+- **AFX-F0117 Feature Semantic Registry** [P2 · verified] — Meaning and units per feature. Problem: Unnamed features invite misuse. Outcome: Registry with definition and unit per feature. Evidence: `packages/features/semantics.py`, `scripts/generate_feature_semantics.py`, `tests/unit/test_batch_g.py`, `FEATURE_SEMANTICS.md`
 - **AFX-F0118 Train/Serve Feature Parity** [P1 · missing] — Guarantee identical features both paths. Problem: Skew between training and serving degrades. Outcome: Parity test with fixed inputs. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0119 Feature Noise Sensitivity Tests** [P2 · missing] — Assert features respond to real signal. Problem: Broken features can look plausible. Outcome: Perturbation-based feature sanity tests. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0120 Feature Computation Budget** [P2 · partial] — Bound feature computation latency. Problem: Slow features break real-time SLAs. Outcome: Per-feature latency budget with measurement. Evidence: `README.md` Reason: Latency measured end-to-end; no per-feature budget
@@ -169,7 +169,7 @@ Status distribution: {"verified": 195, "missing": 558, "partial": 140, "blocked"
 - **AFX-F0136 Feature-Set Feature Flags** [P3 · missing] — Toggle feature subsets safely. Problem: New features ship all-or-nothing. Outcome: Flagged feature subsets per model. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0137 Cross-Entity Feature Sharing** [P3 · missing] — Reuse aggregates across entity types. Problem: Duplicate computations drift apart. Outcome: Shared aggregates with single definition. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0138 Feature Export for Analysis** [P3 · missing] — Export feature matrices for notebooks. Problem: Analysts recompute features ad hoc. Outcome: One-command export with provenance. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0139 Per-Feature Documentation** [P2 · missing] — Purpose and behavior per feature. Problem: Features are used without understanding. Outcome: Docs generated from registry. Evidence: *(new proposal)* Reason: New proposal
+- **AFX-F0139 Per-Feature Documentation** [P2 · verified] — Purpose and behavior per feature. Problem: Features are used without understanding. Outcome: Docs generated from registry. Evidence: `scripts/generate_feature_semantics.py`, `FEATURE_SEMANTICS.md`, `feature_semantics.json`
 - **AFX-F0140 Training Window Alignment** [P1 · missing] — Align feature windows with label timing. Problem: Misaligned windows are leakage. Outcome: Window/label alignment tested. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0141 Scaler Reuse in Serving** [P1 · verified] — Serve with training-fitted scalers. Problem: Serving-time scaling is leakage. Outcome: Scaler loaded from artifact. Evidence: `packages/artifacts/bundle.py`, `scripts/run_ulb_evaluation.py`
 - **AFX-F0142 Feature Computation Audit Trail** [P2 · missing] — Record what produced each feature vector. Problem: Feature disputes cannot be resolved. Outcome: Per-request feature trace. Evidence: *(new proposal)* Reason: New proposal
@@ -514,7 +514,7 @@ Status distribution: {"verified": 195, "missing": 558, "partial": 140, "blocked"
 - **AFX-F0441 Offline Explainability Honesty** [P1 · verified] — Degraded explainability states. Problem: Offline mode must not fake success. Outcome: Offline journey shows unavailable states. Evidence: `apps/web/e2e/journey.spec.ts`
 - **AFX-F0442 Explanation-Audit Linkage** [P2 · partial] — Explanations join audit records. Problem: Explanations float without audit. Outcome: Receipt id in audit records. Evidence: `packages/data/schemas.py` Reason: Receipt hash returned; no persistent audit store
 - **AFX-F0443 What-If Simulator** [P3 · missing] — Interactive scenario testing. Problem: Operators need safe experimentation. Outcome: Score-a-modified-transaction sandbox. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0444 Model Cards** [P2 · missing] — Standard model documentation. Problem: Models ship without documentation. Outcome: Card per champion with limitations. Evidence: *(new proposal)* Reason: New proposal
+- **AFX-F0444 Model Cards** [P2 · verified] — Standard model documentation. Problem: Models ship without documentation. Outcome: Card per champion with limitations. Evidence: `scripts/generate_model_card.py`, `MODEL_CARD.md`, `tests/unit/test_batch_g.py`
 - **AFX-F0445 Policy Cards** [P2 · partial] — Policy documentation. Problem: Policies need human documentation. Outcome: Card per policy with assumptions. Evidence: `OPTIMIZATION_METHODOLOGY.md` Reason: Methodology doc exists; per-policy card absent
 - **AFX-F0446 Decision Narratives** [P3 · missing] — Plain-language decision summaries. Problem: Raw fields are hard to read. Outcome: Template narrative per decision. Evidence: *(new proposal)* Reason: New proposal; risk of overstatement
 - **AFX-F0447 Contribution Ranking Consistency** [P2 · verified] — Stable ranking of contributions. Problem: Unstable rankings confuse users. Outcome: Deterministic ranking per identical input. Evidence: `packages/explainability/shap_engine.py`
@@ -567,7 +567,7 @@ Status distribution: {"verified": 195, "missing": 558, "partial": 140, "blocked"
 - **AFX-F0486 SLA Tracking** [P2 · missing] — Time-bound case handling. Problem: Cases age silently. Outcome: SLA timers with breach alerts. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0487 Evidence Linking** [P1 · verified] — Attach receipts/features to cases. Problem: Cases need complete evidence. Outcome: Evidence links immutable in case. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `packages/data/schemas.py`, `tests/integration/test_batch_de.py`
 - **AFX-F0488 Case Notes** [P2 · verified] — Investigator annotations. Problem: Findings die in chat logs. Outcome: Structured notes with author/time. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `packages/data/schemas.py`, `tests/integration/test_batch_de.py`
-- **AFX-F0489 Case Outcome Recording** [P1 · partial] — Record confirmed outcomes. Problem: No learning without outcomes. Outcome: Outcome codes with provenance. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `packages/data/schemas.py`, `tests/integration/test_batch_de.py` Reason: Typed outcome required at close, but no outcome-code vocabulary/registry yet (free-text outcomes remain unanalyzable)
+- **AFX-F0489 Case Outcome Recording** [P1 · verified] — Record confirmed outcomes. Problem: No learning without outcomes. Outcome: Outcome codes with provenance. Evidence: `packages/data/schemas.py`, `apps/api/main.py`, `tests/integration/test_batch_f.py`
 - **AFX-F0490 Case Deduplication** [P2 · missing] — One case per scheme/entity. Problem: Duplicate cases waste capacity. Outcome: Similar-case detection at intake. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0491 Escalation Paths** [P2 · missing] — Route hard cases upward. Problem: Complex fraud needs senior eyes. Outcome: Escalation with reason tracking. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0492 Bulk Case Actions** [P3 · missing] — Mass-close related cases. Problem: Campaigns create case floods. Outcome: Bulk actions with audit. Evidence: *(new proposal)* Reason: New proposal
@@ -679,7 +679,7 @@ Status distribution: {"verified": 195, "missing": 558, "partial": 140, "blocked"
 - **AFX-F0586 API Contract Tests** [P1 · partial] — Pin API behavior. Problem: API drift breaks clients. Outcome: Schema-contract tests in CI. Evidence: `tests/integration/test_api.py` Reason: Behavioral tests exist; no schema-freeze tests
 - **AFX-F0587 Latency Headers** [P3 · missing] — Server timing on responses. Problem: Clients cannot measure server time. Outcome: Elapsed-time header per response. Evidence: *(new proposal)* Reason: Latency in body for scores only
 - **AFX-F0588 CORS Contract** [P1 · verified] — Explicit origins, no wildcard+credentials. Problem: Wildcards leak with credentials. Outcome: Allowlist config documented. Evidence: `apps/api/main.py`, `tests/integration/test_api.py`
-- **AFX-F0589 Input Size Limits** [P2 · missing] — Bound request sizes. Problem: Oversized requests exhaust resources. Outcome: Limits with 413 responses. Evidence: *(new proposal)* Reason: New proposal
+- **AFX-F0589 Input Size Limits** [P2 · verified] — Bound request sizes. Problem: Oversized requests exhaust resources. Outcome: Limits with 413 responses. Evidence: `apps/api/main.py`, `tests/integration/test_batch_f.py`
 - **AFX-F0590 Timeout Policy** [P2 · missing] — Documented request deadlines. Problem: Hung requests consume workers. Outcome: Timeouts configured per endpoint. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0591 Response Compression** [P3 · missing] — Compress large payloads. Problem: Large responses waste bandwidth. Outcome: gzip for big endpoints. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0592 Streaming Responses** [P3 · missing] — Stream large result sets. Problem: Big responses block workers. Outcome: Streamed pagination. Evidence: *(new proposal)* Reason: New proposal
@@ -734,7 +734,7 @@ Status distribution: {"verified": 195, "missing": 558, "partial": 140, "blocked"
 - **AFX-F0633 Role-Based Access Control** [P2 · missing] — Scopes per role. Problem: All-or-nothing access is unsafe. Outcome: Role-scoped endpoints. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0634 Key Rotation** [P2 · missing] — Rotate credentials without downtime. Problem: Eternal keys are a liability. Outcome: Dual-key grace windows. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0635 Decision-Data Scopes** [P2 · missing] — Least-privilege on sensitive data. Problem: Broad access leaks fraud signals. Outcome: Scoped read access to decisions. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0636 Admin Action Authorization** [P1 · missing] — Guard dangerous operations. Problem: Policy changes need authority. Outcome: Admin scope + approval trail. Evidence: *(new proposal)* Reason: optimize-policy mutates global state unauthenticated
+- **AFX-F0636 Admin Action Authorization** [P1 · verified] — Guard dangerous operations. Problem: Policy changes need authority. Outcome: Admin scope + approval trail. Evidence: `apps/api/main.py`, `tests/integration/test_batch_f.py`
 - **AFX-F0637 Local Mode Declaration** [P2 · verified] — Explicit single-user mode. Problem: Implicit anonymity looks like an oversight. Outcome: Documented local mode with warning. Evidence: `apps/api/main.py`, `tests/integration/test_batch_de.py`
 - **AFX-F0638 Case Assignment Permissions** [P3 · missing] — Only owners/leads reassign. Problem: Reassignment abuse breaks accountability. Outcome: Scoped case mutations. Evidence: *(new proposal)* Reason: New proposal; blocked on case management
 - **AFX-F0639 Audit Read Scope** [P2 · missing] — Auditors read-only access. Problem: Audit access equals write access today. Outcome: Read-only audit role. Evidence: *(new proposal)* Reason: New proposal
@@ -945,7 +945,7 @@ Status distribution: {"verified": 195, "missing": 558, "partial": 140, "blocked"
 - **AFX-F0820 Graceful Shutdown** [P2 · missing] — Drain on stop. Problem: Kills drop in-flight work. Outcome: Documented drain behavior. Evidence: *(new proposal)* Reason: uvicorn handles SIGTERM; no drain verification
 - **AFX-F0821 Startup Config Validation** [P2 · partial] — Fail fast on bad config. Problem: Bad config corrupts runtime behavior. Outcome: Startup validation with clear errors. Evidence: `apps/api/main.py` Reason: Bundle validated at startup; env validation partial
 - **AFX-F0822 Image Vulnerability Scanning** [P2 · missing] — Scan images for CVEs. Problem: Base images carry CVEs. Outcome: Scan in pipeline with report. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0823 Non-Root Container User** [P2 · missing] — Least privilege in containers. Problem: Root containers amplify exploits. Outcome: Dedicated UID in image. Evidence: `infra/Dockerfile.api` Reason: Currently root; fixable in Dockerfile
+- **AFX-F0823 Non-Root Container User** [P2 · implemented_unverified] — Least privilege in containers. Problem: Root containers amplify exploits. Outcome: Dedicated UID in image. Evidence: `infra/Dockerfile.api`
 - **AFX-F0824 Multi-Stage Builds** [P3 · missing] — Slim production images. Problem: Build tools bloat images. Outcome: Builder/runtime stages. Evidence: *(new proposal)* Reason: Single-stage today; slim base mitigates
 - **AFX-F0825 Image Publish Pipeline** [P3 · missing] — Versioned image artifacts. Problem: Images built ad hoc. Outcome: Tagged images per release. Evidence: *(new proposal)* Reason: No registry/remote today
 - **AFX-F0826 Config Templates** [P2 · verified] — Documented example configs. Problem: Config archaeology wastes time. Outcome: .env.example-style templates complete. Evidence: `.env.example`

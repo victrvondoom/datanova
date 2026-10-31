@@ -18,6 +18,11 @@ COPY scripts ./scripts
 
 # Model artifacts, benchmark runs, and datasets are mounted at runtime,
 # never baked into the image (they are environment state, not code).
+
+# Least privilege: run as a dedicated non-root user (catalog: deploy_nonroot_user)
+RUN useradd --uid 10001 --no-create-home --shell /usr/sbin/nologin aegis
+USER aegis
+
 EXPOSE 8000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \

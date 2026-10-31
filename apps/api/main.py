@@ -25,7 +25,9 @@ import numpy as np
 import pandas as pd
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+from starlette.middleware.base import BaseHTTPMiddleware
 
 # Ensure project root in pythonpath
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
@@ -41,8 +43,10 @@ from apps.api.integrity import (
 )
 from packages.artifacts.bundle import BundleValidationError, load_bundle
 from packages.data.schemas import (
+    CASE_OUTCOME_DESCRIPTIONS,
     AuditReceipt,
     CaseNote,
+    CaseOutcomeCode,
     CaseRecord,
     CaseStatus,
     ChannelType,
@@ -264,14 +268,79 @@ def require_api_key(request: Request, x_api_key: str = Header(default=None, alia
       deployment; documented in THREAT_MODEL.md and /api/health auth_mode).
     - AEGIS_API_KEY set    -> every endpoint except the health/readiness
       probes requires a matching X-API-Key (constant-time comparison).
+      AEGIS_ADMIN_API_KEY, when set, is a superset credential accepted here
+      too (it must be, since a request carries one header); the reverse does
+      NOT hold — the ordinary key never passes require_admin_key.
     """
     if request.url.path in ("/api/health", "/api/ready"):
         return  # probes stay open for orchestrators
     expected = os.environ.get("AEGIS_API_KEY", "")
     if not expected:
         return  # local mode
-    if x_api_key is None or not hmac.compare_digest(x_api_key, expected):
+    admin_expected = os.environ.get("AEGIS_ADMIN_API_KEY", "")
+    matches = x_api_key is not None and (
+        hmac.compare_digest(x_api_key, expected)
+        or (admin_expected and hmac.compare_digest(x_api_key, admin_expected))
+    )
+    if not matches:
         raise HTTPException(status_code=401, detail="Invalid or missing API key")
+
+
+def require_admin_key(
+    request: Request, x_api_key: str = Header(default=None, alias="X-API-Key")
+) -> None:
+    """Admin-action authorization (catalog: authz_admin_surface).
+
+    State-mutating admin operations (emergency stop, policy optimization)
+    get a separate privilege tier:
+    - AEGIS_ADMIN_API_KEY set -> admin endpoints require exactly that key;
+      the ordinary AEGIS_API_KEY does NOT grant admin (privilege separation).
+    - else AEGIS_API_KEY set -> admin inherits the single API key.
+    - else local-open mode, reported honestly via /api/health admin_auth_mode.
+    """
+    admin_expected = os.environ.get("AEGIS_ADMIN_API_KEY", "")
+    api_expected = os.environ.get("AEGIS_API_KEY", "")
+    expected = admin_expected or api_expected
+    if not expected:
+        return  # local-open mode
+    if x_api_key is None or not hmac.compare_digest(x_api_key, expected):
+        raise HTTPException(status_code=401, detail="Invalid or missing admin API key")
+
+
+DEFAULT_MAX_BODY_BYTES = 1_048_576
+
+
+class BodySizeLimitMiddleware(BaseHTTPMiddleware):
+    """Rejects oversized request bodies with 413 (catalog: api_input_size_limits).
+
+    Bounded by the declared Content-Length against AEGIS_MAX_BODY_BYTES
+    (default 1 MiB). The body is never read when rejected. A limit <= 0
+    disables the check (useful for trusted bulk-import tooling).
+    """
+
+    async def dispatch(self, request: Request, call_next):  # type: ignore[no-untyped-def]
+        limit = int(os.environ.get("AEGIS_MAX_BODY_BYTES", str(DEFAULT_MAX_BODY_BYTES)))
+        if limit <= 0:
+            return await call_next(request)
+        content_length = request.headers.get("content-length")
+        if content_length is not None:
+            try:
+                size = int(content_length)
+            except ValueError:
+                return JSONResponse(
+                    status_code=400, content={"detail": "Invalid Content-Length header"}
+                )
+            if size > limit:
+                return JSONResponse(
+                    status_code=413,
+                    content={
+                        "detail": (
+                            f"Request body of {size} bytes exceeds the limit of "
+                            f"{limit} bytes (AEGIS_MAX_BODY_BYTES)"
+                        )
+                    },
+                )
+        return await call_next(request)
 
 
 app = FastAPI(
@@ -306,6 +375,9 @@ app.add_middleware(
 if RequestIDMiddleware is not None:
     app.add_middleware(RequestIDMiddleware)
 
+# Bounded request bodies (catalog: api_input_size_limits)
+app.add_middleware(BodySizeLimitMiddleware)
+
 
 @app.get("/api/health")
 def health_check():
@@ -319,6 +391,11 @@ def health_check():
         "active_policy": state.current_policy.model_dump() if state.current_policy else {},
         # Artifact provenance: which trained artifacts produced this engine
         "auth_mode": "api-key" if os.environ.get("AEGIS_API_KEY") else "local-open",
+        "admin_auth_mode": (
+            "admin-key"
+            if os.environ.get("AEGIS_ADMIN_API_KEY")
+            else ("api-key" if os.environ.get("AEGIS_API_KEY") else "local-open")
+        ),
         "artifact_status": state.artifact_status,
         "artifact_run_id": state.artifact_run_id,
         "calibration_source": state.calibration_source,
@@ -601,7 +678,7 @@ class EmergencyStopRequest(BaseModel):
     engaged: bool
 
 
-@app.post("/api/admin/emergency-stop")
+@app.post("/api/admin/emergency-stop", dependencies=[Depends(require_admin_key)])
 def emergency_stop(req: EmergencyStopRequest):
     """Emergency kill switch (catalog: ops_kill_switch, P1 safety control).
 
@@ -610,8 +687,8 @@ def emergency_stop(req: EmergencyStopRequest):
     explicitly disengaged. The state is visible in /api/ready and recorded
     on every ledger entry.
 
-    NOTE: unauthenticated in the current single-user local deployment;
-    admin authorization (authz_admin_surface) remains an open catalog item.
+    Requires admin authorization (authz_admin_surface): AEGIS_ADMIN_API_KEY
+    when set, otherwise AEGIS_API_KEY; local-open mode when neither is set.
     """
     state.emergency_stop_engaged = bool(req.engaged)
     return {
@@ -677,6 +754,49 @@ def list_cases(status: str = "", limit: int = 50, offset: int = 0):
     }
 
 
+@app.get("/api/cases/outcome-codes")
+def list_outcome_codes():
+    """Typed outcome vocabulary (catalog: case_outcomes) so clients and
+    analysts share one closed, documented set of codes."""
+    return {
+        "codes": [
+            {"code": c.value, "description": CASE_OUTCOME_DESCRIPTIONS[c.value]}
+            for c in CaseOutcomeCode
+        ]
+    }
+
+
+@app.get("/api/cases/outcomes/summary")
+def case_outcome_summary():
+    """Aggregated outcome counts across closed cases (catalog: case_outcomes).
+
+    Makes investigation results measurable without exposing payloads;
+    counts only resolved cases and reports the unresolved remainder.
+    """
+    store = state.require(state.case_store)
+    all_cases = store.list(limit=1_000_000, offset=0)
+    by_outcome: Dict[str, int] = {code: 0 for code in CASE_OUTCOME_DESCRIPTIONS}
+    closed = 0
+    for c in all_cases:
+        if c.outcome is not None:
+            by_outcome[c.outcome] = by_outcome.get(c.outcome, 0) + 1
+            closed += 1
+    return {
+        "total_cases": len(all_cases),
+        "closed_cases": closed,
+        "by_outcome": by_outcome,
+        "confirmed_fraud_rate": (
+            round(
+                (by_outcome.get("confirmed_fraud", 0) + by_outcome.get("recovered_fraud", 0))
+                / closed,
+                4,
+            )
+            if closed
+            else None
+        ),
+    }
+
+
 @app.get("/api/cases/{case_id}")
 def get_case(case_id: str):
     case = state.require(state.case_store).get(case_id)
@@ -688,6 +808,8 @@ def get_case(case_id: str):
 class CaseTransitionRequest(BaseModel):
     status: str
     outcome: Optional[str] = None
+    outcome_detail: Optional[str] = Field(default=None, max_length=2000)
+    closed_by: Optional[str] = Field(default=None, max_length=100)
 
 
 @app.post("/api/cases/{case_id}/transition", response_model=CaseRecord)
@@ -711,13 +833,26 @@ def transition_case(case_id: str, req: CaseTransitionRequest):
             status_code=422,
             detail=f"Illegal transition {case.status.value} -> {target}",
         )
-    if target == CaseStatus.CLOSED.value and not (req.outcome or "").strip():
-        raise HTTPException(
-            status_code=422,
-            detail="Closing a case requires a typed outcome (e.g. confirmed_fraud, false_positive)",
-        )
+    if target == CaseStatus.CLOSED.value:
+        outcome_code = (req.outcome or "").strip()
+        if not outcome_code:
+            raise HTTPException(
+                status_code=422,
+                detail="Closing a case requires a typed outcome (e.g. confirmed_fraud, false_positive)",
+            )
+        if outcome_code not in CASE_OUTCOME_DESCRIPTIONS:
+            raise HTTPException(
+                status_code=422,
+                detail=(
+                    f"Unknown outcome code '{outcome_code}'. Valid codes: "
+                    + ", ".join(sorted(CASE_OUTCOME_DESCRIPTIONS))
+                ),
+            )
+        case.outcome = outcome_code
+        case.outcome_detail = (req.outcome_detail or "").strip() or None
+        case.closed_by = (req.closed_by or "").strip() or None
+        case.outcome_recorded_at = datetime.now(timezone.utc)
     case.status = CaseStatus(target)
-    case.outcome = (req.outcome or "").strip() or None
     case.updated_at = datetime.now(timezone.utc)
     store.update(case)
     return case
@@ -789,9 +924,14 @@ class OptimizePolicyRequest(BaseModel):
     review_capacity_daily: int = 100
 
 
-@app.post("/api/optimize-policy")
+@app.post("/api/optimize-policy", dependencies=[Depends(require_admin_key)])
 def optimize_policy_endpoint(req: OptimizePolicyRequest):
-    """Dynamic policy optimizer recalculating cost frontier based on user parameters."""
+    """Dynamic policy optimizer recalculating cost frontier based on user parameters.
+
+    Mutates global serving state, so it requires admin authorization
+    (authz_admin_surface): AEGIS_ADMIN_API_KEY when set, otherwise
+    AEGIS_API_KEY; local-open mode when neither is set.
+    """
     cfg = CostConfiguration(
         investigation_cost=req.investigation_cost,
         customer_friction_cost=req.customer_friction_cost,

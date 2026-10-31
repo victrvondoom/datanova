@@ -184,6 +184,32 @@ class CaseStatus(str, Enum):
     CLOSED = "CLOSED"
 
 
+class CaseOutcomeCode(str, Enum):
+    """Typed outcome vocabulary for closing cases (catalog: case_outcomes).
+
+    Free-text outcomes are unanalyzable; this closed vocabulary keeps
+    case outcomes aggregatable for feedback loops, audit, and honest
+    measurement of AEGIS decision quality.
+    """
+
+    CONFIRMED_FRAUD = "confirmed_fraud"
+    RECOVERED_FRAUD = "recovered_fraud"
+    FALSE_POSITIVE = "false_positive"
+    PARTIALLY_CONFIRMED = "partially_confirmed"
+    INCONCLUSIVE = "inconclusive"
+    ABANDONED = "abandoned"
+
+
+CASE_OUTCOME_DESCRIPTIONS = {
+    CaseOutcomeCode.CONFIRMED_FRAUD.value: "Investigation confirmed the transaction was fraudulent.",
+    CaseOutcomeCode.RECOVERED_FRAUD.value: "Fraud confirmed and funds were (partially) recovered after the block/challenge.",
+    CaseOutcomeCode.FALSE_POSITIVE.value: "Transaction was legitimate; the AEGIS action was a false alarm.",
+    CaseOutcomeCode.PARTIALLY_CONFIRMED.value: "Some suspicious activity was confirmed, but not the full original suspicion.",
+    CaseOutcomeCode.INCONCLUSIVE.value: "Investigation could not determine whether the transaction was fraudulent.",
+    CaseOutcomeCode.ABANDONED.value: "Case dropped without resolution (e.g. customer unreachable, stale evidence).",
+}
+
+
 class CaseRecord(BaseModel):
     """Fraud case linked to an archived decision (catalog: case_intake).
 
@@ -195,7 +221,10 @@ class CaseRecord(BaseModel):
     case_id: str
     transaction_id: str
     status: CaseStatus = CaseStatus.OPEN
-    outcome: Optional[str] = None
+    outcome: Optional[str] = None  # must be a CaseOutcomeCode value when set
+    outcome_detail: Optional[str] = None
+    closed_by: Optional[str] = None
+    outcome_recorded_at: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     receipt_sha256: Optional[str] = None

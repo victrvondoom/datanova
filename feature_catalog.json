@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-31T09:01:07.733633",
+  "generated": "2026-10-31T09:08:37.555334",
   "total_features": 901,
   "features": [
     {
@@ -4229,10 +4229,13 @@
       "expected_outcome": "Registry with definition and unit per feature",
       "dependencies": [],
       "repository_evidence": [
-        "packages/features/pipeline.py"
+        "packages/features/semantics.py",
+        "scripts/generate_feature_semantics.py",
+        "tests/unit/test_batch_g.py",
+        "FEATURE_SEMANTICS.md"
       ],
-      "implementation_status": "partial",
-      "status_reason": "feature_names exist; no semantic/units registry",
+      "implementation_status": "verified",
+      "status_reason": "Registry with definition/unit/family/derivation-source per feature, read from temporal.py/pipeline.py (not invented); dynamic ch_*/cat_* one-hots covered by prefix rules; validate_coverage raises on any unexplained schema feature; 33/33 champion features documented; generation validated by 5 unit tests",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -5026,12 +5029,14 @@
       "problem": "Features are used without understanding",
       "primary_user": "ML engineer",
       "expected_outcome": "Docs generated from registry",
-      "dependencies": [
-        "feat_semantic_names_registry"
+      "dependencies": [],
+      "repository_evidence": [
+        "scripts/generate_feature_semantics.py",
+        "FEATURE_SEMANTICS.md",
+        "feature_semantics.json"
       ],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "implementation_status": "verified",
+      "status_reason": "Per-feature documentation is now generated from the semantic registry (FEATURE_SEMANTICS.md + feature_semantics.json), pinned by test_generated_semantics_files_are_current and test_semantics_generator_output_is_complete",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -16131,9 +16136,13 @@
       "primary_user": "Fraud analyst",
       "expected_outcome": "Card per champion with limitations",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "scripts/generate_model_card.py",
+        "MODEL_CARD.md",
+        "tests/unit/test_batch_g.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "MODEL_CARD.md generated exclusively from champion manifest + benchmark/ULB artifacts (intended use, out-of-scope, honest test metrics, SIMULATED savings semantics, limitations, PaySim blocked honestly); refuses incomplete manifests or champions absent from the run (ValueError, tested)",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -17749,13 +17758,12 @@
       "expected_outcome": "Outcome codes with provenance",
       "dependencies": [],
       "repository_evidence": [
-        "apps/api/integrity.py",
-        "apps/api/main.py",
         "packages/data/schemas.py",
-        "tests/integration/test_batch_de.py"
+        "apps/api/main.py",
+        "tests/integration/test_batch_f.py"
       ],
-      "implementation_status": "partial",
-      "status_reason": "Typed outcome required at close, but no outcome-code vocabulary/registry yet (free-text outcomes remain unanalyzable)",
+      "implementation_status": "verified",
+      "status_reason": "Closed CaseOutcomeCode vocabulary (6 documented codes) enforced at close (422 listing valid codes), structured outcome recording (detail/closed_by/outcome_recorded_at), GET /api/cases/outcome-codes and GET /api/cases/outcomes/summary aggregations; 3 integration tests",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -21332,9 +21340,12 @@
       "primary_user": "API integrator",
       "expected_outcome": "Limits with 413 responses",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "apps/api/main.py",
+        "tests/integration/test_batch_f.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "BodySizeLimitMiddleware rejects declared bodies above AEGIS_MAX_BODY_BYTES (default 1 MiB, <=0 disables) with 413 before reading or processing; 4 integration tests cover rejection, default, disable, and auth-mode interaction",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -23013,9 +23024,12 @@
       "primary_user": "Security engineer",
       "expected_outcome": "Admin scope + approval trail",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "optimize-policy mutates global state unauthenticated",
+      "repository_evidence": [
+        "apps/api/main.py",
+        "tests/integration/test_batch_f.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "require_admin_key guards /api/admin/emergency-stop and /api/optimize-policy; AEGIS_ADMIN_API_KEY is a superset credential (accepted by ordinary auth by necessity of one header), ordinary key never grants admin; admin_auth_mode reported honestly in /api/health; 3 integration tests",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -29727,8 +29741,8 @@
       "repository_evidence": [
         "infra/Dockerfile.api"
       ],
-      "implementation_status": "missing",
-      "status_reason": "Currently root; fixable in Dockerfile",
+      "implementation_status": "implemented_unverified",
+      "status_reason": "USER aegis (UID 10001, no shell) added before EXPOSE/CMD; image build NOT verified because the Docker Desktop daemon is unavailable (NEXT-02) - honest unverified status",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",

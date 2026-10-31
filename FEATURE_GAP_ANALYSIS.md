@@ -5,7 +5,7 @@ Highest-impact missing capabilities, evidence-driven.
 ## P0 integrity/safety gaps: 0
 
 
-## P1 core-intelligence/ops gaps: 46
+## P1 core-intelligence/ops gaps: 45
 
 - **AFX-F0020 Exactly-Once Effect Semantics** (D01): Ensure side effects occur once despite retries
 - **AFX-F0027 Ingress Authentication** (D01): Authenticate ingest callers
@@ -33,7 +33,6 @@ Highest-impact missing capabilities, evidence-driven.
 - **AFX-F0542 Review Queue UI** (D19): Analyst worklist
 - **AFX-F0549 Override Workflow** (D19): Controlled decision overrides
 - **AFX-F0627 Webhook Signature Verification** (D21): Authenticate partner calls
-- **AFX-F0636 Admin Action Authorization** (D22): Guard dangerous operations
 - **AFX-F0643 Policy Edit Permissions** (D22): Control who changes policy
 - **AFX-F0650 Deny-by-Default Alignment** (D22): Safe defaults for new endpoints
 - **AFX-F0651 Credential Storage Hygiene** (D22): Never store plaintext secrets

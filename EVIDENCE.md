@@ -211,3 +211,28 @@ savings **$33,201.56 (86.1%)**, FPR **0.20%**, thresholds tau=(0.2222, 0.2322, 1
   558 missing / 2 blocked / 6 N-A.**
 - Full suite: **106/106 passed**; mypy clean (52 files); ruff clean; frontend
   build clean. Docker Desktop still unresponsive (NEXT-02 remains blocked).
+
+### Implementation batches F & G (input limits, admin authZ, case outcomes,
+### semantic registry, model card)
+- `tests/integration/test_batch_f.py` (10 tests): oversized body -> 413
+  (env-tunable, default 1 MiB, `<=0` disables, fires before auth/processing);
+  admin endpoints in local-open / single-key / admin-key modes with
+  privilege separation (ordinary key 401 on admin surface, admin key 200,
+  admin key accepted by ordinary auth as superset credential);
+  outcome vocabulary endpoint (6 documented codes), free-text outcome
+  rejection (422 listing valid codes), structured outcome recording
+  (detail/closed_by/outcome_recorded_at), summary aggregation with
+  increment assertions.
+- `tests/unit/test_batch_g.py` (8 tests): registry covers 33/33 champion
+  schema features with source citations; unknown feature raises KeyError;
+  dynamic ch_/cat_ rules generate definitions; checked-in artifacts match
+  generation; MODEL_CARD.md reproduces the manifest's own numbers (val
+  0.8111 / honest test 0.7147), carries SIMULATED-savings semantics,
+  ULB external results, PaySim blocked honestly, and refuses incomplete
+  manifests or unknown champions (ValueError, tested).
+- Catalog re-validated: **901 features — 201 verified / 138 partial /
+  553 missing / 2 blocked / 6 N-A / 1 implemented_unverified** (the
+  implemented_unverified entry is `deploy_nonroot_user`: Dockerfile landed,
+  image build blocked on the unavailable Docker daemon — honest).
+- Full suite: **124/124 passed**; mypy clean (55 files); ruff clean;
+  frontend build clean. Docker Desktop still unresponsive (NEXT-02).
