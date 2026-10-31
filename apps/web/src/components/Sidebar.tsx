@@ -8,6 +8,7 @@ import {
   Activity,
   FileCheck2,
   BookOpenCheck,
+  GraduationCap,
 } from "lucide-react";
 
 export type ViewType =
@@ -18,7 +19,8 @@ export type ViewType =
   | "benchmark"
   | "drift"
   | "explain"
-  | "research";
+  | "research"
+  | "trail";
 
 interface SidebarProps {
   currentView: ViewType;
@@ -35,6 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
     { id: "drift" as ViewType, label: "Drift & Stress Lab", icon: Activity, badge: "PSI Alert" },
     { id: "explain" as ViewType, label: "Explainability Explorer", icon: FileCheck2, badge: "TreeSHAP" },
     { id: "research" as ViewType, label: "Evidence & Research", icon: BookOpenCheck, badge: "Artifacts" },
+    { id: "trail" as ViewType, label: "Vibe Coding Trail", icon: GraduationCap, badge: "20 Topics" },
   ];
 
   return (

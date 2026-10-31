@@ -9,6 +9,7 @@ import { BenchmarkLab } from "./views/BenchmarkLab";
 import { DriftLab } from "./views/DriftLab";
 import { ExplainabilityView } from "./views/ExplainabilityView";
 import { ResearchCenter } from "./views/ResearchCenter";
+import { TrailApp } from "./trail/TrailApp";
 import { checkHealth } from "./api";
 
 export const App: React.FC = () => {
@@ -72,6 +73,7 @@ export const App: React.FC = () => {
             {currentView === "drift" && <DriftLab />}
             {currentView === "explain" && <ExplainabilityView />}
             {currentView === "research" && <ResearchCenter />}
+            {currentView === "trail" && <TrailApp />}
           </main>
         </div>
       </div>

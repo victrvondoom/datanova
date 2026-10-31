@@ -45,3 +45,31 @@ cd apps/web && npm run build                  # frontend type-check + build
 E2E (score -> receipt -> verify): see `scripts/run_e2e.md`.
 External datasets: provenance in `DATA_PROVENANCE.md`; never fabricate or
 commit raw external data.
+
+## TRACEN Vibe Coding Trail (frontend learning product)
+
+The trail (`apps/web/src/trail/`) is a learning product embedded as a view
+in the existing dashboard. Conventions for any change to it:
+
+1. Content is DATA, not markup: all topic/glossary/quiz text lives in
+   `src/trail/content.ts`. Never inline topic prose into components.
+2. Simulation logic must stay PURE: behavior goes in
+   `src/trail/sims/logic.ts` (deterministic, DOM-free, unit-tested);
+   components in `Sims*.tsx` only render state and dispatch actions.
+   A simulation without a logic test is not done.
+3. Completion is earned, never granted: a topic completes only with BOTH
+   simulation interaction and a correct knowledge-check answer
+   (`progress.ts::completeTopic`). Do not weaken this gate.
+4. Handbook text is rendered verbatim; production corrections go into
+   visually separate "Production nuance"/warning callouts, and any new
+   simplification-vs-reality issue must be recorded in
+   `docs/content-accuracy-review.md`.
+5. No new runtime dependencies for the trail; hash routing
+   (`src/trail/router.ts`) instead of react-router; localStorage (behind
+   the storage interface in `progress.ts`) instead of any backend.
+6. Visual states must carry label + icon + color (see `ui.tsx::StateBadge`)
+   — meaning must never be communicated by color alone.
+7. Verification before claiming done:
+   `npm run test && npm run build && npx oxlint src/trail` in `apps/web`,
+   plus `npx playwright test e2e/trail.spec.ts` against
+   `vite preview --port 4173` for user-flow changes.
