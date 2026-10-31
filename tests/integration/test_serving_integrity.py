@@ -72,16 +72,36 @@ def test_score_is_idempotent_no_duplicate_effects():
     assert graph_edges_after_first >= graph_edges_before
 
 
+def _force_deterministic_429(prefix: str):
+    """Drives a REAL 429 through /api/score deterministically.
+
+    The production limiter is burst-60 with a 10 tokens/s refill, so
+    exhausting it by hammering depends on wall-clock request speed: on a
+    slow run the refill keeps up and no 429 ever fires (observed flake).
+    Swapping in a burst-1, ~zero-refill bucket makes throttling
+    timing-independent; the 429 still travels the full endpoint +
+    middleware path, and the production limiter is restored afterwards.
+    """
+    from apps.api.integrity import TokenBucketRateLimiter
+    from apps.api.main import state
+
+    real = state.require(state.rate_limiter)
+    state.rate_limiter = TokenBucketRateLimiter(rate_per_minute=0.001, burst=1)
+    try:
+        for i in range(4):
+            res = client.post("/api/score", json=_score_payload(f"{prefix}_{i}"))
+            if res.status_code == 429:
+                return res
+    finally:
+        state.rate_limiter = real
+    raise AssertionError("Rate limiter never fired despite a burst-1 bucket")
+
+
 def test_rate_limiting_returns_429():
-    """The per-client token bucket must eventually throttle with 429."""
-    # Burst well past the bucket (60 tokens + refill) from one client
-    statuses = []
-    for i in range(150):
-        res = client.post("/api/score", json=_score_payload(f"tx_rl_probe_{i}"))
-        statuses.append(res.status_code)
-        if res.status_code == 429:
-            break
-    assert 429 in statuses, "Rate limiter never fired despite a 150-request burst"
+    """The per-client token bucket throttles with 429 (deterministic)."""
+    res = _force_deterministic_429("tx_rl_det")
+    assert res.status_code == 429
+    assert "Rate limit exceeded" in res.json()["detail"]
     # Non-score endpoints are unaffected (health still fine)
     assert client.get("/api/health").status_code == 200
 

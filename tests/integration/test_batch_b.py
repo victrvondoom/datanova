@@ -135,21 +135,36 @@ def test_metrics_counters_reconcile_with_requests():
     assert counters["requests:/api/health"] == before_health + n_health
     assert counters["responses:2xx"] >= before_2xx + n_health
 
-    # A 429 burst must land in the rate_limited counter
-    for i in range(150):
-        res = client.post(
-            "/api/score",
-            json={
-                "transaction_id": f"tx_batchb_rl_{i}",
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-                "sender_id": "u1",
-                "receiver_id": "m1",
-                "amount": 10.0,
-                "channel": "web",
-            },
-        )
-        if res.status_code == 429:
-            break
+    # A 429 must land in the rate_limited counter. Deterministic: the
+    # production bucket (burst 60, refill 10/s) only exhausts when requests
+    # outrun the refill, which is wall-clock dependent (observed flake);
+    # a swapped-in burst-1 bucket throttles the second request regardless
+    # of machine speed, through the same endpoint + middleware path.
+    from apps.api.integrity import TokenBucketRateLimiter
+    from apps.api.main import state
+
+    real_limiter = state.require(state.rate_limiter)
+    state.rate_limiter = TokenBucketRateLimiter(rate_per_minute=0.001, burst=1)
+    try:
+        got_429 = False
+        for i in range(4):
+            res = client.post(
+                "/api/score",
+                json={
+                    "transaction_id": f"tx_batchb_rl_{i}",
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "sender_id": "u1",
+                    "receiver_id": "m1",
+                    "amount": 10.0,
+                    "channel": "web",
+                },
+            )
+            if res.status_code == 429:
+                got_429 = True
+                break
+        assert got_429, "Rate limiter never fired despite a burst-1 bucket"
+    finally:
+        state.rate_limiter = real_limiter
     counters_after = metrics.snapshot()["counters"]
     assert counters_after.get("rate_limited", 0) >= 1
 
