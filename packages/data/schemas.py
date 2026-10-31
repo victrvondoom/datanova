@@ -148,6 +148,9 @@ class PredictionResult(BaseModel):
     # reconstructing a receipt client-side produces a different payload than
     # the one that was signed and will fail HMAC verification.
     audit_receipt: Optional[Dict[str, Any]] = None
+    # True when this response is an idempotent replay of a previously stored
+    # decision (no side effects were re-applied).
+    idempotent_replay: bool = False
     evaluated_at: datetime = Field(default_factory=datetime.utcnow)
 
 

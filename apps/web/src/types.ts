@@ -39,6 +39,8 @@ export interface PredictionResult {
   audit_receipt_hash?: string;
   /** Server-signed receipt payload; verify this verbatim. */
   audit_receipt?: any;
+  /** True when this response replays a previously stored decision. */
+  idempotent_replay?: boolean;
 }
 
 export interface ReplayRecord {

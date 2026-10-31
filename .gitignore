@@ -62,3 +62,6 @@ datasets/external/*.arff
 
 # Playwright transient results
 apps/web/test-results/
+
+# Runtime decision ledger (append-only operational data, not evidence)
+benchmarks/runs/decision_ledger.jsonl

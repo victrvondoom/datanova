@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-31T06:52:55.081331",
+  "timestamp": "2026-10-31T08:16:21.041978",
   "dataset_manifest": {
     "dataset_name": "Synthetic_Bench_10000",
     "source_url_or_origin": "SyntheticTransactionGenerator(seed=42)",
@@ -75,7 +75,7 @@
         "baseline_cost_no_detection": 38577.83,
         "estimated_net_savings": 10733.26
       },
-      "training_time_seconds": 0.027,
+      "training_time_seconds": 0.049,
       "inference_latency_ms_per_tx": 0.0,
       "validation_pr_auc": 0.45268
     },
@@ -107,8 +107,8 @@
         "baseline_cost_no_detection": 38577.83,
         "estimated_net_savings": 28996.53
       },
-      "training_time_seconds": 0.292,
-      "inference_latency_ms_per_tx": 0.019,
+      "training_time_seconds": 0.355,
+      "inference_latency_ms_per_tx": 0.014,
       "validation_pr_auc": 0.73435
     },
     "LightGBM (Tabular)": {
@@ -139,8 +139,8 @@
         "baseline_cost_no_detection": 38577.83,
         "estimated_net_savings": 32616.95
       },
-      "training_time_seconds": 0.099,
-      "inference_latency_ms_per_tx": 0.001,
+      "training_time_seconds": 0.189,
+      "inference_latency_ms_per_tx": 0.002,
       "validation_pr_auc": 0.75199
     },
     "XGBoost": {
@@ -171,7 +171,7 @@
         "baseline_cost_no_detection": 38577.83,
         "estimated_net_savings": 31135.0
       },
-      "training_time_seconds": 0.204,
+      "training_time_seconds": 0.311,
       "inference_latency_ms_per_tx": 0.001,
       "validation_pr_auc": 0.81108
     },
@@ -203,8 +203,8 @@
         "baseline_cost_no_detection": 38577.83,
         "estimated_net_savings": 32636.95
       },
-      "training_time_seconds": 0.093,
-      "inference_latency_ms_per_tx": 0.001,
+      "training_time_seconds": 0.135,
+      "inference_latency_ms_per_tx": 0.003,
       "validation_pr_auc": 0.77981
     }
   },
@@ -321,7 +321,7 @@
         "use_challenge": true
       },
       "validation_cost": 4711.44,
-      "solve_time_ms": 2.343,
+      "solve_time_ms": 2.42,
       "status": "OPTIMAL"
     },
     "coarse_grid_solver": {
@@ -335,7 +335,7 @@
       "validation_cost": 4711.44,
       "validation_fpr": 0.00357,
       "validation_review_rate": 0.0,
-      "solve_time_ms": 42.521,
+      "solve_time_ms": 63.153,
       "note": "Legacy percentile grid; its fallback performs no constraint check and may violate the FPR or capacity constraints."
     },
     "optimization_gap_validation_usd": 0.0,

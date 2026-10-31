@@ -21,13 +21,19 @@ from typing import Any, Dict, Optional, TypeVar, cast
 import networkx as nx
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 # Ensure project root in pythonpath
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
+from apps.api.integrity import (
+    DecisionLedger,
+    IdempotencyCache,
+    RequestIDMiddleware,
+    TokenBucketRateLimiter,
+)
 from packages.artifacts.bundle import BundleValidationError, load_bundle
 from packages.data.schemas import (
     AuditReceipt,
@@ -85,6 +91,11 @@ class ModelState:
         self.calibration_source: str = "uninitialized"
         self.artifact_status: str = "not_loaded"
         self.artifact_run_id: Optional[str] = None
+        # Serving-integrity components (catalog: ingest_idem, api_rate_limiting,
+        # obs_request_ids, govern_decision_log, deploy_readiness_checks)
+        self.idempotency: Optional[IdempotencyCache] = None
+        self.rate_limiter: Optional[TokenBucketRateLimiter] = None
+        self.decision_ledger: Optional[DecisionLedger] = None
 
 
 state = ModelState()
@@ -101,6 +112,11 @@ CHAMPION_CALIBRATOR_PATH = os.environ.get(
 
 def init_engine():
     """Initializes the ML model, graph, and feature pipeline."""
+    state.idempotency = IdempotencyCache(capacity=4096)
+    state.rate_limiter = TokenBucketRateLimiter(rate_per_minute=600.0, burst=60)
+    state.decision_ledger = DecisionLedger(
+        path=os.environ.get("AEGIS_DECISION_LEDGER", "benchmarks/runs/decision_ledger.jsonl")
+    )
     state.receipt_gen = AuditReceiptGenerator()
     state.cost_engine = CostEngine()
     state.policy_optimizer = PolicyOptimizer()
@@ -254,6 +270,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Request correlation IDs + structured access logs (no payload data logged)
+if RequestIDMiddleware is not None:
+    app.add_middleware(RequestIDMiddleware)
+
 
 @app.get("/api/health")
 def health_check():
@@ -272,9 +292,12 @@ def health_check():
     }
 
 
-@app.post("/api/score", response_model=PredictionResult)
-def score_transaction(tx: Transaction):
-    """Real-time transaction scoring with trained ML model, SHAP, and audit receipt."""
+def _score_and_decide(tx: Transaction) -> PredictionResult:
+    """Core scoring path: features -> model -> calibration -> policy -> SHAP -> receipt.
+
+    No side-effect-free guarantees here: callers decide about idempotency,
+    rate limiting, and ledger persistence.
+    """
     t0 = time.perf_counter()
 
     if state.feature_pipeline is None or not state.feature_pipeline.fitted:
@@ -399,6 +422,81 @@ def score_transaction(tx: Transaction):
     )
 
 
+def _ledger_record(tx: Transaction, result: PredictionResult) -> None:
+    """Appends a decision record (receipt-linked, provenance-complete, payload-minimal)."""
+    ledger = state.require(state.decision_ledger)
+    ledger.append(
+        {
+            "transaction_id": tx.transaction_id,
+            "recorded_at": datetime.now(timezone.utc).isoformat(),
+            "model_id": result.model_id,
+            "model_version": result.model_version,
+            "policy_name": result.policy_name,
+            "artifact_run_id": state.artifact_run_id,
+            "calibration_source": state.calibration_source,
+            "calibrated_probability": result.calibrated_probability,
+            "recommended_action": result.recommended_action.value,
+            "receipt_sha256": result.audit_receipt_hash,
+            "source": "live",
+        }
+    )
+
+
+@app.get("/api/ready")
+def readiness_check():
+    """Readiness (distinct from liveness): can this engine serve real decisions?"""
+    checks = {
+        "model_loaded": state.model is not None,
+        "calibrator_fitted": bool(state.calibrator and state.calibrator.fitted),
+        "policy_present": state.current_policy is not None,
+        "feature_pipeline_fitted": bool(state.feature_pipeline and state.feature_pipeline.fitted),
+        "bundle_validated": state.artifact_status == "bundle_validated",
+    }
+    ready = all(checks.values())
+    return {
+        "ready": ready,
+        "checks": checks,
+        "artifact_status": state.artifact_status,
+        "artifact_run_id": state.artifact_run_id,
+        "calibration_source": state.calibration_source,
+    }
+
+
+@app.post("/api/score", response_model=PredictionResult)
+def score_transaction(tx: Transaction, request: Request):
+    """Real-time scoring with idempotency, rate limiting, and audit ledger.
+
+    - Re-delivery of the same transaction_id within the idempotency window
+      returns the ORIGINAL decision without re-applying side effects.
+    - Mutating traffic is rate limited per client with 429 responses.
+    - Every first-time decision is appended to the tamper-evident,
+      receipt-linked decision ledger.
+    """
+    if state.feature_pipeline is None or not state.feature_pipeline.fitted:
+        init_engine()
+
+    # Per-client token bucket (demo-scale defaults, documented in integrity.py)
+    client = request.client.host if request.client else "anonymous"
+    allowed, retry_after = state.require(state.rate_limiter).allow(client)
+    if not allowed:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Rate limit exceeded; retry after {retry_after:.1f}s",
+        )
+
+    # Idempotent replay: original decision returned, no side effects re-applied
+    cached = state.require(state.idempotency).get(tx.transaction_id)
+    if cached is not None:
+        replay = cached.model_copy()
+        replay.idempotent_replay = True
+        return replay
+
+    result = _score_and_decide(tx)
+    state.require(state.idempotency).put(tx.transaction_id, result)
+    _ledger_record(tx, result)
+    return result
+
+
 class InjectTransactionRequest(BaseModel):
     sender_id: str = "usr_9999"
     receiver_id: str = "merch_999"
@@ -425,7 +523,12 @@ def inject_transaction(req: InjectTransactionRequest):
         category=req.category,
         is_fraud=req.is_fraud_simulated,
     )
-    score_res = score_transaction(tx)
+    # Injection goes through the same integrity path (idempotency + ledger);
+    # injected ids are always fresh, so it behaves as first-time scoring.
+    result = _score_and_decide(tx)
+    state.require(state.idempotency).put(tx.transaction_id, result)
+    _ledger_record(tx, result)
+    score_res = result
     return {
         "status": "injected",
         "transaction": tx.model_dump(),
@@ -579,7 +682,9 @@ def get_replay_batch(offset: int = 0, limit: int = 50):
             device_id=str(row.get("device_id", "none")),
             is_fraud=int(row["is_fraud"]),
         )
-        score_res = score_transaction(tx)
+        # Replay is a reprocessing mode: it intentionally bypasses the live
+        # idempotency cache and ledger (simulation, not live decisions).
+        score_res = _score_and_decide(tx)
 
         is_fraud = int(row["is_fraud"])
         amt = float(row["amount"])

@@ -125,3 +125,34 @@ savings **$33,201.56 (86.1%)**, FPR **0.20%**, thresholds tau=(0.2222, 0.2322, 1
 - frontend: `npm run build` clean (tsc + vite)
 - Docker: image built; post-libgomp-fix build/smoke BLOCKED (Docker Desktop
   unresponsive) — see DEPLOYMENT_READINESS.md
+
+---
+
+## Milestone 3 Evidence (2026-10-31, feature-expansion campaign)
+
+### Feature catalog (Phase 1-2)
+- `python scripts/generate_feature_catalog.py` → **901 features, 30 domains,
+  82 dependency edges**. Validation (uniqueness, >=30/domain, status
+  vocabulary, evidence-file existence, dependency resolution) FAILED loudly
+  4 times during authoring and each violation was fixed (1 field-count bug,
+  2 duplicate names resolved by re-scoping, 1 unresolved dependency, 1
+  domain short by one entry) — the validator demonstrably works.
+- Outputs: `feature_catalog.json`, `FEATURE_CATALOG_900.md`,
+  `FEATURE_DOMAIN_MAP.md`, `FEATURE_GAP_ANALYSIS.md`,
+  `FEATURE_DEPENDENCY_GRAPH.md`, `FEATURE_PRIORITIZATION.md`,
+  `FEATURE_IMPLEMENTATION_STATUS.md`.
+
+### Implementation batch A (serving integrity)
+- `tests/integration/test_serving_integrity.py` (6 tests): idempotent
+  scoring (replay returns original decision, graph edges unchanged,
+  ledger not re-appended), rate limiting (429 on 150-request burst),
+  X-Request-ID generation/echo/malformed-input rejection, append-only
+  receipt-linked ledger, readiness endpoint (positive + negative).
+- Found + fixed en route: the committed champion bundle lacked its sidecar
+  manifest (pre-sidecar-redesign artifact) — the API correctly REFUSED it
+  (`bundle_rejected`); regenerating the bundle restored `bundle_validated`.
+  The refusal path behaved exactly as designed.
+- Full suite: **91/91 passed**; mypy clean (51 files); ruff clean; frontend
+  build clean.
+- Playwright re-run after the score-endpoint change: online journey PASSED,
+  offline journey PASSED (API stopped for the offline case).
