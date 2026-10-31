@@ -41,6 +41,7 @@ datasets/synthetic/*.parquet
 *.csv.gz
 
 # Frontend
+apps/node_modules/
 apps/web/node_modules/
 apps/web/dist/
 apps/web/.vite/
