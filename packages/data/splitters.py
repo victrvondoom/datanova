@@ -94,10 +94,12 @@ class ChronologicalSplitter:
             record_count=len(df),
             fraud_count=fraud_count,
             fraud_prevalence=round(prevalence, 6),
-            start_timestamp=start_ts.to_pydatetime() if hasattr(start_ts, "to_pydatetime") else start_ts,
+            start_timestamp=start_ts.to_pydatetime()
+            if hasattr(start_ts, "to_pydatetime")
+            else start_ts,
             end_timestamp=end_ts.to_pydatetime() if hasattr(end_ts, "to_pydatetime") else end_ts,
             sha256_checksum=data_digest,
-            split_strategy=f"Chronological_{int(self.train_ratio*100)}_{int(self.val_ratio*100)}_{int(self.test_ratio*100)}",
+            split_strategy=f"Chronological_{int(self.train_ratio * 100)}_{int(self.val_ratio * 100)}_{int(self.test_ratio * 100)}",
             train_count=len(train_df),
             val_count=len(val_df),
             test_count=len(test_df),

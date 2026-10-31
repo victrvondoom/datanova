@@ -1,4 +1,5 @@
 """Unit tests for temporal graph and cycle detection."""
+
 import os
 import sys
 

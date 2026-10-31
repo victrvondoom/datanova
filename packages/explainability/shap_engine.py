@@ -29,10 +29,19 @@ class ExplainabilityEngine:
     def _init_explainer(self, background_data: Optional[np.ndarray]):
         """Initializes appropriate SHAP explainer based on model architecture."""
         try:
-            if isinstance(self.model, (LightGBMFraudModel, XGBoostFraudModel)) and self.model.clf is not None:
+            if (
+                isinstance(self.model, (LightGBMFraudModel, XGBoostFraudModel))
+                and self.model.clf is not None
+            ):
                 self.explainer = shap.TreeExplainer(self.model.clf)
-            elif isinstance(self.model, LogisticRegressionFraudModel) and self.model.clf is not None:
-                bg = background_data if background_data is not None else np.zeros((10, len(self.feature_names)))
+            elif (
+                isinstance(self.model, LogisticRegressionFraudModel) and self.model.clf is not None
+            ):
+                bg = (
+                    background_data
+                    if background_data is not None
+                    else np.zeros((10, len(self.feature_names)))
+                )
                 self.explainer = shap.LinearExplainer(self.model.clf, bg)
             else:
                 # KernelExplainer fallback for arbitrary models
@@ -69,8 +78,16 @@ class ExplainabilityEngine:
                 top_indices = np.argsort(np.abs(vals))[::-1][:top_k]
 
                 for rank, idx in enumerate(top_indices, start=1):
-                    f_name = self.feature_names[idx] if idx < len(self.feature_names) else f"feature_{idx}"
-                    f_val = feature_values_dict.get(f_name, round(float(x_vector[idx]), 3)) if feature_values_dict else round(float(x_vector[idx]), 3)
+                    f_name = (
+                        self.feature_names[idx]
+                        if idx < len(self.feature_names)
+                        else f"feature_{idx}"
+                    )
+                    f_val = (
+                        feature_values_dict.get(f_name, round(float(x_vector[idx]), 3))
+                        if feature_values_dict
+                        else round(float(x_vector[idx]), 3)
+                    )
                     contributions.append(
                         FeatureContribution(
                             feature_name=f_name,
@@ -98,7 +115,9 @@ class ExplainabilityEngine:
         return contributions
 
     @staticmethod
-    def generate_narrative_explanation(contributions: List[FeatureContribution], action_name: str) -> str:
+    def generate_narrative_explanation(
+        contributions: List[FeatureContribution], action_name: str
+    ) -> str:
         """Translates numerical SHAP values into plain-English regulatory rationale."""
         if not contributions:
             return f"Action {action_name} triggered by baseline statistical distribution."
@@ -109,4 +128,6 @@ class ExplainabilityEngine:
             f"{c.feature_name} ({direction} fraud risk by {abs(c.shap_value):.2f})"
             for c in contributions[:3]
         ]
-        return f"Operational action '{action_name}' primarily driven by: " + "; ".join(reasons) + "."
+        return (
+            f"Operational action '{action_name}' primarily driven by: " + "; ".join(reasons) + "."
+        )

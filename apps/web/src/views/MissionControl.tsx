@@ -22,18 +22,19 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
     fetchBenchmarks().then((b) => setBenchmarks(b));
   }, []);
 
-  const championData = benchmarks?.benchmark_summary?.["AEGIS LightGBM + Graph"] || {
-    pr_auc: 0.8004,
-    recall_at_fpr_1pct: 0.8106,
-    financial_outcomes: { estimated_net_savings: 35516.39 },
-    inference_latency_ms_per_tx: 0.02,
+  const championName = benchmarks?.champion_model_name || "XGBoost";
+  const championData = benchmarks?.benchmark_summary?.[championName] || {
+    pr_auc: 0.7147,
+    recall_at_fpr_1pct: 0.7141,
+    financial_outcomes: { estimated_net_savings: 31135.0 },
+    inference_latency_ms_per_tx: 0.001,
   };
 
   const kpis = [
     {
       label: "Champion PR-AUC",
       value: championData.pr_auc.toFixed(4),
-      subtext: "vs 0.0949 Rule Baseline (+743%)",
+      subtext: "vs 0.0949 Rule Baseline (+653%)",
       icon: TrendingUp,
       badge: "Validated",
     },
@@ -47,7 +48,7 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
     {
       label: "Net Operational Savings",
       value: `$${championData.financial_outcomes.estimated_net_savings.toLocaleString("en-US", { maximumFractionDigits: 0 })}`,
-      subtext: "92.1% loss reduction under AEGIS policy",
+      subtext: "86.1% loss reduction under AEGIS policy",
       icon: DollarSign,
       badge: "Cost-Aware",
     },

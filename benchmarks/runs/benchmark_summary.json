@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-27T11:54:41.451238",
+  "timestamp": "2026-10-31T06:14:13.536675",
   "dataset_manifest": {
     "dataset_name": "Synthetic_Bench_10k",
     "source_url_or_origin": "SyntheticTransactionGenerator(seed=42)",
@@ -8,7 +8,7 @@
     "fraud_prevalence": 0.0199,
     "start_timestamp": "2026-01-01 00:14:21.367355",
     "end_timestamp": "2026-02-18 13:53:44.981759",
-    "sha256_checksum": "f8e57f97c769eb9d0c9441bdbe05f67210ece4b6ead8fb5993496ecd0d1df7ef",
+    "sha256_checksum": "f40c4cec7b5e2edd81b1378fe515bf1343f9392e6e830e448c0d085ff97381da",
     "split_strategy": "Chronological_60_20_20",
     "train_count": 6000,
     "val_count": 2000,
@@ -44,11 +44,12 @@
         "estimated_net_savings": 2827.76
       },
       "training_time_seconds": 0.0,
-      "inference_latency_ms_per_tx": 0.001
+      "inference_latency_ms_per_tx": 0.001,
+      "validation_pr_auc": 0.12156
     },
     "Logistic Regression": {
-      "pr_auc": 0.45055,
-      "roc_auc": 0.96461,
+      "pr_auc": 0.45093,
+      "roc_auc": 0.96462,
       "precision": 0.88889,
       "recall": 0.18605,
       "f1": 0.30769,
@@ -56,10 +57,10 @@
       "recall_at_fpr_1pct": 0.43033,
       "recall_at_fpr_05pct": 0.30522,
       "recall_at_fpr_01pct": 0.19903,
-      "precision_at_k100": 0.33,
-      "recall_at_k100": 0.76744,
-      "brier_score": 0.014296,
-      "expected_calibration_error": 0.003696,
+      "precision_at_k100": 0.34,
+      "recall_at_k100": 0.7907,
+      "brier_score": 0.014302,
+      "expected_calibration_error": 0.003934,
       "confusion_matrix": {
         "true_positives": 8,
         "false_positives": 1,
@@ -74,54 +75,56 @@
         "baseline_cost_no_detection": 38577.83,
         "estimated_net_savings": 10733.26
       },
-      "training_time_seconds": 0.018,
-      "inference_latency_ms_per_tx": 0.0
+      "training_time_seconds": 0.031,
+      "inference_latency_ms_per_tx": 0.0,
+      "validation_pr_auc": 0.45268
     },
     "Random Forest": {
-      "pr_auc": 0.75695,
-      "roc_auc": 0.96772,
-      "precision": 1.0,
-      "recall": 0.39535,
-      "f1": 0.56667,
-      "false_positive_rate": 0.0,
-      "recall_at_fpr_1pct": 0.72009,
-      "recall_at_fpr_05pct": 0.60465,
-      "recall_at_fpr_01pct": 0.51163,
+      "pr_auc": 0.71896,
+      "roc_auc": 0.97827,
+      "precision": 0.95,
+      "recall": 0.44186,
+      "f1": 0.60317,
+      "false_positive_rate": 0.00051,
+      "recall_at_fpr_1pct": 0.67237,
+      "recall_at_fpr_05pct": 0.57925,
+      "recall_at_fpr_01pct": 0.47524,
       "precision_at_k100": 0.39,
       "recall_at_k100": 0.90698,
-      "brier_score": 0.009153,
-      "expected_calibration_error": 0.00355,
+      "brier_score": 0.009618,
+      "expected_calibration_error": 0.003638,
       "confusion_matrix": {
-        "true_positives": 17,
-        "false_positives": 0,
-        "true_negatives": 1957,
-        "false_negatives": 26
+        "true_positives": 19,
+        "false_positives": 1,
+        "true_negatives": 1956,
+        "false_negatives": 24
       },
       "financial_outcomes": {
-        "uncaught_fraud_loss": 10734.04,
-        "investigation_labor_cost": 255.0,
-        "customer_friction_cost": 0.0,
-        "total_operational_cost": 10989.04,
+        "uncaught_fraud_loss": 9276.3,
+        "investigation_labor_cost": 300.0,
+        "customer_friction_cost": 5.0,
+        "total_operational_cost": 9581.3,
         "baseline_cost_no_detection": 38577.83,
-        "estimated_net_savings": 27588.79
+        "estimated_net_savings": 28996.53
       },
-      "training_time_seconds": 0.22,
-      "inference_latency_ms_per_tx": 0.013
+      "training_time_seconds": 0.303,
+      "inference_latency_ms_per_tx": 0.013,
+      "validation_pr_auc": 0.73435
     },
     "LightGBM (Tabular)": {
-      "pr_auc": 0.79765,
-      "roc_auc": 0.99276,
+      "pr_auc": 0.72399,
+      "roc_auc": 0.98914,
       "precision": 0.95652,
       "recall": 0.51163,
       "f1": 0.66667,
       "false_positive_rate": 0.00051,
-      "recall_at_fpr_1pct": 0.78736,
-      "recall_at_fpr_05pct": 0.66323,
-      "recall_at_fpr_01pct": 0.54501,
+      "recall_at_fpr_1pct": 0.68868,
+      "recall_at_fpr_05pct": 0.58413,
+      "recall_at_fpr_01pct": 0.51163,
       "precision_at_k100": 0.4,
       "recall_at_k100": 0.93023,
-      "brier_score": 0.008169,
-      "expected_calibration_error": 0.003625,
+      "brier_score": 0.008608,
+      "expected_calibration_error": 0.004328,
       "confusion_matrix": {
         "true_positives": 22,
         "false_positives": 1,
@@ -129,61 +132,31 @@
         "false_negatives": 21
       },
       "financial_outcomes": {
-        "uncaught_fraud_loss": 7061.32,
+        "uncaught_fraud_loss": 5610.88,
         "investigation_labor_cost": 345.0,
         "customer_friction_cost": 5.0,
-        "total_operational_cost": 7411.32,
+        "total_operational_cost": 5960.88,
         "baseline_cost_no_detection": 38577.83,
-        "estimated_net_savings": 31166.51
+        "estimated_net_savings": 32616.95
       },
-      "training_time_seconds": 0.054,
-      "inference_latency_ms_per_tx": 0.001
+      "training_time_seconds": 0.116,
+      "inference_latency_ms_per_tx": 0.002,
+      "validation_pr_auc": 0.75199
     },
     "XGBoost": {
-      "pr_auc": 0.77548,
-      "roc_auc": 0.98116,
-      "precision": 0.96,
-      "recall": 0.55814,
-      "f1": 0.70588,
-      "false_positive_rate": 0.00051,
-      "recall_at_fpr_1pct": 0.73753,
-      "recall_at_fpr_05pct": 0.66391,
-      "recall_at_fpr_01pct": 0.59152,
-      "precision_at_k100": 0.39,
-      "recall_at_k100": 0.90698,
-      "brier_score": 0.007935,
-      "expected_calibration_error": 0.003626,
-      "confusion_matrix": {
-        "true_positives": 24,
-        "false_positives": 1,
-        "true_negatives": 1956,
-        "false_negatives": 19
-      },
-      "financial_outcomes": {
-        "uncaught_fraud_loss": 5604.46,
-        "investigation_labor_cost": 375.0,
-        "customer_friction_cost": 5.0,
-        "total_operational_cost": 5984.46,
-        "baseline_cost_no_detection": 38577.83,
-        "estimated_net_savings": 32593.37
-      },
-      "training_time_seconds": 0.163,
-      "inference_latency_ms_per_tx": 0.001
-    },
-    "AEGIS LightGBM + Graph": {
-      "pr_auc": 0.80041,
-      "roc_auc": 0.99034,
+      "pr_auc": 0.71466,
+      "roc_auc": 0.99145,
       "precision": 0.92,
       "recall": 0.53488,
       "f1": 0.67647,
       "false_positive_rate": 0.00102,
-      "recall_at_fpr_1pct": 0.81062,
-      "recall_at_fpr_05pct": 0.69002,
-      "recall_at_fpr_01pct": 0.53338,
-      "precision_at_k100": 0.4,
-      "recall_at_k100": 0.93023,
-      "brier_score": 0.008279,
-      "expected_calibration_error": 0.00381,
+      "recall_at_fpr_1pct": 0.71412,
+      "recall_at_fpr_05pct": 0.64532,
+      "recall_at_fpr_01pct": 0.52338,
+      "precision_at_k100": 0.39,
+      "recall_at_k100": 0.90698,
+      "brier_score": 0.009085,
+      "expected_calibration_error": 0.00478,
       "confusion_matrix": {
         "true_positives": 23,
         "false_positives": 2,
@@ -191,28 +164,61 @@
         "false_negatives": 20
       },
       "financial_outcomes": {
-        "uncaught_fraud_loss": 5607.95,
+        "uncaught_fraud_loss": 7057.83,
         "investigation_labor_cost": 375.0,
         "customer_friction_cost": 10.0,
-        "total_operational_cost": 5992.95,
+        "total_operational_cost": 7442.83,
         "baseline_cost_no_detection": 38577.83,
-        "estimated_net_savings": 32584.88
+        "estimated_net_savings": 31135.0
       },
-      "training_time_seconds": 0.052,
-      "inference_latency_ms_per_tx": 0.001
+      "training_time_seconds": 0.233,
+      "inference_latency_ms_per_tx": 0.001,
+      "validation_pr_auc": 0.81108
+    },
+    "AEGIS LightGBM + Graph": {
+      "pr_auc": 0.76672,
+      "roc_auc": 0.99046,
+      "precision": 1.0,
+      "recall": 0.51163,
+      "f1": 0.67692,
+      "false_positive_rate": 0.0,
+      "recall_at_fpr_1pct": 0.77529,
+      "recall_at_fpr_05pct": 0.61959,
+      "recall_at_fpr_01pct": 0.51163,
+      "precision_at_k100": 0.4,
+      "recall_at_k100": 0.93023,
+      "brier_score": 0.008152,
+      "expected_calibration_error": 0.003727,
+      "confusion_matrix": {
+        "true_positives": 22,
+        "false_positives": 0,
+        "true_negatives": 1957,
+        "false_negatives": 21
+      },
+      "financial_outcomes": {
+        "uncaught_fraud_loss": 5610.88,
+        "investigation_labor_cost": 330.0,
+        "customer_friction_cost": 0.0,
+        "total_operational_cost": 5940.88,
+        "baseline_cost_no_detection": 38577.83,
+        "estimated_net_savings": 32636.95
+      },
+      "training_time_seconds": 0.125,
+      "inference_latency_ms_per_tx": 0.002,
+      "validation_pr_auc": 0.77981
     }
   },
-  "champion_model_name": "AEGIS LightGBM + Graph",
+  "champion_model_name": "XGBoost",
   "champion_confidence_intervals_95": {
     "pr_auc": {
-      "mean": 0.80136,
-      "ci_lower": 0.67372,
-      "ci_upper": 0.90668
+      "mean": 0.71687,
+      "ci_lower": 0.59116,
+      "ci_upper": 0.82943
     },
     "roc_auc": {
-      "mean": 0.9905,
-      "ci_lower": 0.9814,
-      "ci_upper": 0.99764
+      "mean": 0.99158,
+      "ci_lower": 0.98627,
+      "ci_upper": 0.99609
     }
   },
   "policy_comparisons": {
@@ -225,10 +231,10 @@
         "use_challenge": false
       },
       "metrics": {
-        "total_cost": 5657.95,
+        "total_cost": 7107.83,
         "baseline_unmitigated_loss": 38577.83,
-        "estimated_savings": 32919.88,
-        "savings_ratio": 0.8533,
+        "estimated_savings": 31470.0,
+        "savings_ratio": 0.8158,
         "false_positive_rate": 0.00102,
         "review_rate": 0.0,
         "action_counts": {
@@ -248,38 +254,52 @@
         "use_challenge": false
       },
       "metrics": {
-        "total_cost": 5017.05,
+        "total_cost": 7107.83,
         "baseline_unmitigated_loss": 38577.83,
-        "estimated_savings": 33560.78,
-        "savings_ratio": 0.8699,
-        "false_positive_rate": 0.00358,
-        "review_rate": 0.007,
+        "estimated_savings": 31470.0,
+        "savings_ratio": 0.8158,
+        "false_positive_rate": 0.00102,
+        "review_rate": 0.0,
         "action_counts": {
-          "ALLOW": 1966,
+          "ALLOW": 1975,
           "CHALLENGE": 0,
-          "REVIEW": 14,
-          "BLOCK": 20
+          "REVIEW": 0,
+          "BLOCK": 25
         }
       }
     },
     "aegis_cost_optimized": {
       "policy": {
         "policy_name": "Cost-Aware-Optimized",
-        "tau_allow": 0.15,
-        "tau_review": 0.42,
-        "tau_block": 0.75,
+        "tau_allow": 0.2222,
+        "tau_review": 0.2322,
+        "tau_block": 1.0,
         "use_challenge": true
       },
       "metrics": {
-        "total_cost": 3061.44,
+        "total_cost": 5376.27,
         "baseline_unmitigated_loss": 38577.83,
-        "estimated_savings": 35516.39,
-        "savings_ratio": 0.9206,
-        "false_positive_rate": 0.00869,
+        "estimated_savings": 33201.56,
+        "savings_ratio": 0.8606,
+        "false_positive_rate": 0.00204,
         "review_rate": 0.0,
         "action_counts": {
-          "ALLOW": 1949,
-          "CHALLENGE": 26,
+          "ALLOW": 1970,
+          "CHALLENGE": 5,
+          "REVIEW": 0,
+          "BLOCK": 25
+        }
+      },
+      "validation_fit_metrics": {
+        "total_cost": 4711.44,
+        "baseline_unmitigated_loss": 32092.91,
+        "estimated_savings": 27381.47,
+        "savings_ratio": 0.8532,
+        "false_positive_rate": 0.00357,
+        "review_rate": 0.0,
+        "action_counts": {
+          "ALLOW": 1966,
+          "CHALLENGE": 9,
           "REVIEW": 0,
           "BLOCK": 25
         }

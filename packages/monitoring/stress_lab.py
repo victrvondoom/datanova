@@ -35,10 +35,12 @@ class StressTestingLab:
         Adversaries split high-value fraud into multiple structured amounts below reporting rules ($4,900).
         """
         stressed = df.copy()
-        fraud_mask = (stressed["is_fraud"] == 1)
+        fraud_mask = stressed["is_fraud"] == 1
         fraud_indices = stressed[fraud_mask].index.tolist()
 
-        target_indices = self.rng.choice(fraud_indices, size=int(len(fraud_indices) * attack_fraction), replace=False)
+        target_indices = self.rng.choice(
+            fraud_indices, size=int(len(fraud_indices) * attack_fraction), replace=False
+        )
         for idx in target_indices:
             # Structuring: amounts between $4,500 and $4,890
             stressed.loc[idx, "amount"] = float(threshold_ceiling - self.rng.uniform(10.0, 390.0))
@@ -55,13 +57,17 @@ class StressTestingLab:
         Adversaries rotate random fake device IDs to evade single-device velocity checks.
         """
         stressed = df.copy()
-        fraud_mask = (stressed["is_fraud"] == 1)
+        fraud_mask = stressed["is_fraud"] == 1
         fraud_indices = stressed[fraud_mask].index.tolist()
 
-        target_indices = self.rng.choice(fraud_indices, size=int(len(fraud_indices) * spoof_fraction), replace=False)
+        target_indices = self.rng.choice(
+            fraud_indices, size=int(len(fraud_indices) * spoof_fraction), replace=False
+        )
         for idx in target_indices:
             stressed.loc[idx, "device_id"] = f"spoofed_dev_{self.rng.integers(100000, 999999)}"
-            stressed.loc[idx, "ip_address"] = f"proxy_{self.rng.integers(1, 255)}.{self.rng.integers(1, 255)}.1.1"
+            stressed.loc[idx, "ip_address"] = (
+                f"proxy_{self.rng.integers(1, 255)}.{self.rng.integers(1, 255)}.1.1"
+            )
 
         return stressed
 
@@ -80,8 +86,8 @@ class StressTestingLab:
         cfg = cost_config or CostConfiguration()
         # 1. Clean evaluation
         X_clean = feature_transform_fn(clean_test_df)
-        y_clean = clean_test_df["is_fraud"].values
-        amt_clean = clean_test_df["amount"].values
+        y_clean = np.asarray(clean_test_df["is_fraud"].values)
+        amt_clean = np.asarray(clean_test_df["amount"].values)
 
         raw_clean = model.predict_proba(X_clean)
         prob_clean = calibrator.calibrate(raw_clean)
@@ -89,12 +95,14 @@ class StressTestingLab:
 
         # 2. Stressed evaluation
         X_stress = feature_transform_fn(stressed_test_df)
-        y_stress = stressed_test_df["is_fraud"].values
-        amt_stress = stressed_test_df["amount"].values
+        y_stress = np.asarray(stressed_test_df["is_fraud"].values)
+        amt_stress = np.asarray(stressed_test_df["amount"].values)
 
         raw_stress = model.predict_proba(X_stress)
         prob_stress = calibrator.calibrate(raw_stress)
-        res_stress = FraudEvaluationMetrics.evaluate(y_stress, prob_stress, amt_stress, cost_config=cfg)
+        res_stress = FraudEvaluationMetrics.evaluate(
+            y_stress, prob_stress, amt_stress, cost_config=cfg
+        )
 
         # Calculate degradation deltas
         delta_pr_auc = round(res_stress["pr_auc"] - res_clean["pr_auc"], 4)
@@ -113,7 +121,9 @@ class StressTestingLab:
             "stressed_scenario": {
                 "pr_auc": res_stress["pr_auc"],
                 "recall_at_1pct_fpr": res_stress["recall_at_fpr_1pct"],
-                "total_operational_cost": res_stress["financial_outcomes"]["total_operational_cost"],
+                "total_operational_cost": res_stress["financial_outcomes"][
+                    "total_operational_cost"
+                ],
             },
             "resilience_summary": {
                 "pr_auc_degradation": delta_pr_auc,

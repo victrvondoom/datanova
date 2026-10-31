@@ -63,7 +63,7 @@ class FeaturePipeline:
         combined = combined[self.feature_names]
 
         # Standard scale
-        scaled = self.scaler.transform(combined.values)
+        scaled = np.asarray(self.scaler.transform(combined.values))
         return scaled
 
     def fit_transform(self, df: pd.DataFrame) -> np.ndarray:

@@ -48,23 +48,23 @@ class TemporalFeatureExtractor:
 
         # 2. Circadian features
         ts = pd.to_datetime(df[time_col])
-        hour = ts.dt.hour.values
-        dow = ts.dt.dayofweek.values
+        hour = np.asarray(ts.dt.hour.values)
+        dow = np.asarray(ts.dt.dayofweek.values)
 
         features["hour_of_day"] = hour
         features["day_of_week"] = dow
-        features["is_weekend"] = (dow >= 5).astype(int)
+        features["is_weekend"] = np.asarray(dow >= 5).astype(int)
 
         # Cyclical sine/cosine transformation for continuous periodic signals
-        features["hour_sin"] = np.sin(2 * np.pi * hour / 24.0)
-        features["hour_cos"] = np.cos(2 * np.pi * hour / 24.0)
-        features["dow_sin"] = np.sin(2 * np.pi * dow / 7.0)
-        features["dow_cos"] = np.cos(2 * np.pi * dow / 7.0)
+        features["hour_sin"] = np.sin(2 * np.pi * np.asarray(hour) / 24.0)
+        features["hour_cos"] = np.cos(2 * np.pi * np.asarray(hour) / 24.0)
+        features["dow_sin"] = np.sin(2 * np.pi * np.asarray(dow) / 7.0)
+        features["dow_cos"] = np.cos(2 * np.pi * np.asarray(dow) / 7.0)
 
         # 3. Fast grouping for rolling sender velocities
         # Group by sender to compute rolling metrics chronologically
         n = len(df)
-        time_seconds = ts.astype("int64").values // 10**9
+        time_seconds = np.asarray(ts.astype("int64").values) // 10**9
         amounts = df[amount_col].values
         senders = df[sender_col].values
         devices = df[device_col].fillna("none").values if device_col in df else ["none"] * n
@@ -76,7 +76,7 @@ class TemporalFeatureExtractor:
         tx_count_24h = np.zeros(n, dtype=np.float32)
         tx_amount_sum_24h = np.zeros(n, dtype=np.float32)
         amount_ratio_24h = np.ones(n, dtype=np.float32)
-        time_since_prev_sec = np.full(n, 86400.0, dtype=np.float32) # Default 24h
+        time_since_prev_sec = np.full(n, 86400.0, dtype=np.float32)  # Default 24h
         distinct_devices_24h = np.ones(n, dtype=np.float32)
         distinct_ips_24h = np.ones(n, dtype=np.float32)
         distinct_receivers_24h = np.ones(n, dtype=np.float32)
@@ -154,6 +154,8 @@ class TemporalFeatureExtractor:
         features["distinct_receivers_24h"] = distinct_receivers_24h
 
         # Velocity surge flag: e.g. >= 3 tx in 1 hour or sudden device proliferation
-        features["is_velocity_surge"] = ((tx_count_1h >= 3) | (distinct_devices_24h >= 2)).astype(int)
+        features["is_velocity_surge"] = ((tx_count_1h >= 3) | (distinct_devices_24h >= 2)).astype(
+            int
+        )
 
         return features

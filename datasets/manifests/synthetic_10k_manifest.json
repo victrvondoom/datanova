@@ -6,7 +6,7 @@
   "fraud_prevalence": 0.0199,
   "start_timestamp": "2026-01-01 00:14:21.367355",
   "end_timestamp": "2026-02-18 13:53:44.981759",
-  "sha256_checksum": "f8e57f97c769eb9d0c9441bdbe05f67210ece4b6ead8fb5993496ecd0d1df7ef",
+  "sha256_checksum": "f40c4cec7b5e2edd81b1378fe515bf1343f9392e6e830e448c0d085ff97381da",
   "split_strategy": "Chronological_60_20_20",
   "train_count": 6000,
   "val_count": 2000,

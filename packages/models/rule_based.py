@@ -21,7 +21,9 @@ class RuleBasedFraudClassifier(BaseFraudClassifier):
     def __init__(self):
         super().__init__(model_id="rule_baseline_v1", version="1.0.0")
 
-    def fit(self, X: np.ndarray, y: np.ndarray, feature_names: Optional[List[str]] = None) -> "RuleBasedFraudClassifier":
+    def fit(
+        self, X: np.ndarray, y: np.ndarray, feature_names: Optional[List[str]] = None
+    ) -> "RuleBasedFraudClassifier":
         self.feature_names = feature_names or []
         self.fitted = True
         return self

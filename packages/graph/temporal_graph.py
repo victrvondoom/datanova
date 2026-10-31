@@ -62,11 +62,13 @@ class TemporalFraudGraph:
         if edge_key not in self.edge_history:
             self.edge_history[edge_key] = []
 
-        self.edge_history[edge_key].append({
-            "timestamp": norm_ts,
-            "amount": amount,
-            "type": "payment",
-        })
+        self.edge_history[edge_key].append(
+            {
+                "timestamp": norm_ts,
+                "amount": amount,
+                "type": "payment",
+            }
+        )
 
         # Add or update edge weight in NetworkX
         self.graph.add_edge(sender_id, receiver_id, weight=amount, last_seen=norm_ts)
@@ -101,5 +103,7 @@ class TemporalFraudGraph:
             "total_nodes": self.graph.number_of_nodes(),
             "total_edges": self.graph.number_of_edges(),
             "tracked_devices": len(self.device_to_accounts),
-            "multi_account_devices": sum(1 for accs in self.device_to_accounts.values() if len(accs) > 1),
+            "multi_account_devices": sum(
+                1 for accs in self.device_to_accounts.values() if len(accs) > 1
+            ),
         }

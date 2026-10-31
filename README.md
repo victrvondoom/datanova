@@ -4,7 +4,7 @@
 [![Python 3.12](https://img.shields.io/badge/Python-3.12.10-green.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.6-teal.svg)](https://fastapi.tiangolo.com)
 [![React 18](https://img.shields.io/badge/React-18.3.1-cyan.svg)](https://react.dev/)
-[![Tests](https://img.shields.io/badge/pytest-24%2F24%20Passed-emerald.svg)](tests/)
+[![Tests](https://img.shields.io/badge/pytest-41%2F41%20Passed-emerald.svg)](tests/)
 [![Offline First](https://img.shields.io/badge/Deployment-100%25%20Local%20%26%20Offline-orange.svg)]()
 
 > **Target:** DataNova 2026 Global Data-thon  
@@ -33,24 +33,31 @@ Conventional financial fraud detection systems suffer from three fundamental def
 
 ## 2. Empirical Benchmark Matrix (Held-Out Test Set)
 
-*Evaluated on 10,000 deterministic seeded transactions (2.0% ground-truth fraud) across a common chronologically partitioned test split.*
+*Evaluated on 10,000 deterministic seeded transactions (1.99% ground-truth fraud) across a common chronologically partitioned test split. **Champion selection uses VALIDATION PR-AUC only; policy thresholds are fitted on VALIDATION and the frozen policy is evaluated once on TEST — the test partition never influences any selection or fitting decision.***
 
-| Model Architecture | PR-AUC | ROC-AUC | Recall @ FPR=1% | Brier Score | Latency (ms) | Total Operational Cost ($) | Net Savings ($) |
+| Model Architecture | Val PR-AUC (selection) | Test PR-AUC | Test ROC-AUC | Recall @ FPR=1% | Brier Score | Latency (ms) | Total Operational Cost ($) |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Rule-Based Heuristic** | 0.0949 | 0.6091 | 12.45% | 0.0198 | < 0.01 ms | $35,750.07 | Baseline |
-| **Logistic Regression (L2)** | 0.4506 | 0.9646 | 43.03% | 0.0143 | < 0.01 ms | $27,844.57 | $7,905.50 |
-| **Random Forest** | 0.7570 | 0.9677 | 72.01% | 0.0092 | 0.01 ms | $10,989.04 | $24,761.03 |
-| **LightGBM (Tabular Only)** | 0.7976 | 0.9928 | 78.74% | 0.0082 | < 0.01 ms | $7,411.32 | $28,338.75 |
-| **XGBoost** | 0.7755 | 0.9812 | 73.75% | 0.0079 | < 0.01 ms | $5,984.46 | $29,765.61 |
-| **AEGIS LightGBM + Graph** | **0.8004** | **0.9903** | **81.06%** | **0.0083** | **< 0.01 ms** | **$5,992.95** | **$29,757.12** |
+| **Rule-Based Heuristic** | 0.1216 | 0.0949 | 0.6091 | 12.45% | 0.0198 | < 0.01 ms | $35,750.07 |
+| **Logistic Regression (L2)** | 0.4527 | 0.4509 | 0.9646 | 43.03% | 0.0143 | < 0.01 ms | $27,844.57 |
+| **Random Forest** | 0.7343 | 0.7190 | 0.9783 | 67.24% | 0.0096 | 0.01 ms | $9,581.30 |
+| **LightGBM (Tabular Only)** | 0.7520 | 0.7240 | 0.9891 | 68.87% | 0.0086 | < 0.01 ms | $5,960.88 |
+| **XGBoost (Champion by Validation)** | **0.8111** | 0.7147 | 0.9915 | 71.41% | 0.0091 | < 0.01 ms | $7,442.83 |
+| **AEGIS LightGBM + Graph** | 0.7798 | **0.7667** | 0.9905 | **77.53%** | **0.0082** | < 0.01 ms | $5,940.88 |
 
-### 95% Bootstrap Confidence Intervals (Champion Model)
-- **PR-AUC (95% CI):** `[0.6737, 0.9067]` (Empirical Mean: 0.8014, 200 resamples)
-- **ROC-AUC (95% CI):** `[0.9814, 0.9976]` (Empirical Mean: 0.9905)
+### 95% Bootstrap Confidence Intervals (Champion Model — XGBoost, selected on validation)
+- **PR-AUC (95% CI):** `[0.5912, 0.8294]` (Empirical Mean: 0.7169, 200 resamples)
+- **ROC-AUC (95% CI):** `[0.9863, 0.9961]` (Empirical Mean: 0.9916)
 
-### Operational Policy Comparison
-- **Conventional Fixed Threshold ($p \ge 0.5$):** Cost = **$5,657.95**
-- **AEGIS Cost-Aware Optimized Policy:** Cost = **$3,061.44** (Achieves **$35,516.39 net savings**, a **92.1% loss reduction** while keeping FPR at 0.87%).
+### Operational Policy Comparison (frozen validation-fitted policy, evaluated on held-out test)
+- **Conventional Fixed Threshold ($p \ge 0.5$):** Cost = **$7,107.83** (FPR 0.10%)
+- **AEGIS Cost-Aware Optimized Policy:** Cost = **$5,376.27** (achieves **$33,201.56 net savings**, an **86.1% loss reduction** while keeping FPR at 0.20%).
+
+> **Evidence integrity note (2026-10-31 audit):** earlier versions of this README
+> reported PR-AUC 0.8004 and 92.1% savings. Those numbers were produced by a
+> protocol that selected the champion and tuned policy thresholds on the held-out
+> test partition (test-set leakage). The corrected zero-leakage protocol above
+> supersedes them. See `AUDIT_FINDINGS.md` (issue AFX-01) and
+> `reports/BENCHMARK_REPORT.md` for reproducible artifacts.
 
 ---
 

@@ -41,7 +41,7 @@ class DriftMonitor:
         bin_edges = np.percentile(b, quantiles)
         bin_edges[0] -= 1e-5
         bin_edges[-1] += 1e-5
-        bin_edges = np.unique(bin_edges) # Deduplicate
+        bin_edges = np.unique(bin_edges)  # Deduplicate
 
         if len(bin_edges) < 2:
             return 0.0
@@ -90,7 +90,9 @@ class DriftMonitor:
         if feature_baselines and feature_currents:
             for fname, b_vals in feature_baselines.items():
                 if fname in feature_currents:
-                    feat_drifts[fname] = round(self.calculate_psi(b_vals, feature_currents[fname]), 4)
+                    feat_drifts[fname] = round(
+                        self.calculate_psi(b_vals, feature_currents[fname]), 4
+                    )
 
         return {
             "status": status,

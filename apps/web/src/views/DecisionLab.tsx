@@ -12,19 +12,19 @@ export const DecisionLab: React.FC = () => {
   const [appliedBanner, setAppliedBanner] = useState<string | null>(null);
 
   const [policyData, setPolicyData] = useState<any>({
-    active_policy: { tau_allow: 0.15, tau_review: 0.42, tau_block: 0.75 },
+    active_policy: { tau_allow: 0.2222, tau_review: 0.2322, tau_block: 1.0 },
     comparisons: {
       fixed_threshold_baseline: {
         policy: { policy_name: "Fixed-Threshold (p>=0.5)", tau_allow: 0.5, tau_review: 0.5, tau_block: 0.5 },
-        metrics: { total_cost: 5657.95, false_positive_rate: 0.001, estimated_savings: 32919.88, false_positives: 3, fraud_loss_cost: 5582.95 }
+        metrics: { total_cost: 7107.83, false_positive_rate: 0.00102, estimated_savings: 31470.00 }
       },
       conservative_baseline: {
         policy: { policy_name: "Conservative Heuristic", tau_allow: 0.3, tau_review: 0.7, tau_block: 0.95 },
-        metrics: { total_cost: 5017.05, false_positive_rate: 0.0036, estimated_savings: 33560.78, false_positives: 11, fraud_loss_cost: 4120.0 }
+        metrics: { total_cost: 7107.83, false_positive_rate: 0.00102, estimated_savings: 31470.00 }
       },
       aegis_cost_optimized: {
-        policy: { policy_name: "Cost-Aware-Optimized", tau_allow: 0.15, tau_review: 0.42, tau_block: 0.75 },
-        metrics: { total_cost: 3061.44, false_positive_rate: 0.0087, estimated_savings: 35516.39, false_positives: 26, fraud_loss_cost: 842.10 }
+        policy: { policy_name: "Cost-Aware-Optimized", tau_allow: 0.2222, tau_review: 0.2322, tau_block: 1.0 },
+        metrics: { total_cost: 5376.27, false_positive_rate: 0.00204, estimated_savings: 33201.56 }
       }
     }
   });
@@ -49,10 +49,10 @@ export const DecisionLab: React.FC = () => {
     }
   };
 
-  const opt = policyData?.comparisons?.aegis_cost_optimized?.metrics || { total_cost: 3061.44, false_positive_rate: 0.0087 };
-  const fixed = policyData?.comparisons?.fixed_threshold_baseline?.metrics || { total_cost: 5657.95, false_positive_rate: 0.001 };
+  const opt = policyData?.comparisons?.aegis_cost_optimized?.metrics || { total_cost: 5376.27, false_positive_rate: 0.00204 };
+  const fixed = policyData?.comparisons?.fixed_threshold_baseline?.metrics || { total_cost: 7107.83, false_positive_rate: 0.00102 };
   const netAdvantage = Math.max(0, fixed.total_cost - opt.total_cost);
-  const activePol = policyData?.active_policy || { tau_allow: 0.15, tau_review: 0.42, tau_block: 0.75 };
+  const activePol = policyData?.active_policy || { tau_allow: 0.2222, tau_review: 0.2322, tau_block: 1.0 };
 
   return (
     <div className="space-y-6">

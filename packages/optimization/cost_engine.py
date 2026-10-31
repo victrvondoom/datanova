@@ -7,7 +7,7 @@ Calculates expected financial loss, manual review expense, and customer friction
 - BLOCK: Immediate decline (prevents fraud loss, but causes high churn/friction if legitimate)
 """
 
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 import numpy as np
 
@@ -66,7 +66,7 @@ class CostEngine:
         amounts: np.ndarray,
         labels: np.ndarray,
         policy: DecisionPolicy,
-    ) -> Dict[str, float]:
+    ) -> Dict[str, Any]:
         """
         Calculates total operational cost, action distribution, and false positive rates for a given policy.
         """
@@ -92,7 +92,11 @@ class CostEngine:
                 act = OperationalAction.ALLOW
                 c_allow += 1
             elif p < policy.tau_review:
-                act = OperationalAction.CHALLENGE if policy.use_challenge else OperationalAction.REVIEW
+                act = (
+                    OperationalAction.CHALLENGE
+                    if policy.use_challenge
+                    else OperationalAction.REVIEW
+                )
                 if act == OperationalAction.CHALLENGE:
                     c_challenge += 1
                 else:

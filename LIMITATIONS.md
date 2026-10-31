@@ -17,3 +17,19 @@ In accordance with scientific integrity guidelines, this document explicitly rec
 ## 3. Financial & Operational Scope
 1. **Declared Cost Assumptions:** All financial savings calculations depend directly on declared unit costs ($c_{inv}$, $c_{fric}$, fraud loss recovery rate). These are modeled estimates, not guaranteed bank balance sheet savings.
 2. **Human-in-the-Loop Capacity:** If incoming suspicious transaction volume exceeds investigator queue capacity ($K$), policy optimization shifts excess borderline alerts into step-up authentication (e.g., 3DS / SMS OTP) rather than dropping them silently.
+
+---
+
+## 5. Post-Audit Limitations (2026-10-31)
+
+1. **Optimizer search granularity:** The policy optimizer searches a coarse
+   percentile grid. In the current honest (validation-fitted) run, the frozen policy's
+   REVIEW tier captured 0 test transactions (review_rate 0.0); realized savings come
+   from the CHALLENGE tier. A finer search or exact solver with reported optimization
+   regret is queued (NEXT-02 in `NEXT_ACTIONS.md`).
+2. **Single-dataset evidence:** All benchmark evidence is on the deterministic
+   synthetic population (seed=42). External datasets (ULB, PaySim) have adapters but
+   have not been run through the zero-leakage protocol (NEXT-01).
+3. **Offline demo mode:** The frontend serves clearly-marked degraded fallback data
+   when the API is unreachable. Scores, receipts, and drift results in that mode are
+   illustrations, not measurements.

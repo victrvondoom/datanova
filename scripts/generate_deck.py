@@ -52,7 +52,7 @@ def create_presentation():
                 "Domain: Cybersecurity, Graph Analytics, Optimization & Responsible AI",
                 f"Generated: {datetime.utcnow().strftime('%B %Y')} | Finalist Submission",
             ],
-            "footer": "Evidence First. Implementation Second. Claims Last."
+            "footer": "Evidence First. Implementation Second. Claims Last.",
         },
         # Slide 2: The Core Problem
         {
@@ -62,9 +62,9 @@ def create_presentation():
                 "Severe Class Imbalance: Traditional accuracy and ROC-AUC hide massive false alarm rates that drown operations.",
                 "Lookahead Bias: Standard random k-fold cross-validation inflates PR-AUC by 25-40% by leaking future fraud patterns.",
                 "Cost Blindness: A $20 dispute is treated identically to a $10,000 compromise, while legitimate declines cause cardholder churn ($25 friction).",
-                "Regulatory Imperative: EU AI Act & GDPR Art 22 require immutable, human-interpretable adverse action audit trails."
+                "Regulatory Imperative: EU AI Act & GDPR Art 22 require immutable, human-interpretable adverse action audit trails.",
             ],
-            "footer": "Challenge DN-FN-01: Real-Time Payment Fraud Detection"
+            "footer": "Challenge DN-FN-01: Real-Time Payment Fraud Detection",
         },
         # Slide 3: AEGIS-Fraud X Architecture
         {
@@ -75,23 +75,23 @@ def create_presentation():
                 "Temporal Feature Stream: Multi-scale rolling velocity (1h, 6h, 24h) and deviation from historical spending habits.",
                 "Temporal Fraud Graph: Dynamic NetworkX ego-nets detecting 2-to-3 hop circular smurfing and device sharing syndicates.",
                 "Isotonic Calibration: Post-processing margins on validation folds to produce reliable posterior P(Fraud | x).",
-                "Cost-Aware Optimizer: Dispatching Allow, Challenge (OTP), Manual Review, and Hard Block."
+                "Cost-Aware Optimizer: Dispatching Allow, Challenge (OTP), Manual Review, and Hard Block.",
             ],
-            "footer": "Sub-Millisecond Inference Latency (<0.02ms per tx)"
+            "footer": "Sub-Millisecond Inference Latency (<0.02ms per tx)",
         },
         # Slide 4: Empirical Benchmark Results
         {
             "title": "Empirical Benchmark: Held-Out Chronological Evaluation",
             "subtitle": "Comparing 6 Candidate Architectures on 10,000 Seeded Transactions (2.0% Fraud)",
             "bullets": [
-                f"Rule Baseline: PR-AUC {bench['Rule-Based Heuristic']['pr_auc']:.4f} | Recall@1%FPR: {bench['Rule-Based Heuristic']['recall_at_fpr_1pct']*100:.1f}% | Total Cost: ${bench['Rule-Based Heuristic']['financial_outcomes']['total_operational_cost']:,.2f}",
-                f"Logistic Regression: PR-AUC {bench['Logistic Regression']['pr_auc']:.4f} | Recall@1%FPR: {bench['Logistic Regression']['recall_at_fpr_1pct']*100:.1f}%",
-                f"Random Forest: PR-AUC {bench['Random Forest']['pr_auc']:.4f} | Recall@1%FPR: {bench['Random Forest']['recall_at_fpr_1pct']*100:.1f}%",
-                f"LightGBM (Tabular): PR-AUC {bench['LightGBM (Tabular)']['pr_auc']:.4f} | Recall@1%FPR: {bench['LightGBM (Tabular)']['recall_at_fpr_1pct']*100:.1f}%",
-                f"AEGIS LightGBM + Graph: PR-AUC {bench['AEGIS LightGBM + Graph']['pr_auc']:.4f} | Recall@1%FPR: {bench['AEGIS LightGBM + Graph']['recall_at_fpr_1pct']*100:.1f}% (CHAMPION)",
-                f"Bootstrap 95% CI: [{ci['pr_auc']['ci_lower']:.4f}, {ci['pr_auc']['ci_upper']:.4f}] across 200 resamples."
+                f"Rule Baseline: PR-AUC {bench['Rule-Based Heuristic']['pr_auc']:.4f} | Recall@1%FPR: {bench['Rule-Based Heuristic']['recall_at_fpr_1pct'] * 100:.1f}% | Total Cost: ${bench['Rule-Based Heuristic']['financial_outcomes']['total_operational_cost']:,.2f}",
+                f"Logistic Regression: PR-AUC {bench['Logistic Regression']['pr_auc']:.4f} | Recall@1%FPR: {bench['Logistic Regression']['recall_at_fpr_1pct'] * 100:.1f}%",
+                f"Random Forest: PR-AUC {bench['Random Forest']['pr_auc']:.4f} | Recall@1%FPR: {bench['Random Forest']['recall_at_fpr_1pct'] * 100:.1f}%",
+                f"LightGBM (Tabular): PR-AUC {bench['LightGBM (Tabular)']['pr_auc']:.4f} | Recall@1%FPR: {bench['LightGBM (Tabular)']['recall_at_fpr_1pct'] * 100:.1f}%",
+                f"AEGIS LightGBM + Graph: PR-AUC {bench['AEGIS LightGBM + Graph']['pr_auc']:.4f} | Recall@1%FPR: {bench['AEGIS LightGBM + Graph']['recall_at_fpr_1pct'] * 100:.1f}% (CHAMPION)",
+                f"Bootstrap 95% CI: [{ci['pr_auc']['ci_lower']:.4f}, {ci['pr_auc']['ci_upper']:.4f}] across 200 resamples.",
             ],
-            "footer": "Evidence Stored in benchmarks/runs/benchmark_summary.json"
+            "footer": "Evidence Stored in benchmarks/runs/benchmark_summary.json",
         },
         # Slide 5: Graph Intelligence Differentiator
         {
@@ -101,9 +101,9 @@ def create_presentation():
                 "Mule Ring Cycle Detection: Real-time search for 2-hop & 3-hop directed cycles (A -> B -> C -> A) capturing structured money laundering.",
                 "Device Fingerprint Proliferation: Tracking multiple distinct identities sharing the same hardware or proxy subnet.",
                 "Empirical Impact: Graph features improved Recall at fixed 1.0% False Positive Rate from 78.7% to 81.1% (+2.3% points).",
-                "Bounded Latency: Rolling 24-hour temporal edge pruning guarantees sub-20ms lookup times even at scale."
+                "Bounded Latency: Rolling 24-hour temporal edge pruning guarantees sub-20ms lookup times even at scale.",
             ],
-            "footer": "Packages: packages/graph/temporal_graph.py & packages/graph/features.py"
+            "footer": "Packages: packages/graph/temporal_graph.py & packages/graph/features.py",
         },
         # Slide 6: Novel Cost-Aware Decision Engine
         {
@@ -113,10 +113,10 @@ def create_presentation():
                 "Beyond Simple F1: Models expected loss E[Fraud] + Cost(Investigation) + Cost(Friction).",
                 f"Fixed 0.5 Threshold Baseline Cost: ${pols['fixed_threshold_baseline']['metrics']['total_cost']:,.2f}",
                 f"AEGIS Cost-Aware Policy Cost: ${pols['aegis_cost_optimized']['metrics']['total_cost']:,.2f}",
-                f"Net Operational Dollar Savings: ${pols['aegis_cost_optimized']['metrics']['estimated_savings']:,.2f} ({pols['aegis_cost_optimized']['metrics']['savings_ratio']*100:.1f}% loss reduction).",
-                "Hard Constraint Satisfaction: Enforces investigator queue capacity <= K and FPR <= 1.5%."
+                f"Net Operational Dollar Savings: ${pols['aegis_cost_optimized']['metrics']['estimated_savings']:,.2f} ({pols['aegis_cost_optimized']['metrics']['savings_ratio'] * 100:.1f}% loss reduction).",
+                "Hard Constraint Satisfaction: Enforces investigator queue capacity <= K and FPR <= 1.5%.",
             ],
-            "footer": "Packages: packages/optimization/cost_engine.py & packages/optimization/optimizer.py"
+            "footer": "Packages: packages/optimization/cost_engine.py & packages/optimization/optimizer.py",
         },
         # Slide 7: Explainability & Cryptographic Receipts
         {
@@ -126,9 +126,9 @@ def create_presentation():
                 "TreeSHAP Attribution: Real-time calculation of exact Shapley values for every flagged transaction.",
                 "Plain-English Rationale: Automatically translates mathematical attributions into regulatory adverse action notices.",
                 "HMAC SHA-256 Audit Receipts: Cryptographically binds transaction timestamp, model checkpoint, feature vector, and decision.",
-                "Compliance Ready: Designed for GDPR Article 22, FCRA, and EU AI Act high-risk financial AI standards."
+                "Compliance Ready: Designed for GDPR Article 22, FCRA, and EU AI Act high-risk financial AI standards.",
             ],
-            "footer": "Packages: packages/explainability/shap_engine.py & packages/explainability/receipts.py"
+            "footer": "Packages: packages/explainability/shap_engine.py & packages/explainability/receipts.py",
         },
         # Slide 8: Drift & Adversarial Stress Lab
         {
@@ -138,9 +138,9 @@ def create_presentation():
                 "Population Stability Index (PSI): Real-time sliding window drift tracking with 3-tier alerts (Green, Amber, Red).",
                 "Wasserstein Distance: 1D Earth Mover's Distance monitoring on calibrated probability output distributions.",
                 "Adversarial Stress Scenarios: Simulated smurfing attacks, device fingerprint spoofing, and 30-day delayed chargebacks.",
-                "Robustness Assurance: Champion model degraded by less than 0.05 PR-AUC under synthetic adversarial shocks."
+                "Robustness Assurance: Champion model degraded by less than 0.05 PR-AUC under synthetic adversarial shocks.",
             ],
-            "footer": "Packages: packages/monitoring/drift.py & packages/monitoring/stress_lab.py"
+            "footer": "Packages: packages/monitoring/drift.py & packages/monitoring/stress_lab.py",
         },
         # Slide 9: Live Digital Twin
         {
@@ -150,9 +150,9 @@ def create_presentation():
                 "Digital Twin Comparator: Judges can stream historical or synthetic streams and inspect decisions in real time.",
                 "Side-by-Side View: Shows baseline rule-based action vs AEGIS-Fraud X action simultaneously.",
                 "Live Financial Tally: Real-time counter of dollars saved, false alarms averted, and investigator workload hours conserved.",
-                "Zero Fake Inference: Every transaction is transformed and scored live by the running FastAPI backend."
+                "Zero Fake Inference: Every transaction is transformed and scored live by the running FastAPI backend.",
             ],
-            "footer": "Live Replay Stream API: /api/stream/replay-batch"
+            "footer": "Live Replay Stream API: /api/stream/replay-batch",
         },
         # Slide 10: Enterprise Dashboard
         {
@@ -162,9 +162,9 @@ def create_presentation():
                 "8 Mission-Critical Views: Mission Control, Transaction Stream, Fraud Graph, Decision Lab, ML Benchmark, Drift Lab, Explainability Explorer, Research Center.",
                 "Theme Support: High-contrast Dark Mode and Enterprise Clean Light Mode.",
                 "Interactive Graph: Network visualization of accounts, transactions, and mule rings.",
-                "Auditable Receipts: Direct export of cryptographic JSON receipts and CSV benchmark summaries."
+                "Auditable Receipts: Direct export of cryptographic JSON receipts and CSV benchmark summaries.",
             ],
-            "footer": "Frontend: apps/web/ | Backend: apps/api/"
+            "footer": "Frontend: apps/web/ | Backend: apps/api/",
         },
         # Slide 11: Responsible AI & Risk Assessment
         {
@@ -174,9 +174,9 @@ def create_presentation():
                 "Zero Lookahead Protocol: Strict temporal forward-chaining prevents optimistic model over-fitting.",
                 "Human-in-the-Loop Safeguards: Investigator capacity constraints prevent alert queue burnout and fatigue.",
                 "Fairness Across Channels: Calibrated step-up authentication prevents biased decline rates against web/mobile users.",
-                "Privacy Preservation: Anonymized device fingerprints and tokenized account IDs ensure zero PII exposure."
+                "Privacy Preservation: Anonymized device fingerprints and tokenized account IDs ensure zero PII exposure.",
             ],
-            "footer": "Ethics & Safety First in Financial Artificial Intelligence"
+            "footer": "Ethics & Safety First in Financial Artificial Intelligence",
         },
         # Slide 12: Conclusion & Submission Summary
         {
@@ -187,9 +187,9 @@ def create_presentation():
                 f"Quantified Economics: 92.1% net operational loss reduction (${pols['aegis_cost_optimized']['metrics']['estimated_savings']:,.2f} saved).",
                 "Ultra-Low Latency: <0.02ms per transaction inference, sub-20ms graph lookups.",
                 "Production Monorepo: 24 passing unit/invariant/integration tests, FastAPI backend, React dashboard, fully reproducible.",
-                "Thank You: Ready for Live Demonstration and Code Inspection."
+                "Thank You: Ready for Live Demonstration and Code Inspection.",
             ],
-            "footer": "AEGIS-Fraud X | DataNova 2026 Global Data-thon"
+            "footer": "AEGIS-Fraud X | DataNova 2026 Global Data-thon",
         },
     ]
 
@@ -227,7 +227,9 @@ def create_presentation():
         p_sub.font.color.rgb = C_TEAL
 
         # Content Card Background
-        card = slide.shapes.add_shape(1, Inches(0.8), Inches(1.8), Inches(11.7), Inches(4.8)) # 1 is rectangle
+        card = slide.shapes.add_shape(
+            1, Inches(0.8), Inches(1.8), Inches(11.7), Inches(4.8)
+        )  # 1 is rectangle
         card.fill.solid()
         card.fill.fore_color.rgb = C_CARD
         card.line.color.rgb = RGBColor(40, 60, 90)

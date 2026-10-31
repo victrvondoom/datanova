@@ -1,4 +1,5 @@
 """Data package initialization."""
+
 from packages.data.schemas import (
     AuditReceipt,
     ChannelType,

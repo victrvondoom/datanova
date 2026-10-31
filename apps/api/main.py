@@ -16,8 +16,9 @@ import sys
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, TypeVar, cast
 
+import networkx as nx
 import numpy as np
 import pandas as pd
 from fastapi import FastAPI, HTTPException
@@ -49,9 +50,21 @@ from packages.monitoring.stress_lab import StressTestingLab
 from packages.optimization.cost_engine import CostEngine
 from packages.optimization.optimizer import PolicyOptimizer
 
-
 # Global State Container
+T = TypeVar("T")
+
+
 class ModelState:
+    def require(self, value: Optional[T]) -> T:
+        """Narrow an Optional engine component to its non-None type.
+
+        mypy cannot narrow ``state.x`` attribute access, so endpoints call
+        ``state.require(state.drift_monitor)`` to obtain a typed reference
+        and fail fast with a clear message if the engine is uninitialized.
+        """
+        assert value is not None, "engine state not initialized; call init_engine() first"
+        return value
+
     def __init__(self):
         self.model: Optional[BaseFraudClassifier] = None
         self.calibrator: Optional[ProbabilityCalibrator] = None
@@ -68,6 +81,7 @@ class ModelState:
         self.stress_lab: Optional[StressTestingLab] = None
         self.drift_monitor: Optional[DriftMonitor] = None
         self.sample_X: Optional[np.ndarray] = None
+        self.calibration_source: str = "uninitialized"
 
 
 state = ModelState()
@@ -114,7 +128,7 @@ def init_engine():
 
     # Populate initial graph with first 1500 historical transactions
     for _, r in state.sample_transactions.iloc[:1500].iterrows():
-        state.temporal_graph.add_transaction(
+        state.require(state.temporal_graph).add_transaction(
             sender_id=str(r["sender_id"]),
             receiver_id=str(r["receiver_id"]),
             amount=float(r["amount"]),
@@ -123,18 +137,45 @@ def init_engine():
         )
 
     # Precompute sample_X matching model feature shape
-    X_tab = state.feature_pipeline.transform(state.sample_transactions)
+    X_tab = state.require(state.feature_pipeline).transform(state.sample_transactions)
     if state.model and len(state.model.feature_names) > X_tab.shape[1]:
         gf_df = state.graph_extractor.extract_batch_graph_features(state.sample_transactions)
         state.sample_X = np.hstack([X_tab, gf_df.values])
     else:
         state.sample_X = X_tab
 
-    # Calibrator setup
-    state.calibrator = ProbabilityCalibrator(method="isotonic")
-    dummy_scores = np.linspace(0.01, 0.99, 100)
-    dummy_labels = (dummy_scores > 0.4).astype(int)
-    state.calibrator.fit(dummy_scores, dummy_labels)
+    # Calibrator setup: load the artifact fitted on the validation split by
+    # scripts/run_benchmarks.py. If absent, fit on the real reference population
+    # (model scores + ground-truth labels) instead of fabricated data.
+    calibrator_path = "experiments/champion_calibrator.pkl"
+    calibration_source = "base-rate-prior"
+    if state.model is not None and os.path.exists(calibrator_path):
+        try:
+            state.calibrator = ProbabilityCalibrator.load(calibrator_path)
+            calibration_source = "validation-artifact"
+        except Exception:
+            state.calibrator = None
+    else:
+        state.calibrator = None
+
+    if state.calibrator is None:
+        state.calibrator = ProbabilityCalibrator(method="isotonic")
+        if state.model is not None and state.sample_X is not None:
+            ref_scores = state.model.predict_proba(state.sample_X)
+            ref_labels = np.asarray(
+                state.sample_transactions["is_fraud"].values, dtype=int
+            )
+            state.calibrator.fit(ref_scores, ref_labels)
+            calibration_source = "reference-data"
+        else:
+            # No model available: calibrate against the reference population's
+            # base-rate prior so outputs are at least statistically grounded.
+            base_rate = float(
+                state.sample_transactions["is_fraud"].mean()
+            )
+            raw = np.linspace(0.0, 1.0, 100)
+            state.calibrator.fit(raw, np.full(100, base_rate))
+    state.calibration_source = calibration_source
 
     if state.model:
         state.explainer = ExplainabilityEngine(state.model)
@@ -156,10 +197,21 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS setup
+# CORS setup: explicit origin allowlist via environment variable.
+# Wildcard origins combined with allow_credentials=True are disallowed;
+# the default covers only local development origins. Both plain
+# comma-separated and JSON-list formats are accepted.
+_default_origins = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
+_raw_origins = os.environ.get("AEGIS_CORS_ORIGINS", _default_origins).strip()
+ALLOWED_ORIGINS = [
+    o.strip().strip('"').strip("'")
+    for o in _raw_origins.strip("[]").split(",")
+    if o.strip().strip('"').strip("'")
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -188,43 +240,47 @@ def score_transaction(tx: Transaction):
         init_engine()
 
     # Convert single transaction to single-row DataFrame
-    row_df = pd.DataFrame([
-        {
-            "transaction_id": tx.transaction_id,
-            "timestamp": tx.timestamp,
-            "sender_id": tx.sender_id,
-            "receiver_id": tx.receiver_id,
-            "amount": tx.amount,
-            "currency": tx.currency,
-            "channel": tx.channel.value if hasattr(tx.channel, "value") else str(tx.channel),
-            "device_id": tx.device_id or "none",
-            "ip_address": tx.ip_address or "none",
-            "location": tx.location or "US-NYC",
-            "category": tx.category or "retail",
-        }
-    ])
+    row_df = pd.DataFrame(
+        [
+            {
+                "transaction_id": tx.transaction_id,
+                "timestamp": tx.timestamp,
+                "sender_id": tx.sender_id,
+                "receiver_id": tx.receiver_id,
+                "amount": tx.amount,
+                "currency": tx.currency,
+                "channel": tx.channel.value if hasattr(tx.channel, "value") else str(tx.channel),
+                "device_id": tx.device_id or "none",
+                "ip_address": tx.ip_address or "none",
+                "location": tx.location or "US-NYC",
+                "category": tx.category or "retail",
+            }
+        ]
+    )
 
     # 1. Extract tabular features
-    X_tab = state.feature_pipeline.transform(row_df)
+    X_tab = state.require(state.feature_pipeline).transform(row_df)
 
     # 2. Extract graph features
-    g_feats = state.graph_extractor.extract_features_for_transaction(
-        graph=state.temporal_graph,
+    g_feats = state.require(state.graph_extractor).extract_features_for_transaction(
+        graph=state.require(state.temporal_graph),
         sender_id=tx.sender_id,
         receiver_id=tx.receiver_id,
         timestamp=tx.timestamp,
         device_id=tx.device_id,
     )
-    g_vector = np.array([
+    g_vector = np.array(
         [
-            g_feats["graph_sender_out_degree"],
-            g_feats["graph_receiver_in_degree"],
-            g_feats["graph_device_shared_accounts"],
-            g_feats["graph_cycle_detected"],
-            g_feats["graph_is_reciprocal"],
-            g_feats["graph_sender_pagerank"],
+            [
+                g_feats["graph_sender_out_degree"],
+                g_feats["graph_receiver_in_degree"],
+                g_feats["graph_device_shared_accounts"],
+                g_feats["graph_cycle_detected"],
+                g_feats["graph_is_reciprocal"],
+                g_feats["graph_sender_pagerank"],
+            ]
         ]
-    ])
+    )
 
     X_full = (
         np.hstack([X_tab, g_vector])
@@ -258,7 +314,7 @@ def score_transaction(tx: Transaction):
         top_features = state.explainer.explain_instance(X_full[0], top_k=5)
 
     # 6. Cryptographic Audit Receipt
-    receipt = state.receipt_gen.create_receipt(
+    receipt = state.require(state.receipt_gen).create_receipt(
         transaction_id=tx.transaction_id,
         model_id=state.model.model_id if state.model else "aegis_champion",
         model_version=state.model.version if state.model else "1.0",
@@ -270,7 +326,7 @@ def score_transaction(tx: Transaction):
     )
 
     # 7. Add to temporal graph state for forward-chaining
-    state.temporal_graph.add_transaction(
+    state.require(state.temporal_graph).add_transaction(
         sender_id=tx.sender_id,
         receiver_id=tx.receiver_id,
         amount=tx.amount,
@@ -291,7 +347,7 @@ def score_transaction(tx: Transaction):
         inference_latency_ms=round(latency_ms, 2),
         expected_fraud_loss=round(tx.amount * calibrated_prob, 2),
         expected_cost=round(
-            state.cost_engine.calculate_action_cost(
+            state.require(state.cost_engine).calculate_action_cost(
                 action, 1 if calibrated_prob > 0.5 else 0, tx.amount
             ),
             2,
@@ -356,20 +412,22 @@ def optimize_policy_endpoint(req: OptimizePolicyRequest):
     optimizer = PolicyOptimizer(cfg)
 
     if state.sample_transactions is not None:
-        y_test = state.sample_transactions["is_fraud"].values
-        amt_test = state.sample_transactions["amount"].values
+        y_test = np.asarray(state.sample_transactions["is_fraud"].values)
+        amt_test = np.asarray(state.sample_transactions["amount"].values)
         if state.sample_X is not None:
             X = state.sample_X
         else:
-            X_tab = state.feature_pipeline.transform(state.sample_transactions)
+            X_tab = state.require(state.feature_pipeline).transform(state.sample_transactions)
             if state.model and len(state.model.feature_names) > X_tab.shape[1]:
-                gf_df = state.graph_extractor.extract_batch_graph_features(state.sample_transactions)
+                gf_df = state.require(state.graph_extractor).extract_batch_graph_features(
+                    state.sample_transactions
+                )
                 X = np.hstack([X_tab, gf_df.values])
             else:
                 X = X_tab
 
         probs = (
-            state.calibrator.calibrate(state.model.predict_proba(X))
+            state.require(state.calibrator).calibrate(state.require(state.model).predict_proba(X))
             if state.model
             else np.random.uniform(0, 0.2, len(y_test))
         )
@@ -402,30 +460,44 @@ def get_graph_subgraph(limit_nodes: int = 40):
     if state.temporal_graph is None:
         init_engine()
 
-    G = state.temporal_graph.graph
+    G = state.require(state.temporal_graph).graph
     nodes = []
     edges = []
 
     sub_nodes = list(G.nodes())[:limit_nodes]
     subgraph = G.subgraph(sub_nodes)
 
+    # Risk signal is DERIVED from real graph topology: an account belongs to a
+    # cycle iff it sits in a strongly connected component of size > 1. No
+    # fabricated per-name risk scores.
+    sccs = [comp for comp in nx.strongly_connected_components(subgraph) if len(comp) > 1]
+    cycle_members = set().union(*sccs) if sccs else set()
+
     for n in subgraph.nodes():
         is_mule = "mule" in str(n)
-        nodes.append({
-            "id": str(n),
-            "label": str(n),
-            "type": "mule_account" if is_mule else ("merchant" if "merch" in str(n) else "account"),
-            "risk_score": 0.88 if is_mule else 0.12,
-            "in_degree": G.in_degree(n),
-            "out_degree": G.out_degree(n),
-        })
+        nodes.append(
+            {
+                "id": str(n),
+                "label": str(n),
+                "type": "mule_account"
+                if is_mule
+                else ("merchant" if "merch" in str(n) else "account"),
+                # Display-scale indicator of real cycle membership (not a model score)
+                "risk_score": 0.9 if n in cycle_members else 0.1,
+                "cycle_member": n in cycle_members,
+                "in_degree": G.in_degree(n),
+                "out_degree": G.out_degree(n),
+            }
+        )
 
     for u, v, d in subgraph.edges(data=True):
-        edges.append({
-            "source": str(u),
-            "target": str(v),
-            "amount": float(d.get("weight", 100.0)),
-        })
+        edges.append(
+            {
+                "source": str(u),
+                "target": str(v),
+                "amount": float(d.get("weight", 100.0)),
+            }
+        )
 
     return {
         "nodes": nodes,
@@ -444,10 +516,10 @@ def get_replay_batch(offset: int = 0, limit: int = 50):
     if state.sample_transactions is None:
         init_engine()
 
-    total_len = len(state.sample_transactions)
+    total_len = len(state.require(state.sample_transactions))
     # Loop over offset if exceeds available transactions
     safe_offset = offset % total_len
-    slice_df = state.sample_transactions.iloc[safe_offset : safe_offset + limit]
+    slice_df = state.require(state.sample_transactions).iloc[safe_offset : safe_offset + limit]
     results = []
 
     fixed_baseline_cost = 0.0
@@ -472,22 +544,32 @@ def get_replay_batch(offset: int = 0, limit: int = 50):
 
         baseline_act = "BLOCK" if score_res.calibrated_probability >= 0.50 else "ALLOW"
         if baseline_act == "BLOCK":
-            base_cost = 25.0 if is_fraud == 0 else 0.0
+            base_cost = (
+                0.0
+                if is_fraud == 1
+                else state.require(state.cost_engine).config.friction_block_cost
+            )
         else:
             base_cost = amt if is_fraud == 1 else 0.0
 
-        aegis_cost = score_res.expected_cost
+        # Both sides of the comparison use GROUND-TRUTH labels and the same
+        # cost engine, so the twin comparison cannot understate missed fraud.
+        aegis_cost = state.require(state.cost_engine).calculate_action_cost(
+            score_res.recommended_action, is_fraud, amt
+        )
         fixed_baseline_cost += base_cost
         aegis_optimized_cost += aegis_cost
 
-        results.append({
-            "transaction": tx.model_dump(),
-            "aegis_result": score_res.model_dump(),
-            "baseline_action": baseline_act,
-            "baseline_cost": round(base_cost, 2),
-            "aegis_cost": round(aegis_cost, 2),
-            "ground_truth_fraud": is_fraud,
-        })
+        results.append(
+            {
+                "transaction": tx.model_dump(),
+                "aegis_result": score_res.model_dump(),
+                "baseline_action": baseline_act,
+                "baseline_cost": round(base_cost, 2),
+                "aegis_cost": round(aegis_cost, 2),
+                "ground_truth_fraud": is_fraud,
+            }
+        )
 
     return {
         "batch_offset": offset,
@@ -498,7 +580,10 @@ def get_replay_batch(offset: int = 0, limit: int = 50):
             "aegis_total_cost": round(aegis_optimized_cost, 2),
             "net_dollar_savings": round(max(0.0, fixed_baseline_cost - aegis_optimized_cost), 2),
             "savings_percentage": round(
-                (max(0.0, fixed_baseline_cost - aegis_optimized_cost) / max(1.0, fixed_baseline_cost))
+                (
+                    max(0.0, fixed_baseline_cost - aegis_optimized_cost)
+                    / max(1.0, fixed_baseline_cost)
+                )
                 * 100,
                 1,
             ),
@@ -516,25 +601,32 @@ def simulate_stress_endpoint(req: StressScenarioRequest):
     """Applies controlled defensive stress scenarios in-memory and returns empirical drift metrics."""
     if state.sample_transactions is None:
         init_engine()
+    assert state.sample_transactions is not None, "engine not initialized; call init_engine() first"
 
     base_df = state.sample_transactions.iloc[:1000]
     target_df = state.sample_transactions.iloc[1000:2000].copy()
 
     if req.scenario == "smurfing":
-        stressed_df = state.stress_lab.simulate_smurfing_attack(target_df, attack_fraction=0.30)
-        scenario_desc = "Adversarial Smurfing / Structuring ($4,500 - $4,890 to bypass $5k rule checks)"
+        stressed_df = cast(StressTestingLab, state.stress_lab).simulate_smurfing_attack(
+            target_df, attack_fraction=0.30
+        )
+        scenario_desc = (
+            "Adversarial Smurfing / Structuring ($4,500 - $4,890 to bypass $5k rule checks)"
+        )
     elif req.scenario == "spoofing":
-        stressed_df = state.stress_lab.simulate_device_spoofing(target_df, spoof_fraction=0.40)
+        stressed_df = cast(StressTestingLab, state.stress_lab).simulate_device_spoofing(
+            target_df, spoof_fraction=0.40
+        )
         scenario_desc = "Rapid Device Fingerprint Spoofing & Tor Proxy Subnet Proliferation"
     else:
         stressed_df = target_df
         scenario_desc = "Clean Baseline Stationary Stream"
 
-    b_amounts = base_df["amount"].values
-    t_amounts = stressed_df["amount"].values
+    b_amounts = np.asarray(base_df["amount"].values)
+    t_amounts = np.asarray(stressed_df["amount"].values)
 
-    psi_amt = state.drift_monitor.calculate_psi(b_amounts, t_amounts)
-    wd_amt = state.drift_monitor.calculate_wasserstein(b_amounts, t_amounts)
+    psi_amt = state.require(state.drift_monitor).calculate_psi(b_amounts, t_amounts)
+    wd_amt = state.require(state.drift_monitor).calculate_wasserstein(b_amounts, t_amounts)
 
     if psi_amt >= 0.25:
         status = "CRITICAL_DRIFT"
@@ -577,7 +669,7 @@ def verify_receipt_endpoint(req: VerifyReceiptRequest):
     """Dynamically verifies cryptographic HMAC-SHA256 signature for any input receipt."""
     try:
         receipt_obj = AuditReceipt(**req.receipt)
-        is_valid = state.receipt_gen.verify_receipt(receipt_obj)
+        is_valid = state.require(state.receipt_gen).verify_receipt(receipt_obj)
         return {
             "receipt_id": receipt_obj.receipt_id,
             "is_valid": is_valid,

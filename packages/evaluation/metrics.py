@@ -9,7 +9,7 @@ Calculates:
 - Modeled Financial Loss & Operational Cost
 """
 
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 import numpy as np
 from sklearn.metrics import (
@@ -36,12 +36,12 @@ class FraudEvaluationMetrics:
         amounts: Optional[np.ndarray] = None,
         threshold: float = 0.5,
         cost_config: Optional[CostConfiguration] = None,
-    ) -> Dict[str, any]:
+    ) -> Dict[str, Any]:
         """
         Full evaluation suite across discrimination, calibration, and financial cost.
         """
         cost_cfg = cost_config or CostConfiguration()
-        y_pred = (y_prob >= threshold).astype(int)
+        y_pred = np.asarray(y_prob >= threshold).astype(int)
 
         # 1. Discrimination metrics
         pr_auc = float(average_precision_score(y_true, y_prob))

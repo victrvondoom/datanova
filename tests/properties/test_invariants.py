@@ -68,7 +68,9 @@ def test_invariant_2_zero_temporal_lookahead():
         if idx == 0:
             assert feats["graph_sender_out_degree"] == 0.0
             assert feats["graph_receiver_in_degree"] == 0.0
-        graph.add_transaction(str(row["sender_id"]), str(row["receiver_id"]), float(row["amount"]), row["timestamp"])
+        graph.add_transaction(
+            str(row["sender_id"]), str(row["receiver_id"]), float(row["amount"]), row["timestamp"]
+        )
 
 
 def test_invariant_4_deterministic_decisions():
@@ -105,7 +107,11 @@ def test_invariant_7_tamper_evident_audit_receipts():
         calibrated_probability=0.88,
         recommended_action=OperationalAction.BLOCK,
         financial_cost_estimate=2500.0,
-        top_features=[FeatureContribution(feature_name="tx_count_1h", feature_value=5.0, shap_value=0.45, importance_rank=1)],
+        top_features=[
+            FeatureContribution(
+                feature_name="tx_count_1h", feature_value=5.0, shap_value=0.45, importance_rank=1
+            )
+        ],
     )
 
     # Valid receipt

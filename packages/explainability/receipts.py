@@ -57,7 +57,9 @@ class AuditReceiptGenerator:
             "top_features": [f.model_dump() for f in top_features],
         }
         canonical_str = json.dumps(payload, sort_keys=True)
-        digest = hmac.new(self.secret_key, canonical_str.encode("utf-8"), hashlib.sha256).hexdigest()
+        digest = hmac.new(
+            self.secret_key, canonical_str.encode("utf-8"), hashlib.sha256
+        ).hexdigest()
 
         return AuditReceipt(
             receipt_id=receipt_id,
@@ -97,5 +99,7 @@ class AuditReceiptGenerator:
             "top_features": [f.model_dump() for f in receipt.top_features],
         }
         canonical_str = json.dumps(payload, sort_keys=True)
-        expected_digest = hmac.new(self.secret_key, canonical_str.encode("utf-8"), hashlib.sha256).hexdigest()
+        expected_digest = hmac.new(
+            self.secret_key, canonical_str.encode("utf-8"), hashlib.sha256
+        ).hexdigest()
         return hmac.compare_digest(expected_digest, receipt.sha256_hash)

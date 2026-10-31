@@ -48,11 +48,18 @@ class PolicyOptimizer:
         best_metrics: Dict[str, float] = {}
 
         # Enforce capacity strictly: Review rate cannot exceed max_review_rate
-        # We search thresholds guided by empirical probability percentiles
-        np.sort(calibrated_probs)
-
-        # Grid over allow thresholds (e.g. bottom 70-95% allowed or challenged)
-        allow_candidates = np.percentile(calibrated_probs, [50, 70, 80, 85, 90, 95])
+        # We search thresholds guided by empirical probability percentiles.
+        # Isotonic calibration often maps a large mass of low-risk scores to
+        # exactly 0.0, so low percentiles collapse to 0 and no candidate could
+        # satisfy the FPR constraint. We therefore include high percentiles and
+        # the smallest strictly-positive probability (which allows exactly the
+        # zero-mass and challenges only scored traffic).
+        allow_percentiles = [50, 70, 80, 85, 90, 92, 95, 97, 98, 99, 99.5]
+        allow_candidates = list(np.percentile(calibrated_probs, allow_percentiles))
+        positive_probs = calibrated_probs[calibrated_probs > 1e-12]
+        if positive_probs.size > 0:
+            allow_candidates.append(float(np.min(positive_probs)))
+        allow_candidates = sorted(set(allow_candidates))
 
         # To guarantee review_rate <= max_review_rate:
         # We can set tau_review such that only at most max_review_rate of transactions fall in [tau_review, tau_block]
@@ -63,13 +70,19 @@ class PolicyOptimizer:
             for blk_pct in [0.002, 0.005, 0.01, 0.02, 0.05]:
                 t_blk = float(np.percentile(calibrated_probs, max(0.0, (1.0 - blk_pct) * 100)))
                 # Set t_rev such that at most cap_pct transactions fall in [t_rev, t_blk]
-                rev_pct = cap_pct * 0.90 # 90% of cap to guarantee buffer
-                t_rev = float(np.percentile(calibrated_probs, max(0.0, (1.0 - blk_pct - rev_pct) * 100)))
+                rev_pct = cap_pct * 0.90  # 90% of cap to guarantee buffer
+                t_rev = float(
+                    np.percentile(calibrated_probs, max(0.0, (1.0 - blk_pct - rev_pct) * 100))
+                )
 
                 if t_rev <= t_allow:
-                    t_rev = float(t_allow + 0.01)
+                    t_rev = min(1.0, t_allow + 0.01)
                 if t_blk <= t_rev:
-                    t_blk = float(t_rev + 0.01)
+                    t_blk = min(1.0, t_rev + 0.01)
+                # Degenerate candidate (thresholds collapsed at the top of the
+                # probability range): no valid 4-tier policy can be formed.
+                if t_allow >= 1.0 or t_rev <= t_allow or t_blk <= t_rev:
+                    continue
 
                 candidate_policy = DecisionPolicy(
                     policy_name="Candidate",
@@ -103,15 +116,28 @@ class PolicyOptimizer:
                     )
                     best_metrics = res
 
-        # Guaranteed fallback satisfying hard capacity constraint
+        # Fallback: safest defensible policy when no grid candidate satisfied
+        # the constraints. It is built directly from the constraint definitions
+        # (allow all but the top max_fpr fraction; review within capacity) and
+        # its realized metrics are reported honestly so violations are visible.
         if best_cost == float("inf"):
+            # tau_allow: allow every transaction below the (1 - max_fpr) quantile
+            t_allow = float(np.percentile(calibrated_probs, (1.0 - max_fpr) * 100))
+            # If a point mass at 0 absorbs the quantile, allow exactly the zero mass
+            if t_allow <= 1e-12:
+                positive = calibrated_probs[calibrated_probs > 1e-12]
+                t_allow = float(np.min(positive)) if positive.size > 0 else 1.0
+            # Review window: at most 90% of the review capacity budget
+            t_rev = float(
+                np.percentile(
+                    calibrated_probs, max(0.0, (1.0 - max_review_rate * 0.9) * 100)
+                )
+            )
             t_blk = float(np.percentile(calibrated_probs, 99.0))
-            t_rev = float(np.percentile(calibrated_probs, max(50.0, (1.0 - max_review_rate * 0.8) * 100)))
-            t_allow = float(np.percentile(calibrated_probs, 80.0))
             if t_rev <= t_allow:
-                t_allow = max(0.01, t_rev - 0.05)
+                t_rev = min(1.0, t_allow + 0.01)
             if t_blk <= t_rev:
-                t_blk = min(0.99, t_rev + 0.02)
+                t_blk = min(1.0, t_rev + 0.01)
 
             fallback_policy = DecisionPolicy(
                 policy_name="Constrained-Safe",
@@ -151,7 +177,9 @@ class PolicyOptimizer:
             tau_block=0.50,
             use_challenge=False,
         )
-        res_fixed = self.cost_engine.evaluate_policy_batch(calibrated_probs, amounts, labels, fixed_policy)
+        res_fixed = self.cost_engine.evaluate_policy_batch(
+            calibrated_probs, amounts, labels, fixed_policy
+        )
 
         # Policy 2: Rule-of-thumb Conservative (High Allow, High Block)
         conservative_policy = DecisionPolicy(
@@ -161,7 +189,9 @@ class PolicyOptimizer:
             tau_block=0.95,
             use_challenge=False,
         )
-        res_cons = self.cost_engine.evaluate_policy_batch(calibrated_probs, amounts, labels, conservative_policy)
+        res_cons = self.cost_engine.evaluate_policy_batch(
+            calibrated_probs, amounts, labels, conservative_policy
+        )
 
         # Policy 3: AEGIS Optimized
         opt_policy, res_opt = self.optimize_policy(calibrated_probs, amounts, labels)

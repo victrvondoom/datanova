@@ -7,7 +7,8 @@ Implements:
 Strict guarantee: Calibrators are fitted exclusively on Validation split, NEVER on Test data.
 """
 
-from typing import Dict
+import pickle
+from typing import Dict, Optional, Union
 
 import numpy as np
 from sklearn.isotonic import IsotonicRegression
@@ -21,9 +22,11 @@ class ProbabilityCalibrator:
 
     def __init__(self, method: str = "isotonic"):
         if method not in {"isotonic", "sigmoid"}:
-            raise ValueError(f"Unknown calibration method '{method}'. Choose 'isotonic' or 'sigmoid'.")
+            raise ValueError(
+                f"Unknown calibration method '{method}'. Choose 'isotonic' or 'sigmoid'."
+            )
         self.method = method
-        self.calibrator = None
+        self.calibrator: Optional[Union[IsotonicRegression, LogisticRegression]] = None
         self.fitted = False
 
     def fit(self, val_scores: np.ndarray, val_labels: np.ndarray) -> "ProbabilityCalibrator":
@@ -32,14 +35,33 @@ class ProbabilityCalibrator:
         scores = np.clip(val_scores, 1e-6, 1.0 - 1e-6)
 
         if self.method == "isotonic":
-            self.calibrator = IsotonicRegression(out_of_bounds="clip", y_min=0.0, y_max=1.0)
-            self.calibrator.fit(scores, val_labels)
-        else: # sigmoid (Platt scaling)
-            self.calibrator = LogisticRegression(C=1.0, solver="lbfgs")
-            self.calibrator.fit(scores.reshape(-1, 1), val_labels)
+            iso = IsotonicRegression(out_of_bounds="clip", y_min=0.0, y_max=1.0)
+            iso.fit(scores, val_labels)
+            self.calibrator = iso
+        else:  # sigmoid (Platt scaling)
+            lr = LogisticRegression(C=1.0, solver="lbfgs")
+            lr.fit(scores.reshape(-1, 1), val_labels)
+            self.calibrator = lr
 
         self.fitted = True
         return self
+
+    def save(self, filepath: str) -> None:
+        """Persists the fitted calibrator so serving processes can reuse it."""
+        if not self.fitted:
+            raise RuntimeError("ProbabilityCalibrator must be fitted before calling save.")
+        with open(filepath, "wb") as f:
+            pickle.dump({"method": self.method, "calibrator": self.calibrator}, f)
+
+    @classmethod
+    def load(cls, filepath: str) -> "ProbabilityCalibrator":
+        """Restores a previously fitted calibrator from disk."""
+        with open(filepath, "rb") as f:
+            payload = pickle.load(f)
+        instance = cls(method=payload["method"])
+        instance.calibrator = payload["calibrator"]
+        instance.fitted = True
+        return instance
 
     def calibrate(self, raw_scores: np.ndarray) -> np.ndarray:
         """Applies calibration mapping to new raw predictions."""
@@ -47,15 +69,18 @@ class ProbabilityCalibrator:
             raise RuntimeError("ProbabilityCalibrator must be fitted before calling calibrate.")
 
         scores = np.clip(raw_scores, 1e-6, 1.0 - 1e-6)
+        assert self.calibrator is not None, "calibrator not fitted; call fit() first"
         if self.method == "isotonic":
             calibrated = self.calibrator.predict(scores)
         else:
             calibrated = self.calibrator.predict_proba(scores.reshape(-1, 1))[:, 1]
 
-        return np.clip(calibrated, 0.0, 1.0)
+        return np.asarray(np.clip(np.asarray(calibrated), 0.0, 1.0))
 
     @staticmethod
-    def compute_calibration_metrics(probs: np.ndarray, labels: np.ndarray, n_bins: int = 10) -> Dict[str, float]:
+    def compute_calibration_metrics(
+        probs: np.ndarray, labels: np.ndarray, n_bins: int = 10
+    ) -> Dict[str, float]:
         """
         Computes Expected Calibration Error (ECE) and Brier score.
         """
@@ -70,7 +95,11 @@ class ProbabilityCalibrator:
         for i in range(n_bins):
             bin_lower = bin_boundaries[i]
             bin_upper = bin_boundaries[i + 1]
-            mask = (probs >= bin_lower) & (probs < bin_upper) if i < n_bins - 1 else (probs >= bin_lower) & (probs <= bin_upper)
+            mask = (
+                (probs >= bin_lower) & (probs < bin_upper)
+                if i < n_bins - 1
+                else (probs >= bin_lower) & (probs <= bin_upper)
+            )
 
             bin_size = np.sum(mask)
             if bin_size > 0:

@@ -393,17 +393,27 @@ export const ExplainabilityView: React.FC = () => {
             {verifyResult && (
               <div
                 className={`p-3 rounded-xl border text-xs space-y-1 ${
-                  verifyResult.is_valid
+                  verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE"
+                    ? "bg-amber-500/10 border-amber-500/30 text-amber-500"
+                    : verifyResult.is_valid
                     ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
                     : "bg-rose-500/10 border-rose-500/30 text-rose-500"
                 }`}
               >
                 <div className="flex items-center space-x-1.5 font-bold">
-                  {verifyResult.is_valid ? <ShieldCheck className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                  {verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE" ? (
+                    <AlertCircle className="w-4 h-4" />
+                  ) : verifyResult.is_valid ? (
+                    <ShieldCheck className="w-4 h-4" />
+                  ) : (
+                    <AlertCircle className="w-4 h-4" />
+                  )}
                   <span>VERIFICATION RESULT: {verifyResult.status}</span>
                 </div>
                 <p className="text-[11px] text-slate-600 dark:text-slate-300">
-                  {verifyResult.is_valid
+                  {verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE"
+                    ? "Verification engine is offline. No authenticity claim can be made without the server-side HMAC key — start the API to verify this receipt."
+                    : verifyResult.is_valid
                     ? "Cryptographic HMAC matches exactly. Token payload is guaranteed authentic and untampered."
                     : "HMAC mismatch detected! Calibrated probability or operational action was altered after signing."}
                 </p>

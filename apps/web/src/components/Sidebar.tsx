@@ -81,11 +81,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
           Active Champion
         </div>
         <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
-          AEGIS LightGBM + Graph
+          XGBoost (by Validation)
         </div>
         <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200 dark:border-navy-700 text-[11px]">
           <span className="text-slate-500">PR-AUC:</span>
-          <span className="font-bold text-emerald-500">0.8004</span>
+          <span className="font-bold text-emerald-500">0.7147</span>
         </div>
         <div className="flex items-center justify-between text-[11px] mt-0.5">
           <span className="text-slate-500">Latency:</span>

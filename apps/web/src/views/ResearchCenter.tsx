@@ -13,7 +13,7 @@ export const ResearchCenter: React.FC = () => {
       title: "Independent Red-Team & Ablation Study",
       path: "reports/ABLATION_STUDY.md",
       type: "Markdown / Ablation",
-      desc: "Quantifies incremental gain of Gradient Boosting (+77.0%), Graph Heuristics (+2.3% Recall@1%FPR), and Policy Optimization (92.1% loss reduction).",
+      desc: "Quantifies incremental gain of Gradient Boosting (+60.6%), Graph Heuristics (+8.7pp Recall@1%FPR), and Policy Optimization (86.1% loss reduction).",
     },
     {
       title: "Executive Finalist Presentation Deck",

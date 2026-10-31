@@ -36,6 +36,7 @@ class DatasetDesignation(str, Enum):
 
 class Transaction(BaseModel):
     """Canonical transaction schema across all adapters."""
+
     transaction_id: str = Field(..., description="Unique transaction identifier")
     timestamp: datetime = Field(..., description="UTC ISO-8601 transaction timestamp")
     sender_id: str = Field(..., description="Originating account / card / user identifier")
@@ -44,10 +45,18 @@ class Transaction(BaseModel):
     currency: str = Field(default="USD", min_length=3, max_length=3)
     channel: ChannelType = Field(default=ChannelType.MOBILE)
     device_id: Optional[str] = Field(default=None, description="Hashed hardware device fingerprint")
-    ip_address: Optional[str] = Field(default=None, description="Originating IP address or anonymized subnet")
-    location: Optional[str] = Field(default=None, description="Country/City or geographic coordinate code")
-    category: Optional[str] = Field(default="retail", description="Merchant category or transfer type")
-    is_fraud: Optional[int] = Field(default=None, ge=0, le=1, description="Ground truth (0: legit, 1: fraud)")
+    ip_address: Optional[str] = Field(
+        default=None, description="Originating IP address or anonymized subnet"
+    )
+    location: Optional[str] = Field(
+        default=None, description="Country/City or geographic coordinate code"
+    )
+    category: Optional[str] = Field(
+        default="retail", description="Merchant category or transfer type"
+    )
+    is_fraud: Optional[int] = Field(
+        default=None, ge=0, le=1, description="Ground truth (0: legit, 1: fraud)"
+    )
     dataset_designation: DatasetDesignation = Field(default=DatasetDesignation.SYNTHETIC)
     metadata: Dict[str, Any] = Field(default_factory=dict)
 
@@ -61,6 +70,7 @@ class Transaction(BaseModel):
 
 class FeatureContribution(BaseModel):
     """Local SHAP feature contribution for explainability."""
+
     feature_name: str
     feature_value: Any
     shap_value: float
@@ -69,27 +79,59 @@ class FeatureContribution(BaseModel):
 
 class CostConfiguration(BaseModel):
     """Configurable financial and operational parameters (in USD)."""
-    investigation_cost: float = Field(default=15.00, ge=0.0, description="Cost to manually investigate 1 alert ($)")
-    customer_friction_cost: float = Field(default=5.00, ge=0.0, description="Friction cost for legitimate review/challenge ($)")
-    friction_block_cost: float = Field(default=25.00, ge=0.0, description="Heavy friction/churn cost if legitimate card is blocked ($)")
-    challenge_cost: float = Field(default=0.10, ge=0.0, description="Automated SMS/push OTP verification cost ($)")
-    challenge_efficiency: float = Field(default=0.88, ge=0.0, le=1.0, description="Fraction of challenged fraud successfully stopped")
-    investigation_efficiency: float = Field(default=0.98, ge=0.0, le=1.0, description="Fraction of reviewed fraud successfully caught")
-    max_fpr: float = Field(default=0.015, ge=0.0, le=1.0, description="Maximum permitted operational False Positive Rate")
-    review_capacity_daily: int = Field(default=100, ge=1, description="Maximum manual investigations per day")
+
+    investigation_cost: float = Field(
+        default=15.00, ge=0.0, description="Cost to manually investigate 1 alert ($)"
+    )
+    customer_friction_cost: float = Field(
+        default=5.00, ge=0.0, description="Friction cost for legitimate review/challenge ($)"
+    )
+    friction_block_cost: float = Field(
+        default=25.00,
+        ge=0.0,
+        description="Heavy friction/churn cost if legitimate card is blocked ($)",
+    )
+    challenge_cost: float = Field(
+        default=0.10, ge=0.0, description="Automated SMS/push OTP verification cost ($)"
+    )
+    challenge_efficiency: float = Field(
+        default=0.88,
+        ge=0.0,
+        le=1.0,
+        description="Fraction of challenged fraud successfully stopped",
+    )
+    investigation_efficiency: float = Field(
+        default=0.98, ge=0.0, le=1.0, description="Fraction of reviewed fraud successfully caught"
+    )
+    max_fpr: float = Field(
+        default=0.015,
+        ge=0.0,
+        le=1.0,
+        description="Maximum permitted operational False Positive Rate",
+    )
+    review_capacity_daily: int = Field(
+        default=100, ge=1, description="Maximum manual investigations per day"
+    )
 
 
 class DecisionPolicy(BaseModel):
     """Thresholds determining operational actions based on calibrated probability."""
+
     policy_name: str = "Cost-Aware-Optimized"
     tau_allow: float = Field(default=0.15, ge=0.0, le=1.0, description="p < tau_allow -> ALLOW")
-    tau_review: float = Field(default=0.45, ge=0.0, le=1.0, description="tau_allow <= p < tau_review -> CHALLENGE (or REVIEW)")
+    tau_review: float = Field(
+        default=0.45,
+        ge=0.0,
+        le=1.0,
+        description="tau_allow <= p < tau_review -> CHALLENGE (or REVIEW)",
+    )
     tau_block: float = Field(default=0.85, ge=0.0, le=1.0, description="p >= tau_block -> BLOCK")
     use_challenge: bool = True
 
 
 class PredictionResult(BaseModel):
     """Comprehensive score and operational output for a transaction."""
+
     transaction_id: str
     calibrated_probability: float = Field(..., ge=0.0, le=1.0)
     raw_score: float
@@ -107,6 +149,7 @@ class PredictionResult(BaseModel):
 
 class AuditReceipt(BaseModel):
     """Tamper-evident cryptographic receipt for a high-stakes decision."""
+
     receipt_id: str
     transaction_id: str
     timestamp: datetime
@@ -122,6 +165,7 @@ class AuditReceipt(BaseModel):
 
 class DatasetManifest(BaseModel):
     """Integrity and provenance manifest for a dataset partition."""
+
     dataset_name: str
     source_url_or_origin: str
     record_count: int

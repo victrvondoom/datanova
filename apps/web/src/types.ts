@@ -23,6 +23,8 @@ export interface Transaction {
 }
 
 export interface PredictionResult {
+  degraded?: boolean;
+  source?: string;
   transaction_id: string;
   calibrated_probability: number;
   raw_score: number;
@@ -50,6 +52,9 @@ export interface ReplayBatchResponse {
   batch_offset: number;
   batch_count: number;
   total_available: number;
+  /** True when the payload is a client-side offline fallback, not live API data. */
+  degraded?: boolean;
+  source?: string;
   cumulative_summary: {
     baseline_total_cost: number;
     aegis_total_cost: number;
@@ -102,6 +107,8 @@ export interface GraphEdge {
 }
 
 export interface SubgraphResponse {
+  degraded?: boolean;
+  source?: string;
   nodes: GraphNode[];
   edges: GraphEdge[];
   total_nodes: number;

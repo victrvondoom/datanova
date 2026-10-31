@@ -1,4 +1,5 @@
 """Unit tests for data contracts and chronological splitting."""
+
 import os
 import sys
 

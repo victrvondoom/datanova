@@ -1,4 +1,5 @@
 """Unit tests for cost engine and policy optimizer."""
+
 import os
 import sys
 
@@ -15,15 +16,21 @@ def test_cost_calculation():
     engine = CostEngine(CostConfiguration(investigation_cost=15.0, customer_friction_cost=5.0))
 
     # Allow fraud = 100% loss
-    cost_allow_fraud = engine.calculate_action_cost(OperationalAction.ALLOW, is_fraud=1, amount=500.0)
+    cost_allow_fraud = engine.calculate_action_cost(
+        OperationalAction.ALLOW, is_fraud=1, amount=500.0
+    )
     assert cost_allow_fraud == 500.0
 
     # Allow legit = $0
-    cost_allow_legit = engine.calculate_action_cost(OperationalAction.ALLOW, is_fraud=0, amount=500.0)
+    cost_allow_legit = engine.calculate_action_cost(
+        OperationalAction.ALLOW, is_fraud=0, amount=500.0
+    )
     assert cost_allow_legit == 0.0
 
     # Block legit = $25 friction
-    cost_block_legit = engine.calculate_action_cost(OperationalAction.BLOCK, is_fraud=0, amount=500.0)
+    cost_block_legit = engine.calculate_action_cost(
+        OperationalAction.BLOCK, is_fraud=0, amount=500.0
+    )
     assert cost_block_legit == 25.0
 
 

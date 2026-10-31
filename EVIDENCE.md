@@ -18,14 +18,22 @@ This document records the exact experiments, benchmark measurements, reproducibi
 
 *Dataset: Seeded Synthetic Benchmark (10,000 transactions, 2.0% ground-truth fraud). Split: Chronological 60% Train, 20% Val, 20% Test.*
 
-| Artifact ID | Experiment Name | Model Architecture | PR-AUC | ROC-AUC | Recall@1%FPR | Operational Cost ($) | Artifact Path |
-|:---|:---|:---|:---:|:---:|:---:|:---:|:---|
-| `BM-001` | Rule Baseline | Expert Rule Heuristic | 0.0949 | 0.6091 | 12.45% | $35,750.07 | `benchmarks/runs/benchmark_summary.json` |
-| `BM-002` | Logistic Regression | L2 Regularized LogReg | 0.4506 | 0.9646 | 43.03% | $27,844.57 | `benchmarks/runs/benchmark_summary.json` |
-| `BM-003` | Random Forest | Bagged Trees (100 est) | 0.7570 | 0.9677 | 72.01% | $10,989.04 | `benchmarks/runs/benchmark_summary.json` |
-| `BM-004` | LightGBM Tabular | GBDT Tabular Features | 0.7976 | 0.9928 | 78.74% | $7,411.32 | `benchmarks/runs/benchmark_summary.json` |
-| `BM-005` | XGBoost | Extreme Gradient Boosting | 0.7755 | 0.9812 | 73.75% | $5,984.46 | `benchmarks/runs/benchmark_summary.json` |
-| `BM-006` | AEGIS LightGBM + Graph | LightGBM + Temporal Graph | **0.8004** | **0.9903** | **81.06%** | **$5,992.95** | `benchmarks/runs/benchmark_summary.json` |
+**Protocol note (2026-10-31 audit, issue AFX-01):** champion selection uses VALIDATION
+PR-AUC only; policy thresholds are fitted on VALIDATION and the frozen policy is evaluated
+once on TEST. Values below are from the post-fix honest run
+(`python scripts/run_benchmarks.py`, seed=42).
+
+| Artifact ID | Experiment Name | Model Architecture | Val PR-AUC (selection) | Test PR-AUC | Test ROC-AUC | Recall@1%FPR | Operational Cost ($) | Artifact Path |
+|:---|:---|:---|:---:|:---:|:---:|:---:|:---:|:---|
+| `BM-001` | Rule Baseline | Expert Rule Heuristic | 0.1216 | 0.0949 | 0.6091 | 12.45% | $35,750.07 | `benchmarks/runs/benchmark_summary.json` |
+| `BM-002` | Logistic Regression | L2 Regularized LogReg | 0.4527 | 0.4509 | 0.9646 | 43.03% | $27,844.57 | `benchmarks/runs/benchmark_summary.json` |
+| `BM-003` | Random Forest | Bagged Trees (100 est) | 0.7343 | 0.7190 | 0.9783 | 67.24% | $9,581.30 | `benchmarks/runs/benchmark_summary.json` |
+| `BM-004` | LightGBM Tabular | GBDT Tabular Features | 0.7520 | 0.7240 | 0.9891 | 68.87% | $5,960.88 | `benchmarks/runs/benchmark_summary.json` |
+| `BM-005` | XGBoost (Champion) | Extreme Gradient Boosting | **0.8111** | 0.7147 | 0.9915 | 71.41% | $7,442.83 | `benchmarks/runs/benchmark_summary.json` |
+| `BM-006` | AEGIS LightGBM + Graph | LightGBM + Temporal Graph | 0.7798 | **0.7667** | 0.9905 | **77.53%** | $5,940.88 | `benchmarks/runs/benchmark_summary.json` |
+
+Frozen validation-fitted policy evaluated on test: cost **$5,376.27**,
+savings **$33,201.56 (86.1%)**, FPR **0.20%**, thresholds tau=(0.2222, 0.2322, 1.0).
 
 ---
 
@@ -33,11 +41,13 @@ This document records the exact experiments, benchmark measurements, reproducibi
 
 | Suite | Status | Tests Executed | Passed | Failed | Verification Command |
 |:---|:---:|:---:|:---:|:---:|:---|
-| **Unit Tests** | Verified | 9 | 9 | 0 | `pytest tests/unit/ -v` |
+| **Unit Tests** | Verified | 19 | 19 | 0 | `pytest tests/unit/ -v` |
 | **Property & Invariant Tests** | Verified | 7 | 7 | 0 | `pytest tests/properties/ -v` |
-| **Integration Tests (FastAPI)** | Verified | 8 | 8 | 0 | `pytest tests/integration/ -v` |
-| **Frontend Bundle Build** | Verified | 1,949 modules | Done | 0 | `cd apps/web && npm run build` |
-| **Total** | **ALL PASSED** | **24** | **24** | **0** | `pytest tests/ -v` |
+| **Integration Tests (FastAPI)** | Verified | 15 | 15 | 0 | `pytest tests/integration/ -v` |
+| **Type Check** | Verified | 38 source files | Clean | 0 | `mypy packages apps scripts --ignore-missing-imports` |
+| **Lint** | Verified | repo-wide | Clean | 0 | `ruff check .` |
+| **Frontend Bundle Build** | Verified | tsc + vite | Done | 0 | `cd apps/web && npm run build` |
+| **Total** | **ALL PASSED** | **41 pytest** | **41** | **0** | `pytest tests/ -q` |
 
 ---
 

@@ -31,25 +31,28 @@ export async function fetchBenchmarks() {
     if (!res.ok) throw new Error("Benchmarks failed");
     return await res.json();
   } catch (e) {
-    // Offline fallback to measured benchmark run
+    // Offline fallback to the last measured benchmark run (2026-10-31 protocol).
+    // `degraded: true` marks this as a stale snapshot, not a live measurement.
     return {
-      champion_model_name: "AEGIS LightGBM + Graph",
+      degraded: true,
+      source: "offline-fallback",
+      champion_model_name: "XGBoost",
       champion_confidence_intervals_95: {
-        pr_auc: { mean: 0.8014, ci_lower: 0.6737, ci_upper: 0.9067 },
-        roc_auc: { mean: 0.9905, ci_lower: 0.9814, ci_upper: 0.9976 }
+        pr_auc: { mean: 0.7169, ci_lower: 0.5912, ci_upper: 0.8294 },
+        roc_auc: { mean: 0.9916, ci_lower: 0.9863, ci_upper: 0.9961 }
       },
       benchmark_summary: {
-        "Rule-Based Heuristic": { pr_auc: 0.0949, roc_auc: 0.6091, recall_at_fpr_1pct: 0.1245, brier_score: 0.0198, inference_latency_ms_per_tx: 0.01, financial_outcomes: { total_operational_cost: 35750.07, estimated_net_savings: 0 } },
-        "Logistic Regression": { pr_auc: 0.4506, roc_auc: 0.9646, recall_at_fpr_1pct: 0.4303, brier_score: 0.0143, inference_latency_ms_per_tx: 0.01, financial_outcomes: { total_operational_cost: 27844.57, estimated_net_savings: 7905.50 } },
-        "Random Forest": { pr_auc: 0.7570, roc_auc: 0.9677, recall_at_fpr_1pct: 0.7201, brier_score: 0.0092, inference_latency_ms_per_tx: 0.01, financial_outcomes: { total_operational_cost: 10989.04, estimated_net_savings: 24761.03 } },
-        "LightGBM (Tabular)": { pr_auc: 0.7976, roc_auc: 0.9928, recall_at_fpr_1pct: 0.7874, brier_score: 0.0082, inference_latency_ms_per_tx: 0.01, financial_outcomes: { total_operational_cost: 7411.32, estimated_net_savings: 28338.75 } },
-        "XGBoost": { pr_auc: 0.7755, roc_auc: 0.9812, recall_at_fpr_1pct: 0.7375, brier_score: 0.0079, inference_latency_ms_per_tx: 0.01, financial_outcomes: { total_operational_cost: 5984.46, estimated_net_savings: 29765.61 } },
-        "AEGIS LightGBM + Graph": { pr_auc: 0.8004, roc_auc: 0.9903, recall_at_fpr_1pct: 0.8106, brier_score: 0.0083, inference_latency_ms_per_tx: 0.01, financial_outcomes: { total_operational_cost: 5992.95, estimated_net_savings: 29757.12 } }
+        "Rule-Based Heuristic": { pr_auc: 0.0949, roc_auc: 0.6092, recall_at_fpr_1pct: 0.1245, brier_score: 0.0198, inference_latency_ms_per_tx: 0.001, financial_outcomes: { total_operational_cost: 35750.07, estimated_net_savings: 2827.76 } },
+        "Logistic Regression": { pr_auc: 0.4509, roc_auc: 0.9646, recall_at_fpr_1pct: 0.4303, brier_score: 0.0143, inference_latency_ms_per_tx: 0.0, financial_outcomes: { total_operational_cost: 27844.57, estimated_net_savings: 10733.26 } },
+        "Random Forest": { pr_auc: 0.7190, roc_auc: 0.9783, recall_at_fpr_1pct: 0.6724, brier_score: 0.0096, inference_latency_ms_per_tx: 0.013, financial_outcomes: { total_operational_cost: 9581.30, estimated_net_savings: 28996.53 } },
+        "LightGBM (Tabular)": { pr_auc: 0.7240, roc_auc: 0.9891, recall_at_fpr_1pct: 0.6887, brier_score: 0.0086, inference_latency_ms_per_tx: 0.002, financial_outcomes: { total_operational_cost: 5960.88, estimated_net_savings: 32616.95 } },
+        "XGBoost": { pr_auc: 0.7147, roc_auc: 0.9915, recall_at_fpr_1pct: 0.7141, brier_score: 0.0091, inference_latency_ms_per_tx: 0.001, financial_outcomes: { total_operational_cost: 7442.83, estimated_net_savings: 31135.00 } },
+        "AEGIS LightGBM + Graph": { pr_auc: 0.7667, roc_auc: 0.9905, recall_at_fpr_1pct: 0.7753, brier_score: 0.0082, inference_latency_ms_per_tx: 0.002, financial_outcomes: { total_operational_cost: 5940.88, estimated_net_savings: 32636.95 } }
       },
       policy_comparisons: {
-        fixed_threshold_baseline: { policy: { policy_name: "Fixed-Threshold (p>=0.5)", tau_allow: 0.5, tau_review: 0.5, tau_block: 0.5 }, metrics: { false_positive_rate: 0.001, total_cost: 5657.95, estimated_savings: 32919.88, savings_ratio: 0.853 } },
-        conservative_baseline: { policy: { policy_name: "Conservative Heuristic", tau_allow: 0.3, tau_review: 0.7, tau_block: 0.95 }, metrics: { false_positive_rate: 0.0036, total_cost: 5017.05, estimated_savings: 33560.78, savings_ratio: 0.87 } },
-        aegis_cost_optimized: { policy: { policy_name: "Cost-Aware-Optimized", tau_allow: 0.15, tau_review: 0.42, tau_block: 0.75 }, metrics: { false_positive_rate: 0.0087, total_cost: 3061.44, estimated_savings: 35516.39, savings_ratio: 0.921 } }
+        fixed_threshold_baseline: { policy: { policy_name: "Fixed-Threshold (p>=0.5)", tau_allow: 0.5, tau_review: 0.5, tau_block: 0.5 }, metrics: { false_positive_rate: 0.00102, total_cost: 7107.83, estimated_savings: 31470.00, savings_ratio: 0.8158 } },
+        conservative_baseline: { policy: { policy_name: "Conservative Heuristic", tau_allow: 0.3, tau_review: 0.7, tau_block: 0.95 }, metrics: { false_positive_rate: 0.00102, total_cost: 7107.83, estimated_savings: 31470.00, savings_ratio: 0.8158 } },
+        aegis_cost_optimized: { policy: { policy_name: "Cost-Aware-Optimized", tau_allow: 0.2222, tau_review: 0.2322, tau_block: 1.0 }, metrics: { false_positive_rate: 0.00204, total_cost: 5376.27, estimated_savings: 33201.56, savings_ratio: 0.8606 } }
       }
     };
   }
@@ -111,6 +114,8 @@ export async function fetchReplayBatch(offset: number = 0, limit: number = 30): 
       batch_offset: offset,
       batch_count: limit,
       total_available: 3000,
+      degraded: true,
+      source: "offline-fallback",
       cumulative_summary: {
         baseline_total_cost: 5650.0,
         aegis_total_cost: 3060.0,
@@ -151,7 +156,14 @@ export async function fetchGraphSubgraph(): Promise<SubgraphResponse> {
       { source: "usr_0089", target: "merch_starbucks", amount: 12.75 },
       { source: "usr_0012", target: "merch_starbucks", amount: 9.50 },
     ];
-    return { nodes, edges, total_nodes: 35, total_edges: 48 };
+    return {
+      nodes,
+      edges,
+      total_nodes: 35,
+      total_edges: 48,
+      degraded: true,
+      source: "offline-fallback",
+    };
   }
 }
 
@@ -177,10 +189,12 @@ export async function optimizePolicy(params: {
     const block = Math.max(0.70, Math.min(0.95, 0.75 + (params.friction_block_cost / 100)));
     return {
       status: "success",
+      degraded: true,
+      source: "offline-fallback",
       active_policy: { policy_name: "Cost-Aware-Optimized", tau_allow: allow, tau_review: review, tau_block: block },
       comparisons: {
-        fixed_threshold_baseline: { policy: { policy_name: "Fixed-Threshold (p>=0.5)", tau_allow: 0.5, tau_review: 0.5, tau_block: 0.5 }, metrics: { false_positive_rate: 0.001, total_cost: 5657.95, estimated_savings: 32919.88, savings_ratio: 0.853 } },
-        aegis_cost_optimized: { policy: { policy_name: "Cost-Aware-Optimized", tau_allow: allow, tau_review: review, tau_block: block }, metrics: { false_positive_rate: 0.0087, total_cost: 3061.44, estimated_savings: 35516.39, savings_ratio: 0.921 } }
+        fixed_threshold_baseline: { policy: { policy_name: "Fixed-Threshold (p>=0.5)", tau_allow: 0.5, tau_review: 0.5, tau_block: 0.5 }, metrics: { false_positive_rate: 0.00102, total_cost: 7107.83, estimated_savings: 31470.00, savings_ratio: 0.8158 } },
+        aegis_cost_optimized: { policy: { policy_name: "Cost-Aware-Optimized", tau_allow: allow, tau_review: review, tau_block: block }, metrics: { false_positive_rate: 0.00204, total_cost: 5376.27, estimated_savings: 33201.56, savings_ratio: 0.8606 } }
       }
     };
   }
@@ -194,6 +208,8 @@ export async function evaluateDrift() {
   } catch (e) {
     return {
       status: "STABLE",
+      degraded: true,
+      source: "offline-fallback",
       amount_psi: 0.0342,
       amount_wasserstein_distance: 14.82,
       alert_level: "GREEN",
@@ -214,10 +230,13 @@ export async function scoreTransaction(tx: any): Promise<PredictionResult> {
     if (!res.ok) throw new Error("Score request failed");
     return await res.json();
   } catch (e) {
+    // NOTE: offline fallback is a heuristic ILLUSTRATION, not model inference.
     const isHigh = tx.amount > 1000 || (tx.channel === "p2p" && tx.amount > 500);
     const prob = isHigh ? 0.84 : 0.03;
     const action = prob < 0.15 ? "ALLOW" : (prob < 0.45 ? "CHALLENGE" : (prob < 0.75 ? "REVIEW" : "BLOCK"));
     return {
+      degraded: true,
+      source: "offline-fallback",
       transaction_id: tx.transaction_id || `tx_fallback_${Date.now()}`,
       calibrated_probability: prob,
       raw_score: prob * 1.04,
@@ -263,6 +282,8 @@ export async function injectTransaction(req: {
     const txId = `inject_${Date.now()}_${Math.floor(Math.random() * 900 + 100)}`;
     return {
       status: "injected",
+      degraded: true,
+      source: "offline-fallback",
       transaction: {
         transaction_id: txId,
         timestamp: now,
@@ -309,6 +330,8 @@ export async function simulateStress(scenario: "smurfing" | "spoofing" | "volume
     if (scenario === "smurfing") {
       return {
         status: "CRITICAL_DRIFT",
+        degraded: true,
+        source: "offline-fallback",
         alert_level: "RED",
         scenario: "smurfing",
         scenario_description: "Adversarial Smurfing / Structuring ($4,500 - $4,890 to bypass $5k rule checks)",
@@ -320,6 +343,8 @@ export async function simulateStress(scenario: "smurfing" | "spoofing" | "volume
     } else if (scenario === "spoofing") {
       return {
         status: "WARNING_MODERATE_DRIFT",
+        degraded: true,
+        source: "offline-fallback",
         alert_level: "AMBER",
         scenario: "spoofing",
         scenario_description: "Rapid Device Fingerprint Spoofing & Tor Proxy Subnet Proliferation",
@@ -331,6 +356,8 @@ export async function simulateStress(scenario: "smurfing" | "spoofing" | "volume
     } else {
       return {
         status: "STABLE",
+        degraded: true,
+        source: "offline-fallback",
         alert_level: "GREEN",
         scenario: "none",
         scenario_description: "Clean Baseline Stationary Stream",
@@ -353,14 +380,17 @@ export async function verifyReceipt(receipt: any) {
     if (!res.ok) throw new Error("Verify receipt failed");
     return await res.json();
   } catch (e) {
-    // Client verification fallback
-    const isValid = Boolean(receipt && receipt.sha256_hash && receipt.sha256_hash.length === 64);
+    // Cryptographic verification is ONLY performed server-side. Offline we
+    // must never claim a receipt is authentic: report the verification as
+    // unavailable rather than fabricating a validity verdict.
     return {
       receipt_id: receipt?.receipt_id || "rcpt_unknown",
-      is_valid: isValid,
+      is_valid: false,
       signature_algorithm: "SHA256-HMAC",
       sha256_hash: receipt?.sha256_hash || "",
-      status: isValid ? "VALID_AUTHENTIC" : "TAMPERED_OR_CORRUPT"
+      status: "VERIFICATION_UNAVAILABLE_OFFLINE",
+      degraded: true,
+      source: "offline-fallback",
     };
   }
 }

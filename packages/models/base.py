@@ -6,7 +6,7 @@ Standardizes training, inference, probability output, and serialization.
 import os
 import pickle
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, cast
 
 import numpy as np
 
@@ -21,7 +21,9 @@ class BaseFraudClassifier(ABC):
         self.feature_names: List[str] = []
 
     @abstractmethod
-    def fit(self, X: np.ndarray, y: np.ndarray, feature_names: Optional[List[str]] = None) -> "BaseFraudClassifier":
+    def fit(
+        self, X: np.ndarray, y: np.ndarray, feature_names: Optional[List[str]] = None
+    ) -> "BaseFraudClassifier":
         """Fits model on training features X and binary labels y."""
         pass
 
@@ -45,4 +47,4 @@ class BaseFraudClassifier(ABC):
     def load(cls, filepath: str) -> "BaseFraudClassifier":
         """Loads serialized model from disk."""
         with open(filepath, "rb") as f:
-            return pickle.load(f)
+            return cast("BaseFraudClassifier", pickle.load(f))
