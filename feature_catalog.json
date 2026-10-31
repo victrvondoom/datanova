@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-31T09:19:33.893539",
+  "generated": "2026-10-31T09:35:15.702632",
   "total_features": 901,
   "features": [
     {
@@ -26436,9 +26436,14 @@
       "primary_user": "MLOps engineer",
       "expected_outcome": "Signed artifacts with key governance",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "SHA-256 proves integrity; not authenticity",
+      "repository_evidence": [
+        "packages/artifacts/signing.py",
+        "packages/artifacts/bundle.py",
+        "scripts/generate_signing_key.py",
+        "tests/unit/test_artifact_signing.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "ed25519 signature over bundle payload bytes (SHA-256 stays for integrity; signature proves ORIGIN); save_bundle signs when AEGIS_SIGNING_KEY is set, load_bundle fails closed on signed manifests without a verification key or with a bad/wrong-key signature; unsigned manifests load in documented dev mode and are reported via _artifact_signature and /api/health artifact_signature; key governance documented (offline keygen, private key never in repo); 6 unit tests incl. forged-signature rejection",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",

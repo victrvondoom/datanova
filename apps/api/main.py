@@ -102,6 +102,7 @@ class ModelState:
         self.sample_X: Optional[np.ndarray] = None
         self.calibration_source: str = "uninitialized"
         self.artifact_status: str = "not_loaded"
+        self.artifact_signature: Optional[Dict[str, Any]] = None
         self.artifact_run_id: Optional[str] = None
         # Serving-integrity components (catalog: ingest_idem, api_rate_limiting,
         # obs_request_ids, govern_decision_log, deploy_readiness_checks)
@@ -162,6 +163,7 @@ def init_engine():
             state.current_policy = DecisionPolicy(**payload["policy"])
             state.artifact_run_id = payload["run_id"]
             state.artifact_status = "bundle_validated"
+            state.artifact_signature = payload.get("_artifact_signature")
             _calibrator_from_bundle = True
         except BundleValidationError as e:
             state.model = None
@@ -398,6 +400,7 @@ def health_check():
         ),
         "artifact_status": state.artifact_status,
         "artifact_run_id": state.artifact_run_id,
+        "artifact_signature": state.artifact_signature,
         "calibration_source": state.calibration_source,
     }
 

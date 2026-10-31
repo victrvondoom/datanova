@@ -28,7 +28,7 @@
 | D22 | Identity and Access Control | Restrict access appropriately | 30 | 3 | 26 |
 | D23 | Privacy and Security | Protect sensitive data and system integrity | 30 | 12 | 18 |
 | D24 | Governance and Audit | Maintain decision and model accountability | 30 | 7 | 22 |
-| D25 | Model Registry and Deployment | Version, validate, and promote models | 30 | 10 | 20 |
+| D25 | Model Registry and Deployment | Version, validate, and promote models | 30 | 11 | 19 |
 | D26 | Monitoring and Drift Detection | Detect operational and statistical changes | 30 | 4 | 26 |
 | D27 | Evaluation and Benchmark Infrastructure | Measure actual performance and failure modes | 30 | 14 | 16 |
 | D28 | Cloud Infrastructure and Deployment | Support reproducible deployment | 30 | 16 | 13 |

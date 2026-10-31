@@ -258,3 +258,19 @@ savings **$33,201.56 (86.1%)**, FPR **0.20%**, thresholds tau=(0.2222, 0.2322, 1
   550 missing / 2 blocked / 6 N-A / 1 implemented_unverified.**
 - Full suite: **135/135 passed**; mypy clean (56 files); ruff clean;
   frontend build clean. Docker Desktop still unresponsive (NEXT-02).
+
+### Implementation batch I (artifact origin signing)
+- `tests/unit/test_artifact_signing.py` (6 tests): signed bundle roundtrip
+  (manifest carries ed25519 signature + key id; load verifies and reports
+  verified=True); unsigned manifest when no signing key (no fake
+  signatures); fail-closed rejection of signed manifests without a
+  configured verification key; FORGED signature (attacker key, claimed
+  trusted key id) rejected; unsigned dev-mode load reported honestly;
+  stable key ids.
+- API: `/api/health` now exposes `artifact_signature`
+  ({"signed": false, ...} for the current unsigned champion bundle —
+  honest).
+- Catalog re-validated: **901 features — 204 verified / 139 partial /
+  549 missing / 2 blocked / 6 N-A / 1 implemented_unverified.**
+- Full suite: **141/141 passed**; mypy clean (58 files); ruff clean;
+  frontend build clean. Docker Desktop still unresponsive (NEXT-02).

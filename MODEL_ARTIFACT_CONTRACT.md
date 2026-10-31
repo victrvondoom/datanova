@@ -50,8 +50,36 @@ the manifest for provenance. Test environments override paths
 (`artifact_dir`, `experiments_dir`, ...) so gate runs never clobber the
 authoritative artifacts.
 
+## Origin signing (catalog: registry_signature_verification)
+
+SHA-256 in the manifest proves INTEGRITY; an ed25519 signature over the
+payload bytes proves ORIGIN — that a key holder the operator trusts
+produced this artifact.
+
+- Training host sets `AEGIS_SIGNING_KEY` (PEM private key path):
+  `save_bundle` then adds `payload_signature`, `signature_algorithm`
+  ("ed25519"), and `signing_key_id` to the manifest. Without the env key the
+  manifest is written UNSIGNED (never a fake signature).
+- Serving host sets `AEGIS_SIGNING_PUBKEY`: `load_bundle` verifies the
+  signature and REJECTS the bundle on (a) a signed manifest with no
+  configured verification key (fail-closed), (b) key-id mismatch, or
+  (c) failed signature verification (payload changed after signing or
+  signed by an untrusted key).
+- Unsigned manifests load in the documented dev mode; the loaded payload
+  carries `_artifact_signature` (signed/verified/key_id/algorithm) and
+  `/api/health` exposes it as `artifact_signature`.
+- Key generation: `python scripts/generate_signing_key.py <priv.pem> <pub.pem>`
+  (run OFFLINE; the private key must never be committed or baked into images).
+
+**Current repository state (honest):** the checked-in champion bundle is
+UNSIGNED (dev mode, reported as such by the API). Production rollout must
+generate a keypair, configure the env keys, and re-sign the champion.
+
 ## Tests
 
 `tests/unit/test_artifact_bundle.py` (roundtrip, corrupt, tampered payload,
-missing manifest, identity/schema mismatch, API refusal) and release gate 2
+missing manifest, identity/schema mismatch, API refusal),
+`tests/unit/test_artifact_signing.py` (sign roundtrip, unsigned-dev-mode,
+fail-closed without verification key, forged/wrong-key signature rejection,
+stable key ids), and release gate 2
 (`tests/release/test_gate_calibrator_provenance.py`) pin this contract.

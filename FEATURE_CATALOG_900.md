@@ -1,6 +1,6 @@
 # AEGIS-Fraud X — Feature Catalog (900+)
 
-**Generated:** 2026-10-31 09:19:33 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
+**Generated:** 2026-10-31 09:35:15 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
 
 This catalog is GENERATED and VALIDATED by `scripts/generate_feature_catalog.py`
 (uniqueness, domain counts, status vocabulary, and evidence-file existence are
@@ -9,7 +9,7 @@ sources: repository inspection, fraud-domain practice, workflow failure
 analysis, and risk analysis. Acceptance criteria are outcome-derived — no
 invented numeric targets. Field policy is documented in the generator.
 
-Status distribution: {"verified": 203, "missing": 550, "partial": 139, "blocked": 2, "not_applicable": 6, "implemented_unverified": 1}
+Status distribution: {"verified": 204, "missing": 549, "partial": 139, "blocked": 2, "not_applicable": 6, "implemented_unverified": 1}
 
 ## D01 — Data Ingestion and Connectors
 
@@ -841,7 +841,7 @@ Status distribution: {"verified": 203, "missing": 550, "partial": 139, "blocked"
 - **AFX-F0728 Canary Promotion** [P3 · missing] — Gradual artifact rollout. Problem: All-at-once promotion is risky. Outcome: Canary percentages with monitoring. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0729 Schema Compatibility Checks** [P0 · verified] — Artifacts match serving schema. Problem: Schema drift corrupts predictions. Outcome: Feature-schema validation on load. Evidence: `packages/artifacts/bundle.py`, `tests/unit/test_artifact_bundle.py`
 - **AFX-F0730 Dependency Capture in Artifacts** [P1 · missing] — Record training environment. Problem: Env drift breaks reproduction. Outcome: Version list in bundle metadata. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0731 Artifact Signing** [P2 · missing] — Provenance beyond checksums. Problem: Checksums do not prove origin. Outcome: Signed artifacts with key governance. Evidence: *(new proposal)* Reason: SHA-256 proves integrity; not authenticity
+- **AFX-F0731 Artifact Signing** [P2 · verified] — Provenance beyond checksums. Problem: Checksums do not prove origin. Outcome: Signed artifacts with key governance. Evidence: `packages/artifacts/signing.py`, `packages/artifacts/bundle.py`, `scripts/generate_signing_key.py`, `tests/unit/test_artifact_signing.py`
 - **AFX-F0732 Registry Storage Layout** [P2 · partial] — Standardized artifact layout. Problem: Ad-hoc layouts break tooling. Outcome: Documented layout with manifests. Evidence: `experiments/champion_bundle_manifest.json` Reason: Bundle+manifest exist; no registry layout
 - **AFX-F0733 Artifact Cleanup Policy** [P3 · missing] — Bound storage growth. Problem: Artifacts accumulate forever. Outcome: Retention with protected champions. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0734 Artifact Dependency Graph** [P2 · missing] — Which models used which data. Problem: Provenance needs graph structure. Outcome: Artifact-to-dataset edges recorded. Evidence: *(new proposal)* Reason: New proposal

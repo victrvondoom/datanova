@@ -27,6 +27,7 @@ import pickle
 from datetime import datetime
 from typing import Any, Dict, List, Optional
 
+from packages.artifacts.signing import sign_payload, verify_payload_signature
 from packages.data.schemas import DecisionPolicy
 from packages.models.base import BaseFraudClassifier
 from packages.models.calibration import ProbabilityCalibrator
@@ -88,6 +89,14 @@ def save_bundle(
             manifest["benchmark_artifact_sha256"] = hashlib.sha256(f.read()).hexdigest()
         manifest["benchmark_artifact_path"] = benchmark_artifact_path
 
+    # Origin authenticity (catalog: registry_signature_verification):
+    # SHA-256 above proves integrity; an ed25519 signature over the payload
+    # bytes proves a trusted key holder produced this artifact. Unsigned
+    # manifests stay backwards compatible and are reported as unsigned.
+    signature_fields = sign_payload(payload_bytes)
+    if signature_fields is not None:
+        manifest.update(signature_fields)
+
     with open(manifest_path_for(path), "w") as f:
         json.dump(manifest, f, indent=2, default=str)
 
@@ -127,10 +136,20 @@ def load_bundle(
             "corrupted after training. Refusing to serve."
         )
 
+    # Signature verification (catalog: registry_signature_verification).
+    # Fail-closed: signed manifests without a configured verification key or
+    # with a failing signature are rejected; unsigned manifests load in the
+    # documented dev mode and are reported as unsigned.
+    sig_ok, sig_reason, sig_info = verify_payload_signature(payload_bytes, manifest)
+    if not sig_ok:
+        raise BundleValidationError(f"Artifact signature rejected: {sig_reason}")
+
     try:
         payload: Dict[str, Any] = pickle.loads(payload_bytes)
     except Exception as e:
         raise BundleValidationError(f"Corrupt artifact bundle '{path}': {e}") from e
+
+    payload["_artifact_signature"] = sig_info
 
     if payload.get("format_version") != BUNDLE_FORMAT_VERSION:
         raise BundleValidationError(

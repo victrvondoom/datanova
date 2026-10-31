@@ -27,7 +27,7 @@ Actors: local operator (trusted), API client (untrusted input), dataset files
 |:---|:---|:---|:---|:---|
 | S1 | Spoofed ingest/decisions | Env-gated API-key auth (constant-time compare, probes exempt); local-open mode honestly reported via `/api/health` `auth_mode` (`apps/api/main.py`) | `test_batch_de.py` (both modes) | **Local-context mitigated**: without `AEGIS_API_KEY` the API is open by design; multi-user deployment MUST set the key (TLS/reverse proxy still out of scope) |
 | S2 | Forged receipts | HMAC-SHA256 under server-held key; truthful `SIGNATURE_VERIFIED`/`INVALID` semantics; wrong-key test proves rejection (`receipts.py`, `main.py`) | `test_receipt_verification_edge_cases` | **Medium**: dev default key is public in source; production must set `AEGIS_RECEIPT_SECRET` (compose passthrough exists) |
-| T1 | Tampered model artifacts | Bundle payload SHA-256 sidecar manifest; hard rejection, never silent substitution (`bundle.py`) | `test_artifact_bundle.py`, release gate 2 | Low for integrity; **note**: SHA-256 proves integrity, not origin (catalog `registry_signature_verification` open) |
+| T1 | Tampered model artifacts | Bundle payload SHA-256 sidecar manifest + ed25519 origin signature (`packages/artifacts/signing.py`); hard rejection, never silent substitution; fail-closed on unverifiable signatures (`bundle.py`) | `test_artifact_bundle.py`, `test_artifact_signing.py` | Low for integrity; signature proves origin ONLY when the operator configures AEGIS_SIGNING_KEY/AEGIS_SIGNING_PUBKEY - the current repo bundle is UNSIGNED (dev mode, reported honestly via /api/health artifact_signature) |
 | T2 | Tampered benchmark evidence | Adversarial test-label invariance gate; artifact regeneration; provenance hashes | `test_gate_benchmark_protocol.py`, `EVIDENCE.md` | Low |
 | T3 | Silent test leakage reintroduced | Mandatory release gate runs the real pipeline with mutated test labels | Release gate 1 (falsified twice) | Low |
 | R1 | Decisions repudiated | Append-only receipt-linked decision ledger + provenance-complete logs (`integrity.py`, `main.py`) | `test_serving_integrity.py`, `test_batch_b.py` | Medium: single-node JSONL, no log write-once controls (catalog `govern_log_immutability_controls`) |
@@ -59,7 +59,10 @@ Actors: local operator (trusted), API client (untrusted input), dataset files
    non-root user (read-only fs, dropped capabilities).
 2. Supply-chain remediation for starlette/pillow/pytest (requires an
    environment-isolated fastapi upgrade — see DEPENDENCY_AUDIT.md).
-3. `registry_signature_verification` (P2) — checksums prove integrity, not origin.
+3. Operational signing rollout (P2): the ed25519 machinery is verified, but
+   the current champion bundle is UNSIGNED — production deployment must
+   generate a keypair (`scripts/generate_signing_key.py`), configure the
+   env keys, and re-sign artifacts.
 
 Closed in Milestone 3 batches D/F: `authn_apikeys`, `authz_admin_surface`,
 `api_input_size_limits`, `deploy_nonroot_user` (code landed; container build
