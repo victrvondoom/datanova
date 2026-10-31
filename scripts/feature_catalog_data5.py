@@ -133,7 +133,7 @@ PART5 = [
  ("monitor_drift_alerts", "Drift Alert Levels", "Severity-tiered alerts", "Drift needs graded response", "GREEN/AMBER/RED levels", "verified", "P2", ["apps/api/main.py", "tests/integration/test_api.py"], [], "Alert levels in stress endpoint"),
  ("monitor_feature_drift", "Per-Feature Drift Tracking", "Drift beyond amounts", "Amount-only monitoring misses shifts", "PSI across model features", "missing", "P2", [], [], "Only amount distribution monitored today"),
  ("monitor_score_drift", "Prediction Distribution Monitoring", "Score stability over time", "Score drift reveals decay", "Score distribution tracking", "missing", "P2", [], [], "New proposal"),
- ("monitor_latency_tracking", "Latency Monitoring", "Track serving latency", "Latency rot is invisible", "p50/p95/p99 by endpoint", "missing", "P2", [], [], "Per-request latency returned; not aggregated"),
+("monitor_latency_tracking", "Latency Monitoring", "Track serving latency", "Latency rot is invisible", "p50/p95/p99 by endpoint", "partial", "P2", ["apps/api/integrity.py", "apps/api/main.py", "tests/integration/test_batch_b.py"], [], "Per-request elapsed_ms recorded in structured logs; p50/p95/p99 aggregation still absent"),
  ("monitor_throughput_tracking", "Throughput Monitoring", "Requests per second", "Capacity is unknown", "Throughput metrics by endpoint", "missing", "P2", [], [], "New proposal"),
  ("monitor_error_rates", "Error Rate Monitoring", "Failed request ratio", "Error spikes hide in logs", "Error rate by endpoint/category", "missing", "P2", [], [], "New proposal"),
  ("monitor_slo_definitions", "SLO Definitions", "Service objectives documented", "No objective, no accountability", "SLOs with error budgets", "missing", "P2", [], [], "New proposal"),

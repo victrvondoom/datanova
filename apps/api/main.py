@@ -11,6 +11,7 @@ Provides:
 """
 
 import json
+import logging
 import os
 import sys
 import time
@@ -33,6 +34,7 @@ from apps.api.integrity import (
     IdempotencyCache,
     RequestIDMiddleware,
     TokenBucketRateLimiter,
+    metrics,
 )
 from packages.artifacts.bundle import BundleValidationError, load_bundle
 from packages.data.schemas import (
@@ -96,6 +98,9 @@ class ModelState:
         self.idempotency: Optional[IdempotencyCache] = None
         self.rate_limiter: Optional[TokenBucketRateLimiter] = None
         self.decision_ledger: Optional[DecisionLedger] = None
+        # Emergency stop (catalog ops_kill_switch): when engaged, every decision
+        # becomes human REVIEW — automation cannot act until disengaged.
+        self.emergency_stop_engaged: bool = False
 
 
 state = ModelState()
@@ -363,7 +368,10 @@ def _score_and_decide(tx: Transaction) -> PredictionResult:
 
     # 4. Action determination using active policy
     policy = state.current_policy or DecisionPolicy()
-    if calibrated_prob < policy.tau_allow:
+    if state.emergency_stop_engaged:
+        # Kill switch engaged: no automated action may pass without a human.
+        action = OperationalAction.REVIEW
+    elif calibrated_prob < policy.tau_allow:
         action = OperationalAction.ALLOW
     elif calibrated_prob < policy.tau_review:
         action = OperationalAction.CHALLENGE if policy.use_challenge else OperationalAction.REVIEW
@@ -422,8 +430,15 @@ def _score_and_decide(tx: Transaction) -> PredictionResult:
     )
 
 
+decision_logger = logging.getLogger("aegis.decisions")
+
+
 def _ledger_record(tx: Transaction, result: PredictionResult) -> None:
-    """Appends a decision record (receipt-linked, provenance-complete, payload-minimal)."""
+    """Appends a decision record and emits a provenance-complete log line.
+
+    Catalog: govern_decision_log (append), obs_model_version_logging
+    (structured provenance per decision). No transaction payload is logged.
+    """
     ledger = state.require(state.decision_ledger)
     ledger.append(
         {
@@ -438,7 +453,25 @@ def _ledger_record(tx: Transaction, result: PredictionResult) -> None:
             "recommended_action": result.recommended_action.value,
             "receipt_sha256": result.audit_receipt_hash,
             "source": "live",
+            "emergency_stop_engaged": state.emergency_stop_engaged,
         }
+    )
+    decision_logger.info(
+        json.dumps(
+            {
+                "event": "decision",
+                "transaction_id": tx.transaction_id,
+                "model_id": result.model_id,
+                "model_version": result.model_version,
+                "policy_name": result.policy_name,
+                "artifact_run_id": state.artifact_run_id,
+                "calibration_source": state.calibration_source,
+                "calibrated_probability": result.calibrated_probability,
+                "action": result.recommended_action.value,
+                "receipt_sha256": result.audit_receipt_hash,
+                "emergency_stop_engaged": state.emergency_stop_engaged,
+            }
+        )
     )
 
 
@@ -451,11 +484,14 @@ def readiness_check():
         "policy_present": state.current_policy is not None,
         "feature_pipeline_fitted": bool(state.feature_pipeline and state.feature_pipeline.fitted),
         "bundle_validated": state.artifact_status == "bundle_validated",
+        # PASS semantics: True when the kill switch is NOT engaged
+        "emergency_stop_clear": not state.emergency_stop_engaged,
     }
     ready = all(checks.values())
     return {
         "ready": ready,
         "checks": checks,
+        "emergency_stop_engaged": state.emergency_stop_engaged,
         "artifact_status": state.artifact_status,
         "artifact_run_id": state.artifact_run_id,
         "calibration_source": state.calibration_source,
@@ -495,6 +531,70 @@ def score_transaction(tx: Transaction, request: Request):
     state.require(state.idempotency).put(tx.transaction_id, result)
     _ledger_record(tx, result)
     return result
+
+
+@app.get("/api/decisions/{transaction_id}")
+def get_decision(transaction_id: str):
+    """Retrieves an archived decision record by transaction id (catalog:
+    inv_model_output_inspection, NEXT-B1). 404 when unknown."""
+    record = state.require(state.decision_ledger).get(transaction_id)
+    if record is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No archived decision for transaction_id '{transaction_id}'",
+        )
+    return record
+
+
+@app.get("/api/decisions")
+def list_decisions(limit: int = 50, offset: int = 0):
+    """Insertion-ordered page of archived decisions (bounded, validated)."""
+    limit = max(1, min(limit, 200))
+    offset = max(0, offset)
+    ledger = state.require(state.decision_ledger)
+    return {
+        "count": len(ledger),
+        "limit": limit,
+        "offset": offset,
+        "records": ledger.recent(limit=limit, offset=offset),
+    }
+
+
+@app.get("/api/metrics")
+def get_metrics():
+    """Process-local operational counters (catalog: monitor_metrics_endpoint,
+    api_usage_analytics). Demo-scale scope; resets on restart."""
+    if metrics is None:
+        raise HTTPException(status_code=501, detail="Metrics registry unavailable")
+    return metrics.snapshot()
+
+
+class EmergencyStopRequest(BaseModel):
+    engaged: bool
+
+
+@app.post("/api/admin/emergency-stop")
+def emergency_stop(req: EmergencyStopRequest):
+    """Emergency kill switch (catalog: ops_kill_switch, P1 safety control).
+
+    When engaged, EVERY scored transaction is routed to human REVIEW —
+    the system cannot automatically ALLOW, CHALLENGE, or BLOCK until it is
+    explicitly disengaged. The state is visible in /api/ready and recorded
+    on every ledger entry.
+
+    NOTE: unauthenticated in the current single-user local deployment;
+    admin authorization (authz_admin_surface) remains an open catalog item.
+    """
+    state.emergency_stop_engaged = bool(req.engaged)
+    return {
+        "engaged": state.emergency_stop_engaged,
+        "effect": (
+            "All automated decisions are forced to REVIEW until disengaged"
+            if state.emergency_stop_engaged
+            else "Normal policy decisioning restored"
+        ),
+        "recorded_in_ledger": True,
+    }
 
 
 class InjectTransactionRequest(BaseModel):

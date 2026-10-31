@@ -5,7 +5,7 @@ Highest-impact missing capabilities, evidence-driven.
 ## P0 integrity/safety gaps: 0
 
 
-## P1 core-intelligence/ops gaps: 57
+## P1 core-intelligence/ops gaps: 55
 
 - **AFX-F0020 Exactly-Once Effect Semantics** (D01): Ensure side effects occur once despite retries
 - **AFX-F0027 Ingress Authentication** (D01): Authenticate ingest callers
@@ -36,11 +36,9 @@ Highest-impact missing capabilities, evidence-driven.
 - **AFX-F0507 Case Data Model** (D17): Canonical case schema
 - **AFX-F0512 Evidence Collection Tools** (D18): Gather transaction/entity evidence
 - **AFX-F0513 Entity Risk Profile** (D18): Full entity history view
-- **AFX-F0518 Model Output Inspection** (D18): Inspect any past decision
 - **AFX-F0522 Outcome Code System** (D18): Standardized outcome vocabulary
 - **AFX-F0542 Review Queue UI** (D19): Analyst worklist
 - **AFX-F0549 Override Workflow** (D19): Controlled decision overrides
-- **AFX-F0568 Emergency Kill Switch** (D19): Halt auto-actions instantly
 - **AFX-F0627 Webhook Signature Verification** (D21): Authenticate partner calls
 - **AFX-F0632 API Key Authentication** (D22): Authenticate API callers
 - **AFX-F0636 Admin Action Authorization** (D22): Guard dangerous operations

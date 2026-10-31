@@ -1,6 +1,6 @@
 # AEGIS-Fraud X — Feature Catalog (900+)
 
-**Generated:** 2026-10-31 08:17:18 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
+**Generated:** 2026-10-31 08:32:43 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
 
 This catalog is GENERATED and VALIDATED by `scripts/generate_feature_catalog.py`
 (uniqueness, domain counts, status vocabulary, and evidence-file existence are
@@ -9,7 +9,7 @@ sources: repository inspection, fraud-domain practice, workflow failure
 analysis, and risk analysis. Acceptance criteria are outcome-derived — no
 invented numeric targets. Field policy is documented in the generator.
 
-Status distribution: {"verified": 177, "missing": 581, "partial": 135, "blocked": 2, "not_applicable": 6}
+Status distribution: {"verified": 183, "missing": 573, "partial": 137, "blocked": 2, "not_applicable": 6}
 
 ## D01 — Data Ingestion and Connectors
 
@@ -600,7 +600,7 @@ Status distribution: {"verified": 177, "missing": 581, "partial": 135, "blocked"
 - **AFX-F0515 Peer Comparison Analysis** [P2 · missing] — Compare entity to peers. Problem: Outliers need peer context. Outcome: Peer-relative analytics view. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0516 Graph-Guided Investigation** [P2 · missing] — Expand rings from a seed entity. Problem: Rings are found by traversal. Outcome: Investigator graph expansion tool. Evidence: *(new proposal)* Reason: Graph view exists; no guided traversal
 - **AFX-F0517 Transaction Provenance View** [P2 · missing] — Trace a transaction end-to-end. Problem: Data lineage answers disputes. Outcome: Provenance trace per transaction. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0518 Model Output Inspection** [P1 · missing] — Inspect any past decision. Problem: Disputes need decision replay. Outcome: Decision lookup with full context. Evidence: *(new proposal)* Reason: New proposal; needs decision archive
+- **AFX-F0518 Model Output Inspection** [P1 · partial] — Inspect any past decision. Problem: Disputes need decision replay. Outcome: Decision lookup with full context. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_batch_b.py` Reason: Archived decisions retrievable by id and page with full provenance; original transaction inputs are not archived (payload minimization)
 - **AFX-F0519 Receipt Verification Tool** [P1 · verified] — Verify any receipt against history. Problem: Integrity checks need tooling. Outcome: Verification with stored expected hash. Evidence: `apps/api/main.py`, `tests/integration/test_api.py`
 - **AFX-F0520 Investigation Report Export** [P2 · missing] — Formal case reports. Problem: Regulators require written reports. Outcome: Generated case report with evidence. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0521 Collaborative Investigation** [P3 · missing] — Multi-analyst case work. Problem: Parallel work causes conflicts. Outcome: Threaded case collaboration. Evidence: *(new proposal)* Reason: New proposal
@@ -654,7 +654,7 @@ Status distribution: {"verified": 177, "missing": 581, "partial": 135, "blocked"
 - **AFX-F0565 Mobile Review Support** [P3 · partial] — Handle urgent cases on mobile. Problem: Urgent cases wait for desktops. Outcome: Responsive review flows. Evidence: `apps/web/src/App.tsx` Reason: App is responsive; review flows absent entirely
 - **AFX-F0566 Decision Soundness Sampling** [P2 · missing] — Random audit of auto-decisions. Problem: Auto-actions need QA. Outcome: Sampled decision reviews. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0567 Training Feedback Loop** [P3 · missing] — New-analyst ramp metrics. Problem: Ramp time is unmeasured. Outcome: Ramp statistics per cohort. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0568 Emergency Kill Switch** [P1 · missing] — Halt auto-actions instantly. Problem: Runaway automation needs a stop. Outcome: Documented emergency stop with audit. Evidence: *(new proposal)* Reason: New proposal; core safety control
+- **AFX-F0568 Emergency Kill Switch** [P1 · verified] — Halt auto-actions instantly. Problem: Runaway automation needs a stop. Outcome: Documented emergency stop with audit. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_batch_b.py`
 - **AFX-F0569 SLA Policy Configuration** [P3 · missing] — Per-type SLA settings. Problem: Uniform SLAs misfit case types. Outcome: Configurable SLAs per case type. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0570 Customer-Facing Status** [P2 · missing] — Transaction status explanations. Problem: Customers receive opaque declines. Outcome: Customer-safe decline messaging. Evidence: *(new proposal)* Reason: New proposal; must not leak detection logic
 - **AFX-F0571 Shift Reports** [P3 · missing] — End-of-shift summaries. Problem: Handover relies on memory. Outcome: Auto-generated shift summaries. Evidence: *(new proposal)* Reason: New proposal
@@ -669,13 +669,13 @@ Status distribution: {"verified": 177, "missing": 581, "partial": 135, "blocked"
 - **AFX-F0576 Request Idempotency** [P1 · verified] — Safe retries for mutating calls. Problem: Retries duplicate effects. Outcome: Idempotency keys honored. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_serving_integrity.py`
 - **AFX-F0577 Rate Limiting** [P1 · verified] — Protect the API from abuse. Problem: Unthrottled APIs are DoS-able. Outcome: Documented limits with 429s. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_serving_integrity.py`
 - **AFX-F0578 Strict Request Validation** [P1 · verified] — Reject malformed input early. Problem: Malformed input corrupts state. Outcome: Pydantic validation with clear errors. Evidence: `packages/data/schemas.py`
-- **AFX-F0579 Pagination Standards** [P2 · partial] — Consistent paging contract. Problem: Ad-hoc paging breaks clients. Outcome: Standard paging on list endpoints. Evidence: `apps/api/main.py` Reason: Replay paging exists; no global standard
+- **AFX-F0579 Pagination Standards** [P2 · partial] — Consistent paging contract. Problem: Ad-hoc paging breaks clients. Outcome: Standard paging on list endpoints. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_batch_b.py` Reason: Decisions list uses bounded limit/offset like replay; a formal global standard is still undocumented
 - **AFX-F0580 API Versioning** [P2 · missing] — Stable contract evolution. Problem: Breaking changes surprise clients. Outcome: Versioned paths or headers. Evidence: *(new proposal)* Reason: Single unversioned surface (/api)
 - **AFX-F0581 Deprecation Policy** [P3 · missing] — Sunset old surfaces gracefully. Problem: Silent removals break integrators. Outcome: Deprecation headers and notices. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0582 Python Client SDK** [P3 · missing] — Typed client library. Problem: Each integrator reimplements calls. Outcome: Published SDK with tests. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0583 Outbound Webhooks** [P2 · missing] — Push decision events. Problem: Consumers poll instead of push. Outcome: Signed webhook delivery. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0584 Batch Scoring API** [P2 · missing] — Score many transactions at once. Problem: Bulk consumers need throughput. Outcome: Batch endpoint with per-item results. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0585 Error Correlation IDs** [P2 · missing] — Traceable error instances. Problem: Errors are unfindable in logs. Outcome: Error id returned and logged. Evidence: *(new proposal)* Reason: New proposal
+- **AFX-F0585 Error Correlation IDs** [P2 · verified] — Traceable error instances. Problem: Errors are unfindable in logs. Outcome: Error id returned and logged. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_batch_b.py`
 - **AFX-F0586 API Contract Tests** [P1 · partial] — Pin API behavior. Problem: API drift breaks clients. Outcome: Schema-contract tests in CI. Evidence: `tests/integration/test_api.py` Reason: Behavioral tests exist; no schema-freeze tests
 - **AFX-F0587 Latency Headers** [P3 · missing] — Server timing on responses. Problem: Clients cannot measure server time. Outcome: Elapsed-time header per response. Evidence: *(new proposal)* Reason: Latency in body for scores only
 - **AFX-F0588 CORS Contract** [P1 · verified] — Explicit origins, no wildcard+credentials. Problem: Wildcards leak with credentials. Outcome: Allowlist config documented. Evidence: `apps/api/main.py`, `tests/integration/test_api.py`
@@ -691,7 +691,7 @@ Status distribution: {"verified": 177, "missing": 581, "partial": 135, "blocked"
 - **AFX-F0598 Degraded Flags in Responses** [P0 · verified] — API self-reports degradation. Problem: Clients cannot tell degraded serving. Outcome: Degradation flags in health/score. Evidence: `apps/api/main.py`, `PRODUCT_UX_STATES.md`
 - **AFX-F0599 Backwards-Compatibility Tests** [P2 · missing] — Old clients keep working. Problem: Upgrades break integrators. Outcome: Compat fixtures pinned in CI. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0600 Load Testing Harness** [P2 · missing] — Measure capacity honestly. Problem: Throughput claims need load tests. Outcome: Load profile report with limits. Evidence: *(new proposal)* Reason: New proposal; single-process limits documented
-- **AFX-F0601 API Usage Analytics** [P2 · missing] — Endpoint usage statistics. Problem: Usage is invisible. Outcome: Per-endpoint counts and latencies. Evidence: *(new proposal)* Reason: New proposal
+- **AFX-F0601 API Usage Analytics** [P2 · verified] — Endpoint usage statistics. Problem: Usage is invisible. Outcome: Per-endpoint counts and latencies. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_batch_b.py`
 ## D21 — External Integrations
 
 *Connect authorized data and operational systems*
@@ -870,7 +870,7 @@ Status distribution: {"verified": 177, "missing": 581, "partial": 135, "blocked"
 - **AFX-F0753 Drift Alert Levels** [P2 · verified] — Severity-tiered alerts. Problem: Drift needs graded response. Outcome: GREEN/AMBER/RED levels. Evidence: `apps/api/main.py`, `tests/integration/test_api.py`
 - **AFX-F0754 Per-Feature Drift Tracking** [P2 · missing] — Drift beyond amounts. Problem: Amount-only monitoring misses shifts. Outcome: PSI across model features. Evidence: *(new proposal)* Reason: Only amount distribution monitored today
 - **AFX-F0755 Prediction Distribution Monitoring** [P2 · missing] — Score stability over time. Problem: Score drift reveals decay. Outcome: Score distribution tracking. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0756 Latency Monitoring** [P2 · missing] — Track serving latency. Problem: Latency rot is invisible. Outcome: p50/p95/p99 by endpoint. Evidence: *(new proposal)* Reason: Per-request latency returned; not aggregated
+- **AFX-F0756 Latency Monitoring** [P2 · partial] — Track serving latency. Problem: Latency rot is invisible. Outcome: p50/p95/p99 by endpoint. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_batch_b.py` Reason: Per-request elapsed_ms recorded in structured logs; p50/p95/p99 aggregation still absent
 - **AFX-F0757 Throughput Monitoring** [P2 · missing] — Requests per second. Problem: Capacity is unknown. Outcome: Throughput metrics by endpoint. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0758 Error Rate Monitoring** [P2 · missing] — Failed request ratio. Problem: Error spikes hide in logs. Outcome: Error rate by endpoint/category. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0759 SLO Definitions** [P2 · missing] — Service objectives documented. Problem: No objective, no accountability. Outcome: SLOs with error budgets. Evidence: *(new proposal)* Reason: New proposal
@@ -968,11 +968,11 @@ Status distribution: {"verified": 177, "missing": 581, "partial": 135, "blocked"
 
 *Detect, diagnose, and recover from failures*
 
-- **AFX-F0842 Structured Logging** [P2 · missing] — JSON logs with levels. Problem: Unstructured logs are unsearchable. Outcome: Structured logs emitted app-wide. Evidence: *(new proposal)* Reason: uvicorn default logs only
+- **AFX-F0842 Structured Logging** [P2 · verified] — JSON logs with levels. Problem: Unstructured logs are unsearchable. Outcome: Structured logs emitted app-wide. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_batch_b.py`
 - **AFX-F0843 Request Correlation IDs** [P1 · verified] — Trace requests end-to-end. Problem: Cross-cutting failures are unlinkable. Outcome: X-Request-ID on every request/log. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_serving_integrity.py`
-- **AFX-F0844 Version Logging** [P2 · missing] — Log model/policy/run per request. Problem: Decisions lack machine-readable lineage in logs. Outcome: Versions in structured logs. Evidence: *(new proposal)* Reason: Versions in responses; not logs
+- **AFX-F0844 Version Logging** [P2 · verified] — Log model/policy/run per request. Problem: Decisions lack machine-readable lineage in logs. Outcome: Versions in structured logs. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_batch_b.py`
 - **AFX-F0845 Error Categories** [P2 · missing] — Classify failures. Problem: Errors are indistinguishable. Outcome: Category taxonomy with counts. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0846 Metrics Endpoint** [P2 · missing] — Prometheus-style metrics. Problem: Monitoring needs a standard surface. Outcome: Scrapeable metrics with provenance labels. Evidence: *(new proposal)* Reason: New proposal
+- **AFX-F0846 Metrics Endpoint** [P2 · verified] — Prometheus-style metrics. Problem: Monitoring needs a standard surface. Outcome: Scrapeable metrics with provenance labels. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `tests/integration/test_batch_b.py`
 - **AFX-F0847 Log Redaction Policy** [P1 · missing] — No sensitive data in logs. Problem: Logs leak transactions. Outcome: Documented redaction rules enforced. Evidence: *(new proposal)* Reason: No payload logging today; policy not formalized
 - **AFX-F0848 Latency Histograms** [P2 · missing] — Distribution tracking. Problem: Averages hide tails. Outcome: p50/p95/p99 per endpoint. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0849 Degraded-State Metrics** [P1 · missing] — Count degraded responses. Problem: Degradation frequency is invisible. Outcome: Degraded-serving counters. Evidence: *(new proposal)* Reason: Status exposed per request; not counted

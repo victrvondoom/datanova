@@ -110,8 +110,52 @@ class DecisionLedger:
     def get(self, transaction_id: str) -> Optional[Dict[str, Any]]:
         return self._index.get(transaction_id)
 
+    def recent(self, limit: int = 50, offset: int = 0):
+        """Insertion-ordered page of archived decisions."""
+        items = list(self._index.values())
+        return items[offset : offset + limit]
+
     def __len__(self) -> int:
         return len(self._index)
+
+
+class MetricsRegistry:
+    """In-memory per-endpoint operational counters (single-process scope).
+
+    Deliberately simple: counters are process-local and reset on restart —
+    documented as demo-scale observability, not a distributed metrics store.
+    """
+
+    def __init__(self) -> None:
+        self.started_at = time.time()
+        self._counters: Dict[str, int] = {}
+        self._lock = threading.Lock()
+
+    def incr(self, event: str, amount: int = 1) -> None:
+        with self._lock:
+            self._counters[event] = self._counters.get(event, 0) + amount
+
+    def observe_request(self, path: str, status: int) -> None:
+        """Classify one completed request into stable counter names."""
+        with self._lock:
+            key = f"requests:{path}"
+            self._counters[key] = self._counters.get(key, 0) + 1
+            bucket = "responses:2xx" if status < 300 else (
+                "responses:4xx" if status < 500 else "responses:5xx"
+            )
+            self._counters[bucket] = self._counters.get(bucket, 0) + 1
+            if status == 429:
+                self._counters["rate_limited"] = self._counters.get("rate_limited", 0) + 1
+
+    def snapshot(self) -> Dict[str, Any]:
+        with self._lock:
+            counters = dict(self._counters)
+        return {
+            "started_at": self.started_at,
+            "uptime_seconds": round(time.time() - self.started_at, 1),
+            "counters": counters,
+            "note": "process-local counters; reset on restart (single-process deployment)",
+        }
 
 
 def _is_valid_request_id(value: str) -> bool:
@@ -122,8 +166,12 @@ try:
     from starlette.middleware.base import BaseHTTPMiddleware
     from starlette.requests import Request
 
+    # Process-local operational metrics (catalog: monitor_metrics_endpoint,
+    # api_usage_analytics). Single-process scope, documented in MetricsRegistry.
+    metrics = MetricsRegistry()
+
     class RequestIDMiddleware(BaseHTTPMiddleware):
-        """Assigns/propagates X-Request-ID and emits a structured log line.
+        """Assigns/propagates X-Request-ID, emits structured logs, counts ops metrics.
 
         Reuses an incoming X-Request-ID when well-formed, else generates one.
         No payload data is logged (redaction by construction).
@@ -137,6 +185,7 @@ try:
             response = await call_next(request)
             elapsed_ms = (time.perf_counter() - start) * 1000.0
             response.headers["X-Request-ID"] = request_id
+            metrics.observe_request(request.url.path, response.status_code)
             logger.info(
                 json.dumps(
                     {
@@ -153,3 +202,4 @@ try:
 
 except ImportError:  # pragma: no cover - starlette always present in this app
     RequestIDMiddleware = None  # type: ignore[assignment, misc]
+    metrics = None  # type: ignore[assignment]

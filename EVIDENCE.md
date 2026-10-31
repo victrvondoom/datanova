@@ -156,3 +156,19 @@ savings **$33,201.56 (86.1%)**, FPR **0.20%**, thresholds tau=(0.2222, 0.2322, 1
   build clean.
 - Playwright re-run after the score-endpoint change: online journey PASSED,
   offline journey PASSED (API stopped for the offline case).
+
+### Implementation batch B (decision archive, logs, metrics, kill switch)
+- `tests/integration/test_batch_b.py` (4 tests): archive retrieval + paging
+  (404 on miss, order-independent listing), structured decision logs with
+  provenance AND payload-absence assertions (caplog), metrics reconciliation
+  against a scripted request sequence (incl. 429 and 404 counters), and the
+  emergency kill switch (every action -> REVIEW; readiness honest; ledger
+  records the flag; disengage restores normal policy).
+- Bug found by the tests and fixed: the first readiness implementation put the
+  ENGAGED boolean inside an all() of pass/fail checks, so a DISENGAGED stop
+  failed readiness — inverted semantics; fixed with explicit
+  `emergency_stop_clear` pass-check + separate engaged flag.
+- Catalog re-validated after 11 status updates: **901 features — 183 verified,
+  137 partial, 573 missing, 2 blocked, 6 N-A.**
+- Full suite: **95/95 passed**; mypy clean (51 files); ruff clean; frontend
+  build clean.

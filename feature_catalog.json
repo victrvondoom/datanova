@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-31T08:17:18.360334",
+  "generated": "2026-10-31T08:32:43.769957",
   "total_features": 901,
   "features": [
     {
@@ -18729,9 +18729,13 @@
       "primary_user": "Fraud investigator",
       "expected_outcome": "Decision lookup with full context",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal; needs decision archive",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "tests/integration/test_batch_b.py"
+      ],
+      "implementation_status": "partial",
+      "status_reason": "Archived decisions retrievable by id and page with full provenance; original transaction inputs are not archived (payload minimization)",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -20502,9 +20506,13 @@
       "primary_user": "Fraud operations",
       "expected_outcome": "Documented emergency stop with audit",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal; core safety control",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "tests/integration/test_batch_b.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "POST /api/admin/emergency-stop forces REVIEW on every decision; readiness reports engaged state; ledger records the flag; disengage restores normal policy",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -20907,10 +20915,12 @@
       "expected_outcome": "Standard paging on list endpoints",
       "dependencies": [],
       "repository_evidence": [
-        "apps/api/main.py"
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "tests/integration/test_batch_b.py"
       ],
       "implementation_status": "partial",
-      "status_reason": "Replay paging exists; no global standard",
+      "status_reason": "Decisions list uses bounded limit/offset like replay; a formal global standard is still undocumented",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -21120,9 +21130,13 @@
       "dependencies": [
         "obs_request_ids"
       ],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "tests/integration/test_batch_b.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "X-Request-ID present on every response incl. errors (429/404), echoed when well-formed",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -21698,9 +21712,13 @@
       "dependencies": [
         "obs_request_ids"
       ],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "tests/integration/test_batch_b.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "Per-path request counts, 2xx/4xx/5xx buckets, rate_limited counter; honest restart-reset note",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -27234,9 +27252,13 @@
       "primary_user": "SRE",
       "expected_outcome": "p50/p95/p99 by endpoint",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "Per-request latency returned; not aggregated",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "tests/integration/test_batch_b.py"
+      ],
+      "implementation_status": "partial",
+      "status_reason": "Per-request elapsed_ms recorded in structured logs; p50/p95/p99 aggregation still absent",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -30316,9 +30338,13 @@
       "primary_user": "SRE",
       "expected_outcome": "Structured logs emitted app-wide",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "uvicorn default logs only",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "tests/integration/test_batch_b.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "Structured JSON request and decision log lines (no payloads) emitted app-wide via middleware + decision logger",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -30390,9 +30416,13 @@
       "primary_user": "SRE",
       "expected_outcome": "Versions in structured logs",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "Versions in responses; not logs",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "tests/integration/test_batch_b.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "Decision log lines carry model_id/version, policy, artifact run id, calibration source; test asserts fields and payload absence",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -30460,9 +30490,13 @@
       "primary_user": "SRE",
       "expected_outcome": "Scrapeable metrics with provenance labels",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "tests/integration/test_batch_b.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "/api/metrics process-local counters; reconciliation test matches a scripted request sequence exactly",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",

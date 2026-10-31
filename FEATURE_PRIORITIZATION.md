@@ -45,12 +45,12 @@ lower domain, then catalog order (deterministic).
 | 29 | AFX-F0086 | Ground-Truth Feedback Ingestion | D03 | P2 | missing | 2.00 |
 | 30 | AFX-F0217 | Reproduction Check CI | D08 | P2 | missing | 2.00 |
 | 31 | AFX-F0820 | Graceful Shutdown | D28 | P2 | missing | 2.00 |
-| 32 | AFX-F0842 | Structured Logging | D29 | P2 | missing | 2.00 |
-| 33 | AFX-F0004 | Kafka-Compatible Stream Ingestion | D01 | P3 | missing | 1.64 |
-| 34 | AFX-F0045 | Audit Export of Provenance | D02 | P3 | missing | 1.64 |
-| 35 | AFX-F0157 | Transactional Outbox | D06 | P3 | missing | 1.64 |
-| 36 | AFX-F0603 | External Verification Services | D21 | P3 | missing | 1.64 |
-| 37 | AFX-F0008 | PaySim Source Adapter | D01 | P1 | partial | 1.60 |
-| 38 | AFX-F0023 | Event Ordering Integrity | D01 | P1 | partial | 1.60 |
-| 39 | AFX-F0046 | Artifact Overwrite Protection | D02 | P1 | partial | 1.60 |
-| 40 | AFX-F0058 | Data Contract Tests | D02 | P1 | partial | 1.60 |
+| 32 | AFX-F0004 | Kafka-Compatible Stream Ingestion | D01 | P3 | missing | 1.64 |
+| 33 | AFX-F0045 | Audit Export of Provenance | D02 | P3 | missing | 1.64 |
+| 34 | AFX-F0157 | Transactional Outbox | D06 | P3 | missing | 1.64 |
+| 35 | AFX-F0603 | External Verification Services | D21 | P3 | missing | 1.64 |
+| 36 | AFX-F0008 | PaySim Source Adapter | D01 | P1 | partial | 1.60 |
+| 37 | AFX-F0023 | Event Ordering Integrity | D01 | P1 | partial | 1.60 |
+| 38 | AFX-F0046 | Artifact Overwrite Protection | D02 | P1 | partial | 1.60 |
+| 39 | AFX-F0058 | Data Contract Tests | D02 | P1 | partial | 1.60 |
+| 40 | AFX-F0063 | Missing-Value Report | D03 | P1 | partial | 1.60 |
