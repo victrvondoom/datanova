@@ -402,14 +402,14 @@ def health_check():
     }
 
 
-def _score_and_decide(tx: Transaction) -> PredictionResult:
-    """Core scoring path: features -> model -> calibration -> policy -> SHAP -> receipt.
+def _predict(tx: Transaction):
+    """Read-only prediction core: features -> model -> calibration -> action.
 
-    No side-effect-free guarantees here: callers decide about idempotency,
-    rate limiting, and ledger persistence.
+    Shared by live scoring (_score_and_decide) and decision replay
+    (catalog: inv_decision_replay) so both paths are byte-identical by
+    construction. Does NOT mutate graph state, the ledger, the idempotency
+    cache, or receipts.
     """
-    t0 = time.perf_counter()
-
     if state.feature_pipeline is None or not state.feature_pipeline.fitted:
         init_engine()
 
@@ -484,6 +484,19 @@ def _score_and_decide(tx: Transaction) -> PredictionResult:
         action = OperationalAction.REVIEW
     else:
         action = OperationalAction.BLOCK
+
+    return X_full, raw_score, calibrated_prob, action, policy
+
+
+def _score_and_decide(tx: Transaction) -> PredictionResult:
+    """Core scoring path: features -> model -> calibration -> policy -> SHAP -> receipt.
+
+    No side-effect-free guarantees here: callers decide about idempotency,
+    rate limiting, and ledger persistence.
+    """
+    t0 = time.perf_counter()
+
+    X_full, raw_score, calibrated_prob, action, policy = _predict(tx)
 
     # 5. Local SHAP Explainability
     top_features = []
@@ -649,6 +662,118 @@ def get_decision(transaction_id: str):
             detail=f"No archived decision for transaction_id '{transaction_id}'",
         )
     return record
+
+
+@app.post("/api/decisions/{transaction_id}/replay")
+def replay_decision(transaction_id: str, tx: Transaction):
+    """Decision replay for dispute resolution (catalog: inv_decision_replay).
+
+    Re-runs the EXACT production scoring path (shared _predict core, no
+    graph mutation, no ledger append, no idempotency effect) on the supplied
+    original transaction and compares against the archived ledger record.
+
+    Verdict semantics (honest, not a validity claim):
+    - reproduced: calibrated probability AND action identical under the
+      same model, calibrator, and policy as the archived decision.
+    - model_drift: model_id/model_version/artifact run changed since the
+      archived decision; the original cannot be re-derived today.
+    - policy_drift: active policy changed since the archived decision.
+    - action_drift: probability reproduces but the action differs
+      (thresholds or emergency-stop state changed).
+    - probability_drift: probability differs — graph/temporal state has
+      evolved since the original decision (documented limitation of live
+      replay; use a state snapshot for forensic certainty).
+    """
+    record = state.require(state.decision_ledger).get(transaction_id)
+    if record is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(f"No archived decision for transaction_id '{transaction_id}'; "
+                    "there is nothing to replay."),
+        )
+    if tx.transaction_id != transaction_id:
+        raise HTTPException(
+            status_code=422,
+            detail=(
+                f"Replay payload transaction_id '{tx.transaction_id}' does not match "
+                f"the archived decision '{transaction_id}'."
+            ),
+        )
+
+    _, raw_score, calibrated_prob, action, policy = _predict(tx)
+    replayed_prob = round(float(calibrated_prob), 4)
+    archived_prob_raw = record.get("calibrated_probability")
+    if archived_prob_raw is None:
+        raise HTTPException(
+            status_code=500,
+            detail="Archived decision record lacks calibrated_probability; "
+            "the ledger entry is incomplete and cannot be replayed.",
+        )
+    archived_prob = float(archived_prob_raw)
+    replayed_action = action.value
+
+    checks = {
+        "model_matches": (
+            record.get("model_id") == (state.model.model_id if state.model else None)
+            and record.get("model_version") == (state.model.version if state.model else None)
+            and record.get("artifact_run_id") == state.artifact_run_id
+        ),
+        "calibration_source_matches": record.get("calibration_source") == state.calibration_source,
+        "policy_matches": record.get("policy_name") == policy.policy_name,
+        "probability_matches": replayed_prob == archived_prob,
+        "action_matches": record.get("recommended_action") == replayed_action,
+    }
+
+    if not checks["model_matches"]:
+        verdict = "model_drift"
+    elif not checks["policy_matches"]:
+        verdict = "policy_drift"
+    elif checks["probability_matches"] and checks["action_matches"]:
+        verdict = "reproduced"
+    elif checks["probability_matches"]:
+        verdict = "action_drift"
+    else:
+        verdict = "probability_drift"
+
+    notes = []
+    if state.emergency_stop_engaged:
+        notes.append(
+            "Emergency stop is engaged: replay forces REVIEW regardless of policy."
+        )
+    if not checks["calibration_source_matches"]:
+        notes.append(
+            f"Calibration source changed since the archived decision "
+            f"(archived: {record.get('calibration_source')}, current: {state.calibration_source})."
+        )
+
+    return {
+        "transaction_id": transaction_id,
+        "verdict": verdict,
+        "checks": checks,
+        "archived": {
+            "calibrated_probability": record.get("calibrated_probability"),
+            "recommended_action": record.get("recommended_action"),
+            "model_id": record.get("model_id"),
+            "model_version": record.get("model_version"),
+            "policy_name": record.get("policy_name"),
+            "artifact_run_id": record.get("artifact_run_id"),
+            "receipt_sha256": record.get("receipt_sha256"),
+            "recorded_at": record.get("recorded_at"),
+        },
+        "replayed": {
+            "calibrated_probability": replayed_prob,
+            "raw_score": round(raw_score, 4),
+            "recommended_action": replayed_action,
+            "model_id": state.model.model_id if state.model else None,
+            "model_version": state.model.version if state.model else None,
+            "policy_name": policy.policy_name,
+            "artifact_run_id": state.artifact_run_id,
+            "calibration_source": state.calibration_source,
+            "emergency_stop_engaged": state.emergency_stop_engaged,
+        },
+        "side_effects": "none (graph, ledger, and idempotency state untouched)",
+        "notes": notes,
+    }
 
 
 @app.get("/api/decisions")

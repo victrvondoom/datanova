@@ -21,7 +21,7 @@ dependencies = [
     "networkx>=3.4.0",
     "shap>=0.54.0",
     "python-pptx>=1.0.0",
-    "python-dotenv>=1.0.0",
+    "python-dotenv>=1.2.2",  # PYSEC-2026-2270 remediation floor
 ]
 
 [project.optional-dependencies]

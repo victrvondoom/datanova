@@ -38,7 +38,7 @@ Actors: local operator (trusted), API client (untrusted input), dataset files
 | D2 | Duplicate financial effects | Idempotent scoring: replay returns original decision without re-applying effects | `test_serving_integrity.py` | Low (cache is process-local; restart reprocesses — documented) |
 | E1 | Elevation via policy mutation | `require_admin_key` on `optimize-policy` + `emergency-stop`; `AEGIS_ADMIN_API_KEY` is a superset credential, ordinary key never grants admin; `admin_auth_mode` reported in `/api/health` (`apps/api/main.py`) | `test_batch_f.py` (3 modes incl. privilege separation) | **Local-context mitigated**: admin surfaces stay open when no keys are configured (documented local-open mode) |
 | E2 | Container privilege | Dedicated non-root user `aegis` (UID 10001, no shell) added to the image; slim base; no secrets baked; volumes for artifacts | `infra/Dockerfile.api` | **Medium-low**: change is UNVERIFIED — Docker daemon unavailable (NEXT-02); verify image build before any deployment claim |
-| E3 | Supply chain (dependencies) | Pinned bounds; no lockfile/audit | — | **OPEN** (catalog `privacy_dependency_audit`) |
+| E3 | Supply chain (dependencies) | Scoped pip-audit over the AEGIS closure with remediation log (`scripts/generate_dependency_audit_scope.py`, `DEPENDENCY_AUDIT.md`); anyio/certifi/python-dotenv upgraded and re-verified (124/124 tests) | `tests/unit/test_dependency_audit.py` | **Medium**: starlette/pillow/pytest advisories remain open pending an environment-isolated fastapi upgrade (see DEPENDENCY_AUDIT.md); audit reports known advisories only |
 
 ## 3. AI-specific risks (NIST AI RMF Map/Measure, voluntary reference)
 
@@ -55,9 +55,10 @@ Actors: local operator (trusted), API client (untrusted input), dataset files
 
 ## 4. Top open security items (tracked in the catalog)
 
-1. `privacy_dependency_audit` (P1) — no CVE scanning today.
-2. `privacy_container_hardening` (P2) — further image hardening beyond the
+1. `privacy_container_hardening` (P2) — further image hardening beyond the
    non-root user (read-only fs, dropped capabilities).
+2. Supply-chain remediation for starlette/pillow/pytest (requires an
+   environment-isolated fastapi upgrade — see DEPENDENCY_AUDIT.md).
 3. `registry_signature_verification` (P2) — checksums prove integrity, not origin.
 
 Closed in Milestone 3 batches D/F: `authn_apikeys`, `authz_admin_surface`,

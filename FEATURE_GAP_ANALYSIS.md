@@ -5,7 +5,7 @@ Highest-impact missing capabilities, evidence-driven.
 ## P0 integrity/safety gaps: 0
 
 
-## P1 core-intelligence/ops gaps: 45
+## P1 core-intelligence/ops gaps: 44
 
 - **AFX-F0020 Exactly-Once Effect Semantics** (D01): Ensure side effects occur once despite retries
 - **AFX-F0027 Ingress Authentication** (D01): Authenticate ingest callers
@@ -40,7 +40,6 @@ Highest-impact missing capabilities, evidence-driven.
 - **AFX-F0660 Secret Scanning** (D22): Detect committed secrets
 - **AFX-F0662 PII Inventory** (D23): Know where personal data lives
 - **AFX-F0663 Log Redaction** (D23): No sensitive data in logs
-- **AFX-F0675 Dependency Vulnerability Auditing** (D23): Scan dependencies for CVEs
 - **AFX-F0681 API Abuse Prevention** (D23): Throttle abuse
 - **AFX-F0698 Change Management for Policies** (D24): Controlled policy change process
 - **AFX-F0703 Override Governance** (D24): Overrides are tracked and reviewed

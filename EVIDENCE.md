@@ -236,3 +236,25 @@ savings **$33,201.56 (86.1%)**, FPR **0.20%**, thresholds tau=(0.2222, 0.2322, 1
   image build blocked on the unavailable Docker daemon — honest).
 - Full suite: **124/124 passed**; mypy clean (55 files); ruff clean;
   frontend build clean. Docker Desktop still unresponsive (NEXT-02).
+
+### Implementation batch H (dependency audit, decision replay)
+- `tests/unit/test_dependency_audit.py` (5 tests): closure covers every
+  pyproject direct dep with installed versions; key transitive serving
+  deps (anyio/certifi/uvicorn/starlette/h11) inside the audit scope;
+  checked-in `aegis_requirements_audit.txt` matches the live environment
+  (drift fails the test); uninstalled closure members surfaced; recorded
+  audit artifact parseable and every reported package inside the closure.
+- Remediation evidence: `pip-audit` before/after — 91 advisories in 6
+  packages -> 85 in 3 after upgrading anyio 4.13.0->4.15.1,
+  certifi ->2026.10.23, python-dotenv 1.0.1->1.2.4 (pyproject floor raised
+  to >=1.2.2); full suite re-run green after each remediation.
+- `tests/integration/test_batch_h.py` (6 tests): replay reproduces an
+  archived decision exactly (probability + action + receipt hash) with
+  graph/ledger side-effect-free assertions; 404 without archive; 422 on
+  payload-id mismatch; emergency-stop -> action_drift with explanatory
+  note; renamed policy -> policy_drift; altered archive ->
+  probability_drift.
+- Catalog re-validated: **901 features — 203 verified / 139 partial /
+  550 missing / 2 blocked / 6 N-A / 1 implemented_unverified.**
+- Full suite: **135/135 passed**; mypy clean (56 files); ruff clean;
+  frontend build clean. Docker Desktop still unresponsive (NEXT-02).

@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-31T09:08:37.555334",
+  "generated": "2026-10-31T09:19:33.893539",
   "total_features": 901,
   "features": [
     {
@@ -19043,12 +19043,13 @@
       "problem": "Reproduction resolves disputes",
       "primary_user": "Fraud investigator",
       "expected_outcome": "Replay with identical outputs",
-      "dependencies": [
-        "graph_state_recovery"
+      "dependencies": [],
+      "repository_evidence": [
+        "apps/api/main.py",
+        "tests/integration/test_batch_h.py"
       ],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "Training determinism verified; serving replay absent",
+      "implementation_status": "verified",
+      "status_reason": "POST /api/decisions/{id}/replay re-runs the exact production scoring path via a shared _predict core (refactored out of _score_and_decide, no duplicate implementation); zero side effects (graph/ledger/idempotency untouched, tested); honest verdicts reproduced/model_drift/policy_drift/action_drift/probability_drift incl. emergency-stop note; 6 integration tests incl. exact reproduction and 404/422",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -24411,9 +24412,14 @@
       "primary_user": "Security engineer",
       "expected_outcome": "Regular audit with remediation log",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "No audit tooling today",
+      "repository_evidence": [
+        "scripts/generate_dependency_audit_scope.py",
+        "DEPENDENCY_AUDIT.md",
+        "benchmarks/runs/dependency_audit.txt",
+        "tests/unit/test_dependency_audit.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "Scoped pip-audit over the AEGIS dependency closure (52 pinned packages); anyio/certifi/python-dotenv remediated and re-verified (91->85 advisories); starlette/pillow/pytest open with documented blockers (fastapi<0.42 pin, python-pptx, pytest 9 major) - see DEPENDENCY_AUDIT.md; closure pinned by 5 unit tests",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -25533,12 +25539,13 @@
       "problem": "Disputes need exact evidence",
       "primary_user": "Compliance owner",
       "expected_outcome": "Dispute-time evidence assembly",
-      "dependencies": [
-        "inv_decision_replay"
+      "dependencies": [],
+      "repository_evidence": [
+        "apps/api/main.py",
+        "tests/integration/test_batch_h.py"
       ],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "implementation_status": "partial",
+      "status_reason": "Decision reconstruction exists via replay with drift verdicts (inv_decision_replay); full dispute-time evidence assembly (bundled receipt+ledger+replay package export) not yet built",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",

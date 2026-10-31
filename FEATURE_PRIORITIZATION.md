@@ -23,34 +23,34 @@ lower domain, then catalog order (deterministic).
 | 7 | AFX-F0042 | Data Freshness Markers | D02 | P2 | missing | 2.67 |
 | 8 | AFX-F0299 | Review Allocation Value Model | D10 | P2 | missing | 2.67 |
 | 9 | AFX-F0325 | Historical Policy Backtest | D11 | P2 | missing | 2.67 |
-| 10 | AFX-F0525 | Decision Replay | D18 | P2 | missing | 2.67 |
-| 11 | AFX-F0665 | Retention Enforcement | D23 | P2 | missing | 2.67 |
-| 12 | AFX-F0032 | Source Registry | D02 | P1 | partial | 2.40 |
-| 13 | AFX-F0185 | Prevalence Robustness Testing | D07 | P1 | partial | 2.40 |
-| 14 | AFX-F0120 | Feature Computation Budget | D04 | P2 | partial | 2.33 |
-| 15 | AFX-F0268 | Calibration Visibility in UI | D09 | P2 | partial | 2.33 |
-| 16 | AFX-F0039 | Right-to-Erasure Workflow | D02 | P3 | missing | 2.18 |
-| 17 | AFX-F0081 | Label-Derived Feature Scan | D03 | P1 | missing | 2.06 |
-| 18 | AFX-F0122 | Train/Serve Parity Tests | D05 | P1 | missing | 2.06 |
-| 19 | AFX-F0351 | Graph State Recovery | D12 | P1 | missing | 2.06 |
-| 20 | AFX-F0483 | Case Queue Management | D17 | P1 | missing | 2.06 |
-| 21 | AFX-F0549 | Override Workflow | D19 | P1 | missing | 2.06 |
-| 22 | AFX-F0015 | Entity Resolution at Ingestion | D01 | P2 | missing | 2.00 |
-| 23 | AFX-F0021 | Poison-Message Resistance | D01 | P2 | missing | 2.00 |
-| 24 | AFX-F0025 | Schema Diff on Contract Change | D01 | P2 | missing | 2.00 |
-| 25 | AFX-F0086 | Ground-Truth Feedback Ingestion | D03 | P2 | missing | 2.00 |
-| 26 | AFX-F0217 | Reproduction Check CI | D08 | P2 | missing | 2.00 |
-| 27 | AFX-F0820 | Graceful Shutdown | D28 | P2 | missing | 2.00 |
-| 28 | AFX-F0823 | Non-Root Container User | D28 | P2 | implemented_unverified | 1.78 |
-| 29 | AFX-F0004 | Kafka-Compatible Stream Ingestion | D01 | P3 | missing | 1.64 |
-| 30 | AFX-F0045 | Audit Export of Provenance | D02 | P3 | missing | 1.64 |
-| 31 | AFX-F0157 | Transactional Outbox | D06 | P3 | missing | 1.64 |
-| 32 | AFX-F0603 | External Verification Services | D21 | P3 | missing | 1.64 |
-| 33 | AFX-F0008 | PaySim Source Adapter | D01 | P1 | partial | 1.60 |
-| 34 | AFX-F0023 | Event Ordering Integrity | D01 | P1 | partial | 1.60 |
-| 35 | AFX-F0046 | Artifact Overwrite Protection | D02 | P1 | partial | 1.60 |
-| 36 | AFX-F0058 | Data Contract Tests | D02 | P1 | partial | 1.60 |
-| 37 | AFX-F0063 | Missing-Value Report | D03 | P1 | partial | 1.60 |
-| 38 | AFX-F0067 | Temporal Consistency Checks | D03 | P1 | partial | 1.60 |
-| 39 | AFX-F0084 | Identifier Uniqueness Audit | D03 | P1 | partial | 1.60 |
-| 40 | AFX-F0123 | Online/Offline Feature Definitions | D05 | P1 | partial | 1.60 |
+| 10 | AFX-F0665 | Retention Enforcement | D23 | P2 | missing | 2.67 |
+| 11 | AFX-F0032 | Source Registry | D02 | P1 | partial | 2.40 |
+| 12 | AFX-F0185 | Prevalence Robustness Testing | D07 | P1 | partial | 2.40 |
+| 13 | AFX-F0120 | Feature Computation Budget | D04 | P2 | partial | 2.33 |
+| 14 | AFX-F0268 | Calibration Visibility in UI | D09 | P2 | partial | 2.33 |
+| 15 | AFX-F0039 | Right-to-Erasure Workflow | D02 | P3 | missing | 2.18 |
+| 16 | AFX-F0081 | Label-Derived Feature Scan | D03 | P1 | missing | 2.06 |
+| 17 | AFX-F0122 | Train/Serve Parity Tests | D05 | P1 | missing | 2.06 |
+| 18 | AFX-F0483 | Case Queue Management | D17 | P1 | missing | 2.06 |
+| 19 | AFX-F0549 | Override Workflow | D19 | P1 | missing | 2.06 |
+| 20 | AFX-F0015 | Entity Resolution at Ingestion | D01 | P2 | missing | 2.00 |
+| 21 | AFX-F0021 | Poison-Message Resistance | D01 | P2 | missing | 2.00 |
+| 22 | AFX-F0025 | Schema Diff on Contract Change | D01 | P2 | missing | 2.00 |
+| 23 | AFX-F0086 | Ground-Truth Feedback Ingestion | D03 | P2 | missing | 2.00 |
+| 24 | AFX-F0217 | Reproduction Check CI | D08 | P2 | missing | 2.00 |
+| 25 | AFX-F0820 | Graceful Shutdown | D28 | P2 | missing | 2.00 |
+| 26 | AFX-F0823 | Non-Root Container User | D28 | P2 | implemented_unverified | 1.78 |
+| 27 | AFX-F0004 | Kafka-Compatible Stream Ingestion | D01 | P3 | missing | 1.64 |
+| 28 | AFX-F0045 | Audit Export of Provenance | D02 | P3 | missing | 1.64 |
+| 29 | AFX-F0157 | Transactional Outbox | D06 | P3 | missing | 1.64 |
+| 30 | AFX-F0603 | External Verification Services | D21 | P3 | missing | 1.64 |
+| 31 | AFX-F0008 | PaySim Source Adapter | D01 | P1 | partial | 1.60 |
+| 32 | AFX-F0023 | Event Ordering Integrity | D01 | P1 | partial | 1.60 |
+| 33 | AFX-F0046 | Artifact Overwrite Protection | D02 | P1 | partial | 1.60 |
+| 34 | AFX-F0058 | Data Contract Tests | D02 | P1 | partial | 1.60 |
+| 35 | AFX-F0063 | Missing-Value Report | D03 | P1 | partial | 1.60 |
+| 36 | AFX-F0067 | Temporal Consistency Checks | D03 | P1 | partial | 1.60 |
+| 37 | AFX-F0084 | Identifier Uniqueness Audit | D03 | P1 | partial | 1.60 |
+| 38 | AFX-F0123 | Online/Offline Feature Definitions | D05 | P1 | partial | 1.60 |
+| 39 | AFX-F0146 | Feature Contract Tests in CI | D05 | P1 | partial | 1.60 |
+| 40 | AFX-F0156 | Exactly-Once Stream Effects | D06 | P1 | partial | 1.60 |

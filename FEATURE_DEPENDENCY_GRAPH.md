@@ -2,9 +2,9 @@
 
 Edges: feature -> prerequisite feature (by key). Cycles would be a validation error.
 
-- Root features (no prerequisites): 820
-- Features with prerequisites: 81
-- Total dependency edges: 81
+- Root features (no prerequisites): 822
+- Features with prerequisites: 79
+- Total dependency edges: 79
 
 ## Most-depended-on features (unlock the most work)
 

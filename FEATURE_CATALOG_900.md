@@ -1,6 +1,6 @@
 # AEGIS-Fraud X — Feature Catalog (900+)
 
-**Generated:** 2026-10-31 09:08:37 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
+**Generated:** 2026-10-31 09:19:33 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
 
 This catalog is GENERATED and VALIDATED by `scripts/generate_feature_catalog.py`
 (uniqueness, domain counts, status vocabulary, and evidence-file existence are
@@ -9,7 +9,7 @@ sources: repository inspection, fraud-domain practice, workflow failure
 analysis, and risk analysis. Acceptance criteria are outcome-derived — no
 invented numeric targets. Field policy is documented in the generator.
 
-Status distribution: {"verified": 201, "missing": 553, "partial": 138, "blocked": 2, "not_applicable": 6, "implemented_unverified": 1}
+Status distribution: {"verified": 203, "missing": 550, "partial": 139, "blocked": 2, "not_applicable": 6, "implemented_unverified": 1}
 
 ## D01 — Data Ingestion and Connectors
 
@@ -607,7 +607,7 @@ Status distribution: {"verified": 201, "missing": 553, "partial": 138, "blocked"
 - **AFX-F0522 Outcome Code System** [P1 · missing] — Standardized outcome vocabulary. Problem: Free-text outcomes are unanalyzable. Outcome: Typed outcome codes with definitions. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0523 Evidence Sampling Tools** [P2 · missing] — Sample representative evidence. Problem: Floods exceed human capacity. Outcome: Documented sampling with confidence notes. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0524 Feature Snapshot Capture** [P1 · partial] — Freeze features at decision time. Problem: Feature values change after the fact. Outcome: Snapshots stored with decisions. Evidence: `packages/data/schemas.py` Reason: top_features stored in receipts/predictions
-- **AFX-F0525 Decision Replay** [P2 · missing] — Re-run decisions on stored inputs. Problem: Reproduction resolves disputes. Outcome: Replay with identical outputs. Evidence: *(new proposal)* Reason: Training determinism verified; serving replay absent
+- **AFX-F0525 Decision Replay** [P2 · verified] — Re-run decisions on stored inputs. Problem: Reproduction resolves disputes. Outcome: Replay with identical outputs. Evidence: `apps/api/main.py`, `tests/integration/test_batch_h.py`
 - **AFX-F0526 Cross-Case Linking** [P3 · missing] — Connect related cases. Problem: Schemes span many cases. Outcome: Case-link suggestions with evidence. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0527 Investigation Watchlists** [P2 · missing] — Track entities under watch. Problem: Suspects need monitoring. Outcome: Watchlists with expiry and audit. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0528 Fraud Pattern Knowledge Base** [P3 · missing] — Documented patterns from cases. Problem: Institutional memory is tribal. Outcome: Searchable pattern library. Evidence: *(new proposal)* Reason: New proposal
@@ -777,7 +777,7 @@ Status distribution: {"verified": 201, "missing": 553, "partial": 138, "blocked"
 - **AFX-F0672 Re-identification Risk Review** [P2 · missing] — Assess linkage risk. Problem: Datasets combine into identification. Outcome: Linkage risk review process. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0673 Input Validation Hardening** [P1 · verified] — Reject hostile inputs. Problem: Malformed inputs enable injection. Outcome: Strict schema validation everywhere. Evidence: `packages/data/schemas.py`, `packages/data/adapters/ulb.py`
 - **AFX-F0674 Injection Prevention Review** [P1 · partial] — No SQL/command injection paths. Problem: Injection compromises systems. Outcome: Parameterized paths audited. Evidence: `apps/api/main.py` Reason: ORM-free code with no raw query construction; audit not formalized
-- **AFX-F0675 Dependency Vulnerability Auditing** [P1 · missing] — Scan dependencies for CVEs. Problem: Vulnerable deps are attack surface. Outcome: Regular audit with remediation log. Evidence: *(new proposal)* Reason: No audit tooling today
+- **AFX-F0675 Dependency Vulnerability Auditing** [P1 · verified] — Scan dependencies for CVEs. Problem: Vulnerable deps are attack surface. Outcome: Regular audit with remediation log. Evidence: `scripts/generate_dependency_audit_scope.py`, `DEPENDENCY_AUDIT.md`, `benchmarks/runs/dependency_audit.txt`, `tests/unit/test_dependency_audit.py`
 - **AFX-F0676 Container Hardening** [P2 · missing] — Least-privilege containers. Problem: Fat containers are attack surface. Outcome: Non-root user, minimal layers. Evidence: `infra/Dockerfile.api` Reason: Base image is slim; runs as root (fixable)
 - **AFX-F0677 Secrets Management** [P1 · partial] — Externalized secrets. Problem: In-repo secrets are compromised. Outcome: Env-based with no defaults in prod. Evidence: `packages/explainability/receipts.py`, `infra/docker-compose.yml` Reason: Env override exists; documented dev default remains
 - **AFX-F0678 Error Message Hygiene** [P2 · partial] — No internals in errors. Problem: Verbose errors leak architecture. Outcome: Reviewed error responses. Evidence: `apps/api/main.py` Reason: Error detail includes exception text on some paths
@@ -812,7 +812,7 @@ Status distribution: {"verified": 201, "missing": 553, "partial": 138, "blocked"
 - **AFX-F0703 Override Governance** [P1 · missing] — Overrides are tracked and reviewed. Problem: Overrides bypass policy silently. Outcome: Override log with review status. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0704 GDPR Article 22 Support Surface** [P2 · partial] — Automated-decision documentation. Problem: Automated decisions need documented basis. Outcome: Decision documentation pack (no compliance claim). Evidence: `README.md`, `packages/explainability/receipts.py` Reason: Receipts + explanations exist; no compliance claim made
 - **AFX-F0705 EU AI Act Notes** [P3 · missing] — Risk-classification awareness. Problem: AI risk classes impose duties. Outcome: Voluntary classification notes (no legal claim). Evidence: *(new proposal)* Reason: README previously implied compliance; claims removed pending real analysis
-- **AFX-F0706 Dispute Resolution Support** [P2 · missing] — Reconstruct disputed decisions. Problem: Disputes need exact evidence. Outcome: Dispute-time evidence assembly. Evidence: *(new proposal)* Reason: New proposal
+- **AFX-F0706 Dispute Resolution Support** [P2 · partial] — Reconstruct disputed decisions. Problem: Disputes need exact evidence. Outcome: Dispute-time evidence assembly. Evidence: `apps/api/main.py`, `tests/integration/test_batch_h.py` Reason: Decision reconstruction exists via replay with drift verdicts (inv_decision_replay); full dispute-time evidence assembly (bundled receipt+ledger+replay package export) not yet built
 - **AFX-F0707 Standard Audit Export** [P2 · missing] — Portable audit format. Problem: Proprietary audit formats trap data. Outcome: Documented export schema. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0708 Log Write-Once Controls** [P2 · missing] — Prevent log editing. Problem: Mutable logs are worthless. Outcome: Append-only storage controls. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0709 External Auditor Support** [P3 · missing] — Auditors get scoped access. Problem: Audits fail on access friction. Outcome: Auditor access pack. Evidence: *(new proposal)* Reason: New proposal
