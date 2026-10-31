@@ -45,7 +45,11 @@ export const ExplainabilityView: React.FC = () => {
       const res = await scoreTransaction(tx);
       setPrediction(res);
 
-      const rcpt = {
+      // Use the SERVER's signed receipt payload verbatim. Reconstructing a
+      // receipt client-side produces a different payload than the one signed
+      // and would fail HMAC verification. The reconstruction below is only a
+      // clearly-degraded offline illustration fallback.
+      const rcpt = res.audit_receipt || {
         receipt_id: `rcpt_${tx.transaction_id}_${Math.floor(Date.now() / 1000)}`,
         transaction_id: tx.transaction_id,
         timestamp: tx.timestamp,

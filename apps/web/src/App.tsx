@@ -17,10 +17,14 @@ export const App: React.FC = () => {
   const [online, setOnline] = useState<boolean>(false);
   const [showDeckModal, setShowDeckModal] = useState<boolean>(false);
 
-  useEffect(() => {
+  const checkConnection = () => {
     checkHealth().then((res) => {
       setOnline(res.status === "healthy");
     });
+  };
+
+  useEffect(() => {
+    checkConnection();
   }, []);
 
   return (
@@ -33,6 +37,27 @@ export const App: React.FC = () => {
           online={online}
           onOpenDeck={() => setShowDeckModal(true)}
         />
+
+        {/* Global degraded-state banner: no silent offline fallback */}
+        {!online && (
+          <div className="flex items-center justify-between gap-3 px-4 py-2 bg-amber-500/10 border-b border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-bold uppercase tracking-wider">Backend offline</span>
+              <span className="opacity-80">
+                Views are showing offline fallback data (marked “degraded”), not live
+                measurements. Scores, receipts, drift metrics, and savings figures in
+                this mode are simulations. Receipt verification is unavailable offline
+                and will not claim authenticity.
+              </span>
+            </div>
+            <button
+              onClick={checkConnection}
+              className="shrink-0 px-3 py-1 rounded-lg font-bold bg-amber-500/20 border border-amber-500/40 hover:bg-amber-500/30 transition-colors"
+            >
+              Retry connection
+            </button>
+          </div>
+        )}
 
         {/* Main Content Area */}
         <div className="flex flex-1 overflow-hidden">

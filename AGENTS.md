@@ -20,12 +20,28 @@
 10. Preserve the product's core purpose: cost-aware, explainable, real-time payment
     fraud prevention (DN-FN-01). Do not import unrelated product assumptions.
 
+## Release gates (mandatory, see RELEASE_GATES.md)
+
+```bash
+python -m pytest tests/release/ -v   # gate 1: leakage invariance; gate 2: calibrator provenance
+```
+
+Both gates were falsified against intentionally reintroduced leakage before
+being trusted. They must never be skipped, weakened, or marked continue-on-error.
+
 ## Standard verification commands
 
 ```bash
-python -m pytest tests/ -q -W ignore          # full suite (41 tests)
+python -m pytest tests/ -q -W ignore          # full suite
+python -m pytest tests/release/ -v            # mandatory release gates
 python -m mypy packages apps scripts --ignore-missing-imports
 python -m ruff check .
 python scripts/run_benchmarks.py              # regenerates benchmarks/runs + reports
+python scripts/run_ulb_evaluation.py           # external ULB evaluation (needs datasets/external/creditcard.csv)
+python scripts/run_policy_sensitivity.py      # policy sensitivity analysis
 cd apps/web && npm run build                  # frontend type-check + build
 ```
+
+E2E (score -> receipt -> verify): see `scripts/run_e2e.md`.
+External datasets: provenance in `DATA_PROVENANCE.md`; never fabricate or
+commit raw external data.

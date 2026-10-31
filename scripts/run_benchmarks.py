@@ -114,12 +114,12 @@ def run_benchmark_suite(
     X_val = pipe.transform(val_df)
     X_test = pipe.transform(test_df)
 
-    y_train = train_df["is_fraud"].values
-    y_val = val_df["is_fraud"].values
-    y_test = test_df["is_fraud"].values
+    y_train = np.asarray(train_df["is_fraud"].values)
+    y_val = np.asarray(val_df["is_fraud"].values)
+    y_test = np.asarray(test_df["is_fraud"].values)
 
-    amt_val = val_df["amount"].values
-    amt_test = test_df["amount"].values
+    amt_val = np.asarray(val_df["amount"].values)
+    amt_test = np.asarray(test_df["amount"].values)
 
     # Leakage self-verification hook: deterministically mutate TEST labels in an
     # ADVERSARIAL direction (flip the highest-amount test transactions, which

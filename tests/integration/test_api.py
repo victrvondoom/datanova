@@ -161,7 +161,7 @@ def test_api_receipt_verify():
     res = client.post("/api/receipts/verify", json={"receipt": receipt_dict})
     assert res.status_code == 200
     assert res.json()["is_valid"] is True
-    assert res.json()["status"] == "VALID_AUTHENTIC"
+    assert res.json()["status"] == "SIGNATURE_VERIFIED"
 
     # Verify tampered receipt
     tampered_dict = dict(receipt_dict)
@@ -169,7 +169,7 @@ def test_api_receipt_verify():
     res_tamper = client.post("/api/receipts/verify", json={"receipt": tampered_dict})
     assert res_tamper.status_code == 200
     assert res_tamper.json()["is_valid"] is False
-    assert res_tamper.json()["status"] == "TAMPERED_OR_CORRUPT"
+    assert res_tamper.json()["status"] == "SIGNATURE_INVALID"
 
 
 def test_cors_rejects_disallowed_origin():
@@ -254,3 +254,52 @@ def test_graph_subgraph_risk_score_is_derived_not_fabricated():
             assert node["risk_score"] == 0.9
         else:
             assert node["risk_score"] == 0.1
+
+
+def test_receipt_verification_edge_cases():
+    """Truthful verification semantics: schema errors, wrong key, empty hash."""
+    from datetime import datetime, timezone
+
+    from apps.api.main import state
+    from packages.explainability.receipts import AuditReceiptGenerator
+
+    receipt_obj = state.receipt_gen.create_receipt(
+        transaction_id="tx_edge_01",
+        model_id="aegis_champion",
+        model_version="1.0",
+        calibrated_probability=0.42,
+        recommended_action="REVIEW",
+        financial_cost_estimate=100.0,
+        top_features=[],
+        timestamp=datetime.now(timezone.utc),
+    )
+    receipt_dict = receipt_obj.model_dump()
+    receipt_dict["timestamp"] = receipt_dict["timestamp"].isoformat()
+
+    # Malformed receipt -> schema validation error, never a validity verdict
+    res = client.post("/api/receipts/verify", json={"receipt": {"garbage": True}})
+    assert res.status_code == 200
+    assert res.json()["is_valid"] is False
+    assert res.json()["status"] == "SCHEMA_VALIDATION_ERROR"
+
+    # A receipt signed with a DIFFERENT key must fail signature verification
+    other_gen = AuditReceiptGenerator(secret_key="an_attacker_or_misconfigured_key")
+    forged = other_gen.create_receipt(
+        transaction_id="tx_edge_01",
+        model_id="aegis_champion",
+        model_version="1.0",
+        calibrated_probability=0.42,
+        recommended_action="REVIEW",
+        financial_cost_estimate=100.0,
+        top_features=[],
+        timestamp=datetime.now(timezone.utc),
+    )
+    forged_dict = forged.model_dump()
+    forged_dict["timestamp"] = forged_dict["timestamp"].isoformat()
+    res = client.post("/api/receipts/verify", json={"receipt": forged_dict})
+    assert res.json()["is_valid"] is False
+    assert res.json()["status"] == "SIGNATURE_INVALID"
+
+    # The endpoint states its verification semantics explicitly
+    res = client.post("/api/receipts/verify", json={"receipt": receipt_dict})
+    assert "HMAC-SHA256" in res.json()["verification_semantics"]

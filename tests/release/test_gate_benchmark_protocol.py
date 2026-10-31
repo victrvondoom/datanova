@@ -16,7 +16,6 @@ If anyone reintroduces test-based selection, threshold tuning, or calibration
 choice on test data, run B's champion or policy changes and this gate FAILS.
 """
 
-import json
 import os
 import sys
 

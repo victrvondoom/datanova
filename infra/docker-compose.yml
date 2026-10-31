@@ -1,0 +1,23 @@
+# AEGIS-Fraud X — local reproducible environment (API service)
+# Usage:  docker compose -f infra/docker-compose.yml up --build
+#
+# The React dashboard is NOT containerized yet: its API client auto-detects
+# 127.0.0.1 ports and needs an env-configurable API base URL first
+# (see NEXT_ACTIONS.md). Run the web app locally against the containerized API.
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: infra/Dockerfile.api
+    ports:
+      - "8000:8000"
+    environment:
+      # Explicit CORS allowlist; wildcard+credentials is disallowed by the app.
+      AEGIS_CORS_ORIGINS: "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
+      # Receipt signing key must be provided by the operator in production;
+      # the bundled default is a documented development-only key.
+      AEGIS_RECEIPT_SECRET: "${AEGIS_RECEIPT_SECRET:-aegis_fraud_x_master_audit_salt_2026}"
+    volumes:
+      - ../experiments:/app/experiments
+      - ../benchmarks:/app/benchmarks
+      - ../datasets:/app/datasets

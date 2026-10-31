@@ -128,7 +128,7 @@ def load_bundle(
         )
 
     try:
-        payload = pickle.loads(payload_bytes)
+        payload: Dict[str, Any] = pickle.loads(payload_bytes)
     except Exception as e:
         raise BundleValidationError(f"Corrupt artifact bundle '{path}': {e}") from e
 

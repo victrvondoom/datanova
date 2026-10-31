@@ -37,6 +37,8 @@ export interface PredictionResult {
   expected_cost: number;
   top_features: FeatureContribution[];
   audit_receipt_hash?: string;
+  /** Server-signed receipt payload; verify this verbatim. */
+  audit_receipt?: any;
 }
 
 export interface ReplayRecord {

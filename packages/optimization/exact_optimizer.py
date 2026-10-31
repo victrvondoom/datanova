@@ -47,7 +47,7 @@ if realized metrics violate a constraint, the solver reports INFEASIBLE and neve
 returns an infeasible policy as successful.
 """
 
-from typing import Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 
@@ -76,7 +76,7 @@ class ExactPolicyOptimizer:
         probs: np.ndarray,
         amounts: np.ndarray,
         labels: np.ndarray,
-    ) -> Dict[str, np.ndarray]:
+    ) -> Dict[str, Any]:
         order = np.argsort(probs, kind="stable")
         p = probs[order]
         y = labels[order]
@@ -149,7 +149,7 @@ class ExactPolicyOptimizer:
             raise InfeasiblePolicyError("Empty fitting population.")
 
         g = self._build_groups(probs, amounts, labels)
-        m = g["m"]
+        m = int(g["m"])
         u = g["unique_vals"]
         max_cut = m if (m == 0 or u[-1] < 1.0) else m - 1
 

@@ -10,7 +10,7 @@ import numpy as np
 
 from packages.data.schemas import CostConfiguration, DecisionPolicy
 from packages.optimization.cost_engine import CostEngine
-from packages.optimization.exact_optimizer import ExactPolicyOptimizer, InfeasiblePolicyError
+from packages.optimization.exact_optimizer import ExactPolicyOptimizer
 
 
 class PolicyOptimizer:

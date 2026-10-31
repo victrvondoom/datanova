@@ -20,7 +20,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 import numpy as np
 
 from packages.data.schemas import CostConfiguration
-from packages.optimization.cost_engine import CostEngine
 from packages.optimization.exact_optimizer import ExactPolicyOptimizer, InfeasiblePolicyError
 
 ARTIFACT = "benchmarks/runs/benchmark_summary.json"

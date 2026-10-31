@@ -144,6 +144,10 @@ class PredictionResult(BaseModel):
     expected_cost: float
     top_features: List[FeatureContribution] = Field(default_factory=list)
     audit_receipt_hash: Optional[str] = None
+    # Full signed receipt payload. Clients MUST verify this object verbatim;
+    # reconstructing a receipt client-side produces a different payload than
+    # the one that was signed and will fail HMAC verification.
+    audit_receipt: Optional[Dict[str, Any]] = None
     evaluated_at: datetime = Field(default_factory=datetime.utcnow)
 
 

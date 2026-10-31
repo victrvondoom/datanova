@@ -90,7 +90,6 @@ def test_payload_tampering_is_rejected(tmp_path):
 
 
 def test_missing_manifest_is_rejected(tmp_path):
-    import json as _json
 
     model, cal = _trained_model()
     path = str(tmp_path / BUNDLE_FILENAME)

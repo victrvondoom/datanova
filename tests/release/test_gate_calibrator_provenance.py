@@ -56,7 +56,7 @@ def test_corrupt_artifact_is_rejected_not_silently_substituted(tmp_path):
     path = str(tmp_path / "corrupt_calibrator.pkl")
     with open(path, "wb") as f:
         f.write(b"this is not a pickle file")
-    with pytest.raises(Exception):
+    with pytest.raises((pickle.UnpicklingError, EOFError, AttributeError)):
         ProbabilityCalibrator.load(path)
 
 
@@ -69,14 +69,14 @@ def test_wrong_method_artifact_is_rejected(tmp_path):
     # The loader restores the persisted method honestly; a consumer demanding
     # isotonic must detect the mismatch explicitly:
     assert loaded.method == "sigmoid"
-    with pytest.raises(Exception):
+    with pytest.raises((AttributeError, TypeError, ValueError)):
         # calibrate() must fail on the garbage inner object, never fabricate output
         loaded.calibrate(np.array([0.5]))
 
 
 def test_api_calibrator_provenance_is_visible():
     """The serving API must expose which calibration source it uses."""
-    from apps.api.main import state, startup_event
+    from apps.api.main import startup_event, state
 
     startup_event()
     assert state.calibration_source in {
@@ -92,10 +92,10 @@ def test_api_uses_persisted_validation_artifact_when_present(tmp_path, monkeypat
     """When a valid bundle exists, the API must load exactly its calibrator."""
     import numpy as np
 
+    from apps.api import main as api_main
     from packages.artifacts.bundle import save_bundle
     from packages.data.schemas import DecisionPolicy
     from packages.models.classifiers import LogisticRegressionFraudModel
-    from apps.api import main as api_main
 
     rng = np.random.default_rng(0)
     X = rng.uniform(0, 1, (300, 4))

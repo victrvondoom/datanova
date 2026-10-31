@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  release-gates:
+    # MANDATORY release gates — never skipped, never continue-on-error.
+    # If either fails, the release is blocked. See RELEASE_GATES.md.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+      - name: "GATE 1: Benchmark protocol leakage gate (test labels must not influence selection or policy)"
+        run: python -m pytest tests/release/test_gate_benchmark_protocol.py -v
+      - name: "GATE 2: Calibrator provenance lifecycle gate (no fabricated calibration, no corrupt artifacts served)"
+        run: python -m pytest tests/release/test_gate_calibrator_provenance.py -v
+
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+      - name: Full test suite
+        run: python -m pytest tests/ -q
+      - name: Lint (ruff)
+        run: python -m ruff check .
+      - name: Type check (mypy)
+        run: python -m mypy packages apps scripts --ignore-missing-imports
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Install dependencies
+        run: npm ci
+      - name: Type check and build
+        run: npm run build

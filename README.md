@@ -4,7 +4,7 @@
 [![Python 3.12](https://img.shields.io/badge/Python-3.12.10-green.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.6-teal.svg)](https://fastapi.tiangolo.com)
 [![React 18](https://img.shields.io/badge/React-18.3.1-cyan.svg)](https://react.dev/)
-[![Tests](https://img.shields.io/badge/pytest-41%2F41%20Passed-emerald.svg)](tests/)
+[![Tests](https://img.shields.io/badge/pytest-85%2F85%20Passed-emerald.svg)](tests/)
 [![Offline First](https://img.shields.io/badge/Deployment-100%25%20Local%20%26%20Offline-orange.svg)]()
 
 > **Target:** DataNova 2026 Global Data-thon  
@@ -51,6 +51,29 @@ Conventional financial fraud detection systems suffer from three fundamental def
 ### Operational Policy Comparison (frozen validation-fitted policy, evaluated on held-out test)
 - **Conventional Fixed Threshold ($p \ge 0.5$):** Cost = **$7,107.83** (FPR 0.10%)
 - **AEGIS Cost-Aware Optimized Policy:** Cost = **$5,376.27** (achieves **$33,201.56 net savings**, an **86.1% loss reduction** while keeping FPR at 0.20%).
+
+### External validation — ULB Credit Card Fraud (real data, 2026-10-31)
+
+Evaluated under the same zero-leakage protocol on the ULB dataset (283,726
+rows after exact-duplicate removal, 0.167% fraud; OpenML 1597, SHA-256 in
+`DATA_PROVENANCE.md`). No graph features are used (the dataset is anonymized
+— fabricating entities is forbidden).
+
+| Model | Val PR-AUC (selection) | Test PR-AUC | Recall@1%FPR |
+|:---|:---:|:---:|:---:|
+| Logistic Regression | 0.7537 | 0.7618 | 0.8644 |
+| Random Forest | 0.7665 | 0.7725 | 0.8406 |
+| LightGBM (repo default config) | 0.0223 | 0.0391 | 0.4212 |
+| **XGBoost (champion by validation)** | **0.7696** | 0.7408 | 0.8295 |
+
+- Champion 95% CI (test PR-AUC): [0.648, 0.824].
+- Exact policy (validation-fitted, frozen): simulated test savings **63.2%**
+  at 0.20% FPR (amounts treated as USD-equivalent — documented assumption).
+- **Honest finding:** the repository's default LightGBM configuration collapses
+  at 0.17% prevalence; reported, not hidden. PaySim evaluation is blocked on
+  dataset credentials (see `DATA_PROVENANCE.md`).
+- Full artifact: `benchmarks/runs/ulb_evaluation.json` · report:
+  `reports/ULB_EVALUATION.md` · card: `DATASET_CARDS.md`.
 
 > **Evidence integrity note (2026-10-31 audit):** earlier versions of this README
 > reported PR-AUC 0.8004 and 92.1% savings. Those numbers were produced by a

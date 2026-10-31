@@ -139,3 +139,57 @@ below were established by source tracing and/or execution, not by README claims.
   optimizer's percentile grid is coarse; a finer search or exact solver is queued.
 - All benchmarks are on deterministic synthetic data; no external dataset (ULB/PaySim)
   has been run through this protocol yet.
+
+
+---
+
+# Milestone 2 Audit Findings (2026-10-31)
+
+## AFX-09 — P1 — Client-side receipt reconstruction could never verify
+- **Component:** `apps/web/src/views/ExplainabilityView.tsx`, `/api/score`
+- **Observed behavior:** `/api/score` returned only the receipt hash; the
+  frontend reconstructed a receipt-like object with different `receipt_id`,
+  cost field, and rounding than the server signed. "Verify Authentic"
+  therefore ALWAYS failed against a live backend (masked until now by the
+  fabricated offline verification, AFX-05).
+- **How found:** Playwright E2E journey (not by unit tests — the defect spans
+  the client/server boundary).
+- **Fix:** `/api/score` returns the full server-signed receipt
+  (`audit_receipt`); the client verifies it verbatim.
+- **Regression tests:** `apps/web/e2e/journey.spec.ts` (online journey).
+
+## AFX-10 — P1 — ULB adapter desynchronized features from labels
+- **Component:** `packages/data/adapters/ulb.py`
+- **Observed behavior:** `sort_values` (unstable quicksort) shuffled rows
+  sharing the same `Time` second; any consumer re-attaching data to the
+  sorted frame got features misaligned from labels. First ULB run produced
+  PR-AUC BELOW class prevalence (0.0013 < 0.00173) — worse than random.
+- **How found:** external-data magnitude sanity check.
+- **Fix:** stable sort (`kind="stable"`) + `standardize_frame()` API so
+  callers standardize an in-memory frame without re-reads.
+- **Regression tests:** `tests/unit/test_dataset_adapters.py` (stable-order
+  test with tied timestamps).
+
+## AFX-11 — P2 — ULB adapter fabricated recurring entity identities
+- **Observed behavior:** `sender_id = ulb_card_{i % 5000}` invented fake
+  recurring accounts for a dataset with no entity semantics.
+- **Fix:** unique per-row pseudo-IDs + fixed counterparty, documented; graph
+  features explicitly not computed for ULB.
+
+## AFX-12 — P2 — Receipt verification overclaimed authenticity
+- **Observed behavior:** status `VALID_AUTHENTIC` for a plain HMAC match
+  under a hardcoded, source-public key.
+- **Fix:** truthful states `SIGNATURE_VERIFIED` / `SIGNATURE_INVALID`, key
+  via `AEGIS_RECEIPT_SECRET`, verification semantics stated in the response;
+  development-key forgeability documented.
+- **Regression tests:** `test_receipt_verification_edge_cases` (schema error,
+  wrong-key signature, semantics disclosure).
+
+## AFX-13 — P2 — Container image missing native ML runtime
+- **Observed behavior:** API container crashed at startup:
+  `libgomp.so.1: cannot open shared object file` (LightGBM OpenMP runtime
+  absent from python:3.12-slim).
+- **Fix:** `apt-get install libgomp1` in `infra/Dockerfile.api`.
+- **Verification status:** image build verified once pre-fix; the post-fix
+  build + smoke test is BLOCKED (Docker Desktop became unresponsive) —
+  recorded as implemented-not-verified in DEPLOYMENT_READINESS.md.

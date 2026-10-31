@@ -33,11 +33,9 @@ def naive_optimal_cost(probs, amounts, labels, cfg):
     engine = CostEngine(cfg)
 
     unique_vals = np.unique(probs)
-    m = len(unique_vals)
     # realizable boundary "above all values" only when no prob equals 1.0
     boundaries = list(unique_vals) + ([1.0] if unique_vals[-1] < 1.0 else [])
 
-    n_legit = int((labels == 0).sum())
     max_review_rate = cfg.review_capacity_daily / max(100.0, float(n))
     cap_cnt = int(np.floor(max_review_rate * n))
 

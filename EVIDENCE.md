@@ -57,3 +57,71 @@ savings **$33,201.56 (86.1%)**, FPR **0.20%**, thresholds tau=(0.2222, 0.2322, 1
 - **Champion Calibrator Checkpoint:** `experiments/champion_calibrator.pkl`
 - **Finalist Presentation Deck:** `reports/AEGIS_Fraud_X_Finalist_Presentation.pptx`
 - **Ablation Study:** `reports/ABLATION_STUDY.md`
+
+---
+
+## Milestone 2 Evidence (2026-10-31)
+
+### Baseline reproduction (before any M2 change)
+- 41/41 tests passing; `scripts/run_benchmarks.py` reproduced every M1 number
+  exactly (champion XGBoost, val PR-AUC 0.8111, test 0.7147, cost $5,376.27,
+  savings $33,201.56, FPR 0.20%).
+
+### Release gates (mandatory)
+- Gate 1 `tests/release/test_gate_benchmark_protocol.py`: real pipeline run
+  twice, adversarial test-label mutation; champion/policy invariant, test
+  metrics change (vacuity guard). **Falsified twice**: reintroduced
+  test-based champion selection → FAILED as designed; reintroduced
+  test-fitted policy → FAILED as designed (after strengthening the mutation
+  to target high-amount rows — the first, weaker mutation was NOT caught and
+  was fixed). Both restorations verified green.
+- Gate 2 `tests/release/test_gate_calibrator_provenance.py`: lifecycle,
+  corrupt/tamper/identity/schema rejection, API provenance, identifiable
+  fallbacks.
+
+### Exact optimizer
+- `packages/optimization/exact_optimizer.py` verified against an independent
+  naive O(m^3) enumeration on 13 fixtures (`tests/unit/test_exact_optimizer.py`,
+  19 collected cases incl. parametrized seeds) — ties, zero-inflation,
+  all-ones infeasibility, capacity, determinism.
+- Regret (validation): exact $4,711.44 vs coarse $4,711.44 — gap **$0.00**;
+  out-of-sample test cost identical ($5,376.27). Recorded in
+  `benchmarks/runs/benchmark_summary.json::optimization_regret`.
+- Sensitivity: `python scripts/run_policy_sensitivity.py` →
+  `reports/SENSITIVITY_ANALYSIS.md` (7 parameter sweeps, validation-only).
+
+### External dataset (ULB)
+- Acquired from OpenML 1597 (SHA-256
+  `fdaf12730dc1fc426f318b71349f24f5c5fd00aa1152940be7e7509ae3d89d2a`);
+  audit: 284,807 rows / 492 fraud / 0 NaN / 1,081 exact duplicates dropped.
+- First run exposed AFX-10 (unstable-sort feature/label misalignment; PR-AUC
+  0.0013 < prevalence) — fixed and re-run.
+- Final: `python scripts/run_ulb_evaluation.py` → champion XGBoost (val
+  0.7696 / test 0.7408, CI [0.648, 0.824]); exact policy saves 63.2% at 0.19%
+  FPR (simulated). Artifacts: `benchmarks/runs/ulb_evaluation.json`,
+  `reports/ULB_EVALUATION.md`.
+- PaySim: acquisition blocked (Kaggle credentials); tested adapter only;
+  no results claimed.
+
+### Artifact bundle
+- `experiments/champion_bundle.pkl` + manifest (payload SHA-256); API loads
+  bundle-first, refuses corrupt bundles. Tests: 7 bundle cases + API refusal.
+- Design note: IsotonicRegression is not pickle-byte-stable — proven by a
+  failing roundtrip test — hence the sidecar-manifest hash design.
+
+### E2E (Playwright, production build + real backend)
+- `apps/web/e2e/journey.spec.ts` via `scripts/run_e2e.md`:
+  online journey PASSED (score → decision → SIGNATURE_VERIFIED → tamper →
+  SIGNATURE_INVALID); offline journey PASSED (degraded banner +
+  VERIFICATION_UNAVAILABLE_OFFLINE).
+- The online journey initially FAILED and exposed AFX-09 (client-side receipt
+  reconstruction can never verify) — fixed by returning the server-signed
+  receipt; re-run passed.
+
+### Full verification (final, 2026-10-31)
+- pytest: **85/85 passed** (43 unit + 7 property + 16 integration + 12
+  release-gate functions, incl. parametrized expansions)
+- mypy: clean (43 source files) · ruff: clean
+- frontend: `npm run build` clean (tsc + vite)
+- Docker: image built; post-libgomp-fix build/smoke BLOCKED (Docker Desktop
+  unresponsive) — see DEPLOYMENT_READINESS.md

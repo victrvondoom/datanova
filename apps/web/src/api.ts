@@ -52,7 +52,7 @@ export async function fetchBenchmarks() {
       policy_comparisons: {
         fixed_threshold_baseline: { policy: { policy_name: "Fixed-Threshold (p>=0.5)", tau_allow: 0.5, tau_review: 0.5, tau_block: 0.5 }, metrics: { false_positive_rate: 0.00102, total_cost: 7107.83, estimated_savings: 31470.00, savings_ratio: 0.8158 } },
         conservative_baseline: { policy: { policy_name: "Conservative Heuristic", tau_allow: 0.3, tau_review: 0.7, tau_block: 0.95 }, metrics: { false_positive_rate: 0.00102, total_cost: 7107.83, estimated_savings: 31470.00, savings_ratio: 0.8158 } },
-        aegis_cost_optimized: { policy: { policy_name: "Cost-Aware-Optimized", tau_allow: 0.2222, tau_review: 0.2322, tau_block: 1.0 }, metrics: { false_positive_rate: 0.00204, total_cost: 5376.27, estimated_savings: 33201.56, savings_ratio: 0.8606 } }
+        aegis_cost_optimized: { policy: { policy_name: "Cost-Aware-Optimized", tau_allow: 0.2222, tau_review: 1.0, tau_block: 1.0 }, metrics: { false_positive_rate: 0.00204, total_cost: 5376.27, estimated_savings: 33201.56, savings_ratio: 0.8606 } }
       }
     };
   }

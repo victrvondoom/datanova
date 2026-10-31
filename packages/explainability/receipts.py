@@ -11,17 +11,33 @@ Generates immutable, SHA-256 tamper-evident JSON receipts tying predictions to:
 import hashlib
 import hmac
 import json
+import os
 from datetime import datetime, timezone
 from typing import List, Optional
 
 from packages.data.schemas import AuditReceipt, FeatureContribution, OperationalAction
 
+# Development default key. Production deployments MUST set AEGIS_RECEIPT_SECRET;
+# receipt authenticity is only as strong as the secrecy of that key.
+DEFAULT_RECEIPT_SECRET = "aegis_fraud_x_master_audit_salt_2026"
+
 
 class AuditReceiptGenerator:
-    """Generates and verifies cryptographic audit receipts for financial compliance."""
+    """Generates and verifies keyed HMAC-SHA256 audit receipts.
 
-    def __init__(self, secret_key: str = "aegis_fraud_x_master_audit_salt_2026"):
-        self.secret_key = secret_key.encode("utf-8")
+    Verification semantics (stated truthfully):
+    - The HMAC proves CONTENT INTEGRITY (the receipt was not modified after
+      signing) and ISSUER AUTHENTICITY *relative to the secrecy of the key*.
+    - It does NOT prove who originally created the receipt beyond key
+      possession, and it provides no revocation or key rotation.
+    - With the default development key (public in source), receipts are
+      forgeable by anyone with the code; set AEGIS_RECEIPT_SECRET in
+      production.
+    """
+
+    def __init__(self, secret_key: Optional[str] = None):
+        key = secret_key or os.environ.get("AEGIS_RECEIPT_SECRET") or DEFAULT_RECEIPT_SECRET
+        self.secret_key = key.encode("utf-8")
 
     def create_receipt(
         self,

@@ -12,7 +12,7 @@ export const DecisionLab: React.FC = () => {
   const [appliedBanner, setAppliedBanner] = useState<string | null>(null);
 
   const [policyData, setPolicyData] = useState<any>({
-    active_policy: { tau_allow: 0.2222, tau_review: 0.2322, tau_block: 1.0 },
+    active_policy: { tau_allow: 0.2222, tau_review: 1.0, tau_block: 1.0 },
     comparisons: {
       fixed_threshold_baseline: {
         policy: { policy_name: "Fixed-Threshold (p>=0.5)", tau_allow: 0.5, tau_review: 0.5, tau_block: 0.5 },
@@ -23,7 +23,7 @@ export const DecisionLab: React.FC = () => {
         metrics: { total_cost: 7107.83, false_positive_rate: 0.00102, estimated_savings: 31470.00 }
       },
       aegis_cost_optimized: {
-        policy: { policy_name: "Cost-Aware-Optimized", tau_allow: 0.2222, tau_review: 0.2322, tau_block: 1.0 },
+        policy: { policy_name: "Cost-Aware-Optimized", tau_allow: 0.2222, tau_review: 1.0, tau_block: 1.0 },
         metrics: { total_cost: 5376.27, false_positive_rate: 0.00204, estimated_savings: 33201.56 }
       }
     }
@@ -52,7 +52,7 @@ export const DecisionLab: React.FC = () => {
   const opt = policyData?.comparisons?.aegis_cost_optimized?.metrics || { total_cost: 5376.27, false_positive_rate: 0.00204 };
   const fixed = policyData?.comparisons?.fixed_threshold_baseline?.metrics || { total_cost: 7107.83, false_positive_rate: 0.00102 };
   const netAdvantage = Math.max(0, fixed.total_cost - opt.total_cost);
-  const activePol = policyData?.active_policy || { tau_allow: 0.2222, tau_review: 0.2322, tau_block: 1.0 };
+  const activePol = policyData?.active_policy || { tau_allow: 0.2222, tau_review: 1.0, tau_block: 1.0 };
 
   return (
     <div className="space-y-6">

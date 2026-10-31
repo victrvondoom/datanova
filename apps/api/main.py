@@ -28,6 +28,7 @@ from pydantic import BaseModel
 # Ensure project root in pythonpath
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
+from packages.artifacts.bundle import BundleValidationError, load_bundle
 from packages.data.schemas import (
     AuditReceipt,
     ChannelType,
@@ -38,7 +39,6 @@ from packages.data.schemas import (
     Transaction,
 )
 from packages.data.synthetic import SyntheticTransactionGenerator
-from packages.artifacts.bundle import BundleValidationError, load_bundle
 from packages.explainability.receipts import AuditReceiptGenerator
 from packages.explainability.shap_engine import ExplainabilityEngine
 from packages.features.pipeline import FeaturePipeline
@@ -395,6 +395,7 @@ def score_transaction(tx: Transaction):
         ),
         top_features=top_features,
         audit_receipt_hash=receipt.sha256_hash,
+        audit_receipt=receipt.model_dump(mode="json"),
     )
 
 
@@ -707,7 +708,13 @@ class VerifyReceiptRequest(BaseModel):
 
 @app.post("/api/receipts/verify")
 def verify_receipt_endpoint(req: VerifyReceiptRequest):
-    """Dynamically verifies cryptographic HMAC-SHA256 signature for any input receipt."""
+    """Verifies the keyed HMAC-SHA256 signature of a receipt.
+
+    Truthful semantics: a matching HMAC proves content integrity and issuer
+    authenticity RELATIVE TO THE SECRECY OF THE SERVER'S KEY (see
+    packages/explainability/receipts.py). It is not a public-key signature
+    and provides no revocation.
+    """
     try:
         receipt_obj = AuditReceipt(**req.receipt)
         is_valid = state.require(state.receipt_gen).verify_receipt(receipt_obj)
@@ -716,7 +723,12 @@ def verify_receipt_endpoint(req: VerifyReceiptRequest):
             "is_valid": is_valid,
             "signature_algorithm": receipt_obj.signature_algorithm,
             "sha256_hash": receipt_obj.sha256_hash,
-            "status": "VALID_AUTHENTIC" if is_valid else "TAMPERED_OR_CORRUPT",
+            "status": "SIGNATURE_VERIFIED" if is_valid else "SIGNATURE_INVALID",
+            "verification_semantics": (
+                "HMAC-SHA256 keyed signature under a server-held secret. "
+                "Verifies content integrity and issuer authenticity relative "
+                "to key secrecy; not a public-key signature."
+            ),
         }
     except Exception as e:
         return {

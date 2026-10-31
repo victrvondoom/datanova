@@ -33,3 +33,29 @@ In accordance with scientific integrity guidelines, this document explicitly rec
 3. **Offline demo mode:** The frontend serves clearly-marked degraded fallback data
    when the API is unreachable. Scores, receipts, and drift results in that mode are
    illustrations, not measurements.
+
+---
+
+## 6. Milestone 2 Limitations (2026-10-31)
+
+1. **External validation is ULB-only.** PaySim is blocked on Kaggle
+   credentials (tested adapter exists; no results claimed). ULB covers 48
+   hours of European card data — no long-range temporal generalization.
+2. **ULB calibration support is thin:** ~99 fraud cases in the validation
+   partition make isotonic calibration coarse (documented in the report).
+3. **Repo-default LightGBM collapses at 0.17% prevalence** (ULB val PR-AUC
+   0.02). Reported honestly; tuning queued (NEXT-08).
+4. **Optimizer regret is $0.00 on current data** — the coarse grid was lucky.
+   The exact solver's value is its guarantee and feasibility handling; no
+   numerical improvement is claimed.
+5. **Cost/savings figures remain simulations** under documented assumptions
+   (including treating ULB EUR amounts as USD-equivalent). No realized bank
+   savings are claimed anywhere.
+6. **Container post-fix verification blocked:** the Dockerfile libgomp1 fix
+   could not be rebuilt/smoke-tested because Docker Desktop became
+   unresponsive mid-session (NEXT-02).
+7. **CI is prospective configuration:** no remote exists, so the workflow
+   file documents intent; enforcement is the local release-gate commands
+   until a remote with branch protection is configured (NEXT-07).
+8. **Single stateful API process:** in-memory graph/policy state is not
+   horizontally scalable; restarts lose scored-transaction graph state.
