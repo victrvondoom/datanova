@@ -170,6 +170,42 @@ class AuditReceipt(BaseModel):
     signature_algorithm: str = "SHA256-HMAC"
 
 
+class CaseNote(BaseModel):
+    """Immutable investigator annotation on a case."""
+
+    author: str
+    text: str = Field(..., min_length=1, max_length=2000)
+    recorded_at: datetime = Field(default_factory=datetime.utcnow)
+
+
+class CaseStatus(str, Enum):
+    OPEN = "OPEN"
+    IN_PROGRESS = "IN_PROGRESS"
+    CLOSED = "CLOSED"
+
+
+class CaseRecord(BaseModel):
+    """Fraud case linked to an archived decision (catalog: case_intake).
+
+    Lifecycle: OPEN -> IN_PROGRESS -> CLOSED (outcome required to close).
+    Evidence is linked, not copied: the case references the transaction id
+    and receipt hash in the append-only decision ledger.
+    """
+
+    case_id: str
+    transaction_id: str
+    status: CaseStatus = CaseStatus.OPEN
+    outcome: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    receipt_sha256: Optional[str] = None
+    model_id: Optional[str] = None
+    recommended_action: Optional[str] = None
+    calibrated_probability: Optional[float] = None
+    artifact_run_id: Optional[str] = None
+    notes: List[CaseNote] = Field(default_factory=list)
+
+
 class DatasetManifest(BaseModel):
     """Integrity and provenance manifest for a dataset partition."""
 

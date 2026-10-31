@@ -2,7 +2,7 @@
 
 Generated from the validated catalog. Total: 901.
 
-Status distribution: {"verified": 185, "missing": 568, "partial": 140, "blocked": 2, "not_applicable": 6}
+Status distribution: {"verified": 195, "missing": 558, "partial": 140, "blocked": 2, "not_applicable": 6}
 
 ## Milestone-2 implementation batch (catalog-synced vertical slices)
 

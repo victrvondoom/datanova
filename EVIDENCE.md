@@ -192,3 +192,22 @@ savings **$33,201.56 (86.1%)**, FPR **0.20%**, thresholds tau=(0.2222, 0.2322, 1
   568 missing / 2 blocked / 6 N-A.**
 - Full suite: **96/96 passed**; mypy clean (52 files); ruff clean; frontend
   build clean. Docker Desktop still unresponsive (NEXT-02 remains blocked).
+
+### Implementation batches D & E (API-key auth, case management, metric pinning)
+- `tests/integration/test_batch_de.py` (6 tests): local-mode openness +
+  honest auth_mode reporting; api-key mode 401s (missing/wrong key) with
+  probes open and correct key 200; case lifecycle full journey (intake ->
+  notes -> IN_PROGRESS -> revert -> close with required outcome; illegal
+  OPEN->CLOSED and outcomeless close both 422); intake 404 without archived
+  evidence; listing filters + 422 on bad status; evidence-integrity test
+  (case links the exact ledger receipt hash and carries NO payload).
+- Catalog honesty correction: `eval_precision_at_k`/`eval_recall_at_k` were
+  mislabeled 'missing' although implemented since M1 and present in every
+  artifact — corrected to verified and pinned by
+  `tests/unit/test_metrics_ranking.py` (4 tests incl. K>n semantics; one
+  wrong expectation in the new tests was fixed against the CONVENTIONAL
+  metric definition, not by weakening the implementation).
+- Catalog re-validated: **901 features — 195 verified / 140 partial /
+  558 missing / 2 blocked / 6 N-A.**
+- Full suite: **106/106 passed**; mypy clean (52 files); ruff clean; frontend
+  build clean. Docker Desktop still unresponsive (NEXT-02 remains blocked).

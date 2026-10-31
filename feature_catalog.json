@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-31T08:37:21.175910",
+  "generated": "2026-10-31T09:01:07.733633",
   "total_features": 901,
   "features": [
     {
@@ -17483,9 +17483,14 @@
       "primary_user": "Fraud operations",
       "expected_outcome": "Cases created with links to evidence",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal; core operational gap",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "packages/data/schemas.py",
+        "tests/integration/test_batch_de.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "POST /api/cases creates a case from an archived decision; 404 without evidence; intake-by-reference tested",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -17553,9 +17558,14 @@
       "primary_user": "Fraud operations",
       "expected_outcome": "State machine with transitions logged",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "packages/data/schemas.py",
+        "tests/integration/test_batch_de.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "OPEN -> IN_PROGRESS -> CLOSED (outcome required), revert allowed, illegal transitions 422-rejected; full-journey test",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -17658,9 +17668,14 @@
       "primary_user": "Fraud operations",
       "expected_outcome": "Evidence links immutable in case",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "packages/data/schemas.py",
+        "tests/integration/test_batch_de.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "Cases link receipt hash + provenance from the ledger by reference; integrity test asserts exact match and payload absence",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -17693,9 +17708,14 @@
       "primary_user": "Fraud operations",
       "expected_outcome": "Structured notes with author/time",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "packages/data/schemas.py",
+        "tests/integration/test_batch_de.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "Append investigator notes with author/time; tested",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -17728,9 +17748,14 @@
       "primary_user": "Fraud operations",
       "expected_outcome": "Outcome codes with provenance",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "packages/data/schemas.py",
+        "tests/integration/test_batch_de.py"
+      ],
+      "implementation_status": "partial",
+      "status_reason": "Typed outcome required at close, but no outcome-code vocabulary/registry yet (free-text outcomes remain unanalyzable)",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -18325,9 +18350,14 @@
       "dependencies": [
         "authn_apikeys"
       ],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "packages/data/schemas.py",
+        "tests/integration/test_batch_de.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "CRUD + transition + notes endpoints with bounded paging and honest 404/422s; protected by API-key auth when enabled",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -18360,9 +18390,14 @@
       "primary_user": "Fraud operations",
       "expected_outcome": "Typed case contract with versioning",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "apps/api/integrity.py",
+        "apps/api/main.py",
+        "packages/data/schemas.py",
+        "tests/integration/test_batch_de.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "Typed CaseRecord/CaseNote/CaseStatus contracts in packages/data/schemas.py with minimization-by-reference",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -22835,9 +22870,12 @@
       "primary_user": "Security engineer",
       "expected_outcome": "Key-auth with hashed storage",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "No auth today (single-user local system documented)",
+      "repository_evidence": [
+        "apps/api/main.py",
+        "tests/integration/test_batch_de.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "Env-gated AEGIS_API_KEY auth: all endpoints except health/ready require a constant-time-matched X-API-Key; mode honestly reported in /api/health",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -23011,10 +23049,11 @@
       "expected_outcome": "Documented local mode with warning",
       "dependencies": [],
       "repository_evidence": [
-        "DEPLOYMENT_READINESS.md"
+        "apps/api/main.py",
+        "tests/integration/test_batch_de.py"
       ],
-      "implementation_status": "partial",
-      "status_reason": "Single-process local scope documented; no explicit mode flag",
+      "implementation_status": "verified",
+      "status_reason": "Local-open vs api-key mode explicit in the auth dependency and /api/health auth_mode; tested both ways",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -28381,9 +28420,12 @@
       "primary_user": "Evaluation lead",
       "expected_outcome": "Precision@K in evaluation reports",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal; complements PR-AUC",
+      "repository_evidence": [
+        "packages/evaluation/metrics.py",
+        "tests/unit/test_metrics_ranking.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "CATALOG CORRECTION: precision@100 has existed in evaluate() since M1 and flows into every artifact; previously mislabeled missing. Now pinned by dedicated tests (incl. K>n prevalence semantics)",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -28416,9 +28458,12 @@
       "primary_user": "Evaluation lead",
       "expected_outcome": "Recall@K in reports",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "New proposal",
+      "repository_evidence": [
+        "packages/evaluation/metrics.py",
+        "tests/unit/test_metrics_ranking.py"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "CATALOG CORRECTION: recall@100 implemented since M1; now pinned by tests incl. manual-rank fixture",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",

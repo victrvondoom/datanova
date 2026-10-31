@@ -24,7 +24,7 @@ import threading
 import time
 import uuid
 from collections import OrderedDict
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger("aegis.integrity")
 
@@ -203,3 +203,48 @@ try:
 except ImportError:  # pragma: no cover - starlette always present in this app
     RequestIDMiddleware = None  # type: ignore[assignment, misc]
     metrics = None  # type: ignore[assignment]
+
+
+VALID_TRANSITIONS = {
+    # case lifecycle: OPEN -> IN_PROGRESS -> CLOSED; IN_PROGRESS may revert
+    ("OPEN", "IN_PROGRESS"),
+    ("IN_PROGRESS", "CLOSED"),
+    ("IN_PROGRESS", "OPEN"),
+}
+
+
+class CaseStore:
+    """In-memory fraud case store with a validated lifecycle.
+
+    Single-process scope (documented); cases link to evidence by reference
+    (transaction id + receipt hash in the decision ledger), never by copying
+    payloads.
+    """
+
+    def __init__(self) -> None:
+        self._cases: "OrderedDict[str, Any]" = OrderedDict()
+        self._lock = threading.Lock()
+        self._counter = 0
+
+    def create(self, case: Any) -> Any:
+        with self._lock:
+            self._counter += 1
+            case.case_id = f"case_{self._counter:06d}"
+            self._cases[case.case_id] = case
+            return case
+
+    def get(self, case_id: str) -> Optional[Any]:
+        return self._cases.get(case_id)
+
+    def list(self, status: Optional[str] = None, limit: int = 50, offset: int = 0) -> List[Any]:
+        with self._lock:
+            items = [c for c in self._cases.values() if status is None or c.status == status]
+        return items[offset : offset + limit]
+
+    def update(self, case: Any) -> None:
+        with self._lock:
+            if case.case_id in self._cases:
+                self._cases[case.case_id] = case
+
+    def __len__(self) -> int:
+        return len(self._cases)

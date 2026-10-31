@@ -1,6 +1,6 @@
 # AEGIS-Fraud X — Feature Catalog (900+)
 
-**Generated:** 2026-10-31 08:37:21 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
+**Generated:** 2026-10-31 09:01:07 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
 
 This catalog is GENERATED and VALIDATED by `scripts/generate_feature_catalog.py`
 (uniqueness, domain counts, status vocabulary, and evidence-file existence are
@@ -9,7 +9,7 @@ sources: repository inspection, fraud-domain practice, workflow failure
 analysis, and risk analysis. Acceptance criteria are outcome-derived — no
 invented numeric targets. Field policy is documented in the generator.
 
-Status distribution: {"verified": 185, "missing": 568, "partial": 140, "blocked": 2, "not_applicable": 6}
+Status distribution: {"verified": 195, "missing": 558, "partial": 140, "blocked": 2, "not_applicable": 6}
 
 ## D01 — Data Ingestion and Connectors
 
@@ -560,14 +560,14 @@ Status distribution: {"verified": 185, "missing": 568, "partial": 140, "blocked"
 
 *Manage fraud cases and their lifecycle*
 
-- **AFX-F0482 Case Intake** [P1 · missing] — Create cases from decisions/anomalies. Problem: Suspicious decisions die in logs. Outcome: Cases created with links to evidence. Evidence: *(new proposal)* Reason: New proposal; core operational gap
+- **AFX-F0482 Case Intake** [P1 · verified] — Create cases from decisions/anomalies. Problem: Suspicious decisions die in logs. Outcome: Cases created with links to evidence. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `packages/data/schemas.py`, `tests/integration/test_batch_de.py`
 - **AFX-F0483 Case Queue Management** [P1 · missing] — Prioritized investigation queue. Problem: Investigators drown without ranking. Outcome: Priority queue with capacity awareness. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0484 Case Lifecycle States** [P1 · missing] — Open/in-progress/closed states. Problem: Cases without states are unmanageable. Outcome: State machine with transitions logged. Evidence: *(new proposal)* Reason: New proposal
+- **AFX-F0484 Case Lifecycle States** [P1 · verified] — Open/in-progress/closed states. Problem: Cases without states are unmanageable. Outcome: State machine with transitions logged. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `packages/data/schemas.py`, `tests/integration/test_batch_de.py`
 - **AFX-F0485 Case Assignment** [P2 · missing] — Assign cases to investigators. Problem: Unowned cases never close. Outcome: Assignment with load visibility. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0486 SLA Tracking** [P2 · missing] — Time-bound case handling. Problem: Cases age silently. Outcome: SLA timers with breach alerts. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0487 Evidence Linking** [P1 · missing] — Attach receipts/features to cases. Problem: Cases need complete evidence. Outcome: Evidence links immutable in case. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0488 Case Notes** [P2 · missing] — Investigator annotations. Problem: Findings die in chat logs. Outcome: Structured notes with author/time. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0489 Case Outcome Recording** [P1 · missing] — Record confirmed outcomes. Problem: No learning without outcomes. Outcome: Outcome codes with provenance. Evidence: *(new proposal)* Reason: New proposal
+- **AFX-F0487 Evidence Linking** [P1 · verified] — Attach receipts/features to cases. Problem: Cases need complete evidence. Outcome: Evidence links immutable in case. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `packages/data/schemas.py`, `tests/integration/test_batch_de.py`
+- **AFX-F0488 Case Notes** [P2 · verified] — Investigator annotations. Problem: Findings die in chat logs. Outcome: Structured notes with author/time. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `packages/data/schemas.py`, `tests/integration/test_batch_de.py`
+- **AFX-F0489 Case Outcome Recording** [P1 · partial] — Record confirmed outcomes. Problem: No learning without outcomes. Outcome: Outcome codes with provenance. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `packages/data/schemas.py`, `tests/integration/test_batch_de.py` Reason: Typed outcome required at close, but no outcome-code vocabulary/registry yet (free-text outcomes remain unanalyzable)
 - **AFX-F0490 Case Deduplication** [P2 · missing] — One case per scheme/entity. Problem: Duplicate cases waste capacity. Outcome: Similar-case detection at intake. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0491 Escalation Paths** [P2 · missing] — Route hard cases upward. Problem: Complex fraud needs senior eyes. Outcome: Escalation with reason tracking. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0492 Bulk Case Actions** [P3 · missing] — Mass-close related cases. Problem: Campaigns create case floods. Outcome: Bulk actions with audit. Evidence: *(new proposal)* Reason: New proposal
@@ -584,8 +584,8 @@ Status distribution: {"verified": 185, "missing": 568, "partial": 140, "blocked"
 - **AFX-F0503 Dispute/Chargeback Linkage** [P2 · missing] — Link disputes to cases. Problem: Disputes are ground truth signals. Outcome: Dispute linkage with outcome sync. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0504 Held-Transaction Release** [P2 · missing] — Release held transactions. Problem: Holds need defined release. Outcome: Release action with compensation tracking. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0505 Case-to-Policy Feedback** [P3 · missing] — Cases inform policy reviews. Problem: Policy learns from case outcomes. Outcome: Policy review triggers from case stats. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0506 Case API Surface** [P2 · missing] — Programmatic case management. Problem: Ops tooling needs an API. Outcome: CRUD API with auth. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0507 Case Data Model** [P1 · missing] — Canonical case schema. Problem: Ad-hoc case shapes break tooling. Outcome: Typed case contract with versioning. Evidence: *(new proposal)* Reason: New proposal
+- **AFX-F0506 Case API Surface** [P2 · verified] — Programmatic case management. Problem: Ops tooling needs an API. Outcome: CRUD API with auth. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `packages/data/schemas.py`, `tests/integration/test_batch_de.py`
+- **AFX-F0507 Case Data Model** [P1 · verified] — Canonical case schema. Problem: Ad-hoc case shapes break tooling. Outcome: Typed case contract with versioning. Evidence: `apps/api/integrity.py`, `apps/api/main.py`, `packages/data/schemas.py`, `tests/integration/test_batch_de.py`
 - **AFX-F0508 Case Reporting** [P2 · missing] — Case outcome statistics. Problem: Outcome rates are invisible. Outcome: Outcome reports per period/type. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0509 Escalation Metrics** [P3 · missing] — Escalation frequency and quality. Problem: Escalations indicate systematic issues. Outcome: Escalation stats with reasons. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0510 Reviewer Load Balancing** [P3 · missing] — Fair case distribution. Problem: Overload concentrates on few people. Outcome: Load-aware assignment. Evidence: *(new proposal)* Reason: New proposal
@@ -730,12 +730,12 @@ Status distribution: {"verified": 185, "missing": 568, "partial": 140, "blocked"
 
 *Restrict access appropriately*
 
-- **AFX-F0632 API Key Authentication** [P1 · missing] — Authenticate API callers. Problem: Anonymous APIs are abusable. Outcome: Key-auth with hashed storage. Evidence: *(new proposal)* Reason: No auth today (single-user local system documented)
+- **AFX-F0632 API Key Authentication** [P1 · verified] — Authenticate API callers. Problem: Anonymous APIs are abusable. Outcome: Key-auth with hashed storage. Evidence: `apps/api/main.py`, `tests/integration/test_batch_de.py`
 - **AFX-F0633 Role-Based Access Control** [P2 · missing] — Scopes per role. Problem: All-or-nothing access is unsafe. Outcome: Role-scoped endpoints. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0634 Key Rotation** [P2 · missing] — Rotate credentials without downtime. Problem: Eternal keys are a liability. Outcome: Dual-key grace windows. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0635 Decision-Data Scopes** [P2 · missing] — Least-privilege on sensitive data. Problem: Broad access leaks fraud signals. Outcome: Scoped read access to decisions. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0636 Admin Action Authorization** [P1 · missing] — Guard dangerous operations. Problem: Policy changes need authority. Outcome: Admin scope + approval trail. Evidence: *(new proposal)* Reason: optimize-policy mutates global state unauthenticated
-- **AFX-F0637 Local Mode Declaration** [P2 · partial] — Explicit single-user mode. Problem: Implicit anonymity looks like an oversight. Outcome: Documented local mode with warning. Evidence: `DEPLOYMENT_READINESS.md` Reason: Single-process local scope documented; no explicit mode flag
+- **AFX-F0637 Local Mode Declaration** [P2 · verified] — Explicit single-user mode. Problem: Implicit anonymity looks like an oversight. Outcome: Documented local mode with warning. Evidence: `apps/api/main.py`, `tests/integration/test_batch_de.py`
 - **AFX-F0638 Case Assignment Permissions** [P3 · missing] — Only owners/leads reassign. Problem: Reassignment abuse breaks accountability. Outcome: Scoped case mutations. Evidence: *(new proposal)* Reason: New proposal; blocked on case management
 - **AFX-F0639 Audit Read Scope** [P2 · missing] — Auditors read-only access. Problem: Audit access equals write access today. Outcome: Read-only audit role. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0640 Service Accounts** [P3 · missing] — Machine identities. Problem: Shared human keys are untraceable. Outcome: Per-integration accounts. Evidence: *(new proposal)* Reason: New proposal
@@ -905,8 +905,8 @@ Status distribution: {"verified": 185, "missing": 568, "partial": 140, "blocked"
 - **AFX-F0784 External Dataset Evaluation** [P1 · verified] — Real-data validation. Problem: Synthetic-only evidence overstates capability. Outcome: ULB artifact; PaySim blocker documented. Evidence: `scripts/run_ulb_evaluation.py`, `DATA_PROVENANCE.md`
 - **AFX-F0785 Component Ablation Study** [P2 · verified] — Per-component value measurement. Problem: Architecture claims need ablation. Outcome: Ablation table generated from runs. Evidence: `scripts/run_ablation.py`, `reports/ABLATION_STUDY.md`
 - **AFX-F0786 Bootstrap Uncertainty** [P1 · verified] — CIs on metrics. Problem: Point estimates overstate precision. Outcome: Seeded 95% CIs on champion metrics. Evidence: `packages/evaluation/bootstrap.py`
-- **AFX-F0787 Precision@K Metrics** [P2 · missing] — Top-K review precision. Problem: Queue quality is not average quality. Outcome: Precision@K in evaluation reports. Evidence: *(new proposal)* Reason: New proposal; complements PR-AUC
-- **AFX-F0788 Recall@K Metrics** [P2 · missing] — Top-K recall. Problem: Capacity-bounded recall matters. Outcome: Recall@K in reports. Evidence: *(new proposal)* Reason: New proposal
+- **AFX-F0787 Precision@K Metrics** [P2 · verified] — Top-K review precision. Problem: Queue quality is not average quality. Outcome: Precision@K in evaluation reports. Evidence: `packages/evaluation/metrics.py`, `tests/unit/test_metrics_ranking.py`
+- **AFX-F0788 Recall@K Metrics** [P2 · verified] — Top-K recall. Problem: Capacity-bounded recall matters. Outcome: Recall@K in reports. Evidence: `packages/evaluation/metrics.py`, `tests/unit/test_metrics_ranking.py`
 - **AFX-F0789 Cost-Benefit Curves** [P2 · missing] — Policy economics across thresholds. Problem: Single operating points hide curves. Outcome: Curve data per policy. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0790 Latency Benchmarks** [P2 · missing] — Per-stage latency measurement. Problem: Latency claims need measurement. Outcome: Latency split by stage (features/model/receipt). Evidence: *(new proposal)* Reason: End-to-end latency only today
 - **AFX-F0791 Throughput Benchmarks** [P2 · missing] — Sustainable request rate. Problem: Capacity claims need load tests. Outcome: Documented throughput profile. Evidence: *(new proposal)* Reason: New proposal

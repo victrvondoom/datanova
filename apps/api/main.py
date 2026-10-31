@@ -10,6 +10,7 @@ Provides:
 - Real-time transaction injection and cryptographic receipt verification
 """
 
+import hmac
 import json
 import logging
 import os
@@ -22,7 +23,7 @@ from typing import Any, Dict, Optional, TypeVar, cast
 import networkx as nx
 import numpy as np
 import pandas as pd
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -30,6 +31,8 @@ from pydantic import BaseModel
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from apps.api.integrity import (
+    VALID_TRANSITIONS,
+    CaseStore,
     DecisionLedger,
     IdempotencyCache,
     RequestIDMiddleware,
@@ -39,6 +42,9 @@ from apps.api.integrity import (
 from packages.artifacts.bundle import BundleValidationError, load_bundle
 from packages.data.schemas import (
     AuditReceipt,
+    CaseNote,
+    CaseRecord,
+    CaseStatus,
     ChannelType,
     CostConfiguration,
     DecisionPolicy,
@@ -101,6 +107,7 @@ class ModelState:
         # Emergency stop (catalog ops_kill_switch): when engaged, every decision
         # becomes human REVIEW — automation cannot act until disengaged.
         self.emergency_stop_engaged: bool = False
+        self.case_store: Optional[CaseStore] = None
 
 
 state = ModelState()
@@ -122,6 +129,7 @@ def init_engine():
     state.decision_ledger = DecisionLedger(
         path=os.environ.get("AEGIS_DECISION_LEDGER", "benchmarks/runs/decision_ledger.jsonl")
     )
+    state.case_store = CaseStore()
     state.receipt_gen = AuditReceiptGenerator()
     state.cost_engine = CostEngine()
     state.policy_optimizer = PolicyOptimizer()
@@ -248,11 +256,30 @@ async def lifespan(app: FastAPI):
 startup_event = init_engine
 
 
+def require_api_key(request: Request, x_api_key: str = Header(default=None, alias="X-API-Key")) -> None:
+    """API-key authentication (catalog authn_apikeys).
+
+    Mode is env-gated and honestly reported:
+    - AEGIS_API_KEY unset  -> LOCAL MODE: all access open (single-user local
+      deployment; documented in THREAT_MODEL.md and /api/health auth_mode).
+    - AEGIS_API_KEY set    -> every endpoint except the health/readiness
+      probes requires a matching X-API-Key (constant-time comparison).
+    """
+    if request.url.path in ("/api/health", "/api/ready"):
+        return  # probes stay open for orchestrators
+    expected = os.environ.get("AEGIS_API_KEY", "")
+    if not expected:
+        return  # local mode
+    if x_api_key is None or not hmac.compare_digest(x_api_key, expected):
+        raise HTTPException(status_code=401, detail="Invalid or missing API key")
+
+
 app = FastAPI(
     title="AEGIS-Fraud X Engine API",
     description="Adaptive Graph-Enhanced Intelligence for Explainable, Cost-Aware Financial Fraud Prevention",
     version="1.2.0",
     lifespan=lifespan,
+    dependencies=[Depends(require_api_key)],
 )
 
 # CORS setup: explicit origin allowlist via environment variable.
@@ -291,6 +318,7 @@ def health_check():
         "graph_edges": state.temporal_graph.graph.number_of_edges() if state.temporal_graph else 0,
         "active_policy": state.current_policy.model_dump() if state.current_policy else {},
         # Artifact provenance: which trained artifacts produced this engine
+        "auth_mode": "api-key" if os.environ.get("AEGIS_API_KEY") else "local-open",
         "artifact_status": state.artifact_status,
         "artifact_run_id": state.artifact_run_id,
         "calibration_source": state.calibration_source,
@@ -595,6 +623,123 @@ def emergency_stop(req: EmergencyStopRequest):
         ),
         "recorded_in_ledger": True,
     }
+
+
+class CaseIntakeRequest(BaseModel):
+    transaction_id: str
+
+
+@app.post("/api/cases", response_model=CaseRecord)
+def create_case(req: CaseIntakeRequest):
+    """Creates a fraud case linked to an archived decision (catalog:
+    case_intake, case_data_model, case_evidence_linking).
+
+    Evidence is linked by reference (transaction id + receipt hash in the
+    append-only decision ledger), never copied. 404 when no decision was
+    archived for the transaction.
+    """
+    record = state.require(state.decision_ledger).get(req.transaction_id)
+    if record is None:
+        raise HTTPException(
+            status_code=404,
+            detail=(
+                f"No archived decision for transaction_id '{req.transaction_id}'; "
+                "score the transaction first so the case can link evidence."
+            ),
+        )
+    case = CaseRecord(
+        case_id="pending",
+        transaction_id=req.transaction_id,
+        receipt_sha256=record.get("receipt_sha256"),
+        model_id=record.get("model_id"),
+        recommended_action=record.get("recommended_action"),
+        calibrated_probability=record.get("calibrated_probability"),
+        artifact_run_id=record.get("artifact_run_id"),
+    )
+    return state.require(state.case_store).create(case)
+
+
+@app.get("/api/cases")
+def list_cases(status: str = "", limit: int = 50, offset: int = 0):
+    """Lists cases with optional status filter and bounded paging."""
+    limit = max(1, min(limit, 200))
+    offset = max(0, offset)
+    store = state.require(state.case_store)
+    status_filter = status.upper() if status else None
+    if status_filter is not None and status_filter not in {s.value for s in CaseStatus}:
+        raise HTTPException(status_code=422, detail=f"Unknown status '{status}'")
+    records = store.list(status=status_filter, limit=limit, offset=offset)
+    return {
+        "count": len(store),
+        "limit": limit,
+        "offset": offset,
+        "records": [c.model_dump() for c in records],
+    }
+
+
+@app.get("/api/cases/{case_id}")
+def get_case(case_id: str):
+    case = state.require(state.case_store).get(case_id)
+    if case is None:
+        raise HTTPException(status_code=404, detail=f"No case '{case_id}'")
+    return case
+
+
+class CaseTransitionRequest(BaseModel):
+    status: str
+    outcome: Optional[str] = None
+
+
+@app.post("/api/cases/{case_id}/transition", response_model=CaseRecord)
+def transition_case(case_id: str, req: CaseTransitionRequest):
+    """Validated lifecycle transition (catalog: case_lifecycle_states).
+
+    OPEN -> IN_PROGRESS -> CLOSED (outcome REQUIRED to close);
+    IN_PROGRESS -> OPEN is allowed (revert after re-triage).
+    Any other transition is rejected with 422.
+    """
+    store = state.require(state.case_store)
+    case = store.get(case_id)
+    if case is None:
+        raise HTTPException(status_code=404, detail=f"No case '{case_id}'")
+
+    target = req.status.upper()
+    if target not in {s.value for s in CaseStatus}:
+        raise HTTPException(status_code=422, detail=f"Unknown status '{req.status}'")
+    if (case.status.value, target) not in VALID_TRANSITIONS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"Illegal transition {case.status.value} -> {target}",
+        )
+    if target == CaseStatus.CLOSED.value and not (req.outcome or "").strip():
+        raise HTTPException(
+            status_code=422,
+            detail="Closing a case requires a typed outcome (e.g. confirmed_fraud, false_positive)",
+        )
+    case.status = CaseStatus(target)
+    case.outcome = (req.outcome or "").strip() or None
+    case.updated_at = datetime.now(timezone.utc)
+    store.update(case)
+    return case
+
+
+class CaseNoteRequest(BaseModel):
+    author: str
+    text: str
+
+
+@app.post("/api/cases/{case_id}/notes", response_model=CaseRecord)
+def add_case_note(case_id: str, req: CaseNoteRequest):
+    """Appends an investigator note (catalog: case_notes)."""
+    store = state.require(state.case_store)
+    case = store.get(case_id)
+    if case is None:
+        raise HTTPException(status_code=404, detail=f"No case '{case_id}'")
+    note = CaseNote(author=req.author.strip() or "anonymous", text=req.text)
+    case.notes.append(note)
+    case.updated_at = datetime.now(timezone.utc)
+    store.update(case)
+    return case
 
 
 class InjectTransactionRequest(BaseModel):
