@@ -10,12 +10,14 @@ import {
   loadProgress,
   saveProgress,
   markVisited,
+  markSimInteracted,
   completeTopic,
   recordQuizAnswer,
   overallProgress,
   resetProgress,
   ProgressState,
 } from "./progress";
+import { parseHash } from "./router";
 import { LandingView, JourneyView, GlossaryView, QuizView } from "./Views";
 import { TopicPage } from "./TopicPage";
 import { CaseStudyView } from "./CaseStudy";
@@ -28,29 +30,43 @@ const BROWSER_STORAGE = {
 
 export const TrailApp: React.FC = () => {
   const [route, navigate] = useTrailRoute();
-  const [progress, setProgress] = useState<ProgressState>(() => loadProgress(BROWSER_STORAGE));
-  const [simInteracted, setSimInteracted] = useState<Record<number, boolean>>({});
+  // Progress is the single persisted source of truth, INCLUDING simulation-
+  // interaction evidence — so completing requirements survive reloads.
+  // A topic opened directly (deep link) is recorded as visited at load time.
+  const [progress, setProgress] = useState<ProgressState>(() => {
+    const loaded = loadProgress(BROWSER_STORAGE);
+    const initial = parseHash(window.location.hash);
+    if (initial.page === "topic") {
+      return { ...markVisited(loaded, initial.id), lastTopic: initial.id };
+    }
+    return loaded;
+  });
   const [confirmReset, setConfirmReset] = useState(false);
 
   useEffect(() => {
     saveProgress(BROWSER_STORAGE, progress);
   }, [progress]);
 
-  // visiting a topic records it (visit ≠ completion). The functional update
-  // is idempotent: markVisited returns the same object when already visited,
-  // so the persistence effect below does not re-write storage on re-renders.
+  // Visits are recorded from the hashchange event itself, so browser
+  // back/forward and in-app navigation behave identically. Visiting never
+  // completes a topic.
   useEffect(() => {
-    if (route.page === "topic") {
-      setProgress((p) => {
-        const marked = markVisited(p, route.id);
-        if (marked === p && p.lastTopic === route.id) return p;
-        return { ...marked, lastTopic: route.id };
-      });
-    }
-  }, [route]);
+    const onHashChange = () => {
+      const r = parseHash(window.location.hash);
+      if (r.page === "topic") {
+        setProgress((p) => {
+          const marked = markVisited(p, r.id);
+          if (marked === p && p.lastTopic === r.id) return p;
+          return { ...marked, lastTopic: r.id };
+        });
+      }
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   const handleSimInteract = useCallback((id: number) => {
-    setSimInteracted((s) => (s[id] ? s : { ...s, [id]: true }));
+    setProgress((p) => markSimInteracted(p, id));
   }, []);
 
   const handleQuizAnswer = useCallback((id: number, chosen: number, correct: boolean) => {
@@ -95,7 +111,6 @@ export const TrailApp: React.FC = () => {
               }
               setConfirmReset(false);
               setProgress(resetProgress(BROWSER_STORAGE));
-              setSimInteracted({});
             }}
           >
             {confirmReset ? "Confirm reset?" : "Reset progress"}
@@ -136,7 +151,7 @@ export const TrailApp: React.FC = () => {
                 topic={topic}
                 navigate={navigate}
                 completed={progress.completed.includes(topic.id)}
-                simInteracted={simInteracted}
+                simInteracted={Object.fromEntries(progress.simInteracted.map((id) => [id, true]))}
                 onSimInteract={handleSimInteract}
                 quizAnswer={progress.quiz[topic.id]}
                 onQuizAnswer={handleQuizAnswer}

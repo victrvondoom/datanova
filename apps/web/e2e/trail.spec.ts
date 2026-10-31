@@ -76,17 +76,26 @@ test("full learning flow: simulate + quiz completes topic 01, progress persists,
   await page.reload();
   await page.getByText(TRAIL_TAB, { exact: false }).first().click();
   await expect(page.getByText(/1\/20 complete/).first()).toBeVisible();
-  await page.getByRole("button", { name: "Home" }).click();
+  await page.getByRole("button", { name: "Home", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Vibe Coding Trail" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Continue: Topic 02" })).toBeVisible();
+
+  // 9b. Simulation-interaction evidence ALSO survived the reload (persisted,
+  // not session state): topic 01 shows the interaction as already recorded.
+  await page.goto("#/trail/topic/01");
+  await expect(page.getByText("interaction recorded ✓")).toBeVisible();
 
   // 10. Reset progress with confirmation (two clicks)
   await page.getByRole("button", { name: "Reset progress" }).click();
   await expect(page.getByRole("button", { name: "Confirm reset?" })).toBeVisible();
   await page.getByRole("button", { name: "Confirm reset?" }).click();
   await expect(page.getByText(/0\/20 complete/).first()).toBeVisible();
+  await page.getByRole("button", { name: "Home", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Vibe Coding Trail" })).toBeVisible();
   await expect(page.getByRole("button", { name: /Continue: Topic/ })).toHaveCount(0);
+  // and the persisted sim-interaction evidence is gone too
+  await page.goto("#/trail/topic/01");
+  await expect(page.getByText("interaction recorded ✓")).toHaveCount(0);
 });
 
 test("final quiz: all five handbook questions answerable and scoreable", async ({ page }) => {

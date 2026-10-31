@@ -14,7 +14,11 @@ import { checkHealth } from "./api";
 
 export const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState<boolean>(true);
-  const [currentView, setCurrentView] = useState<ViewType>("mission");
+  // Deep-link support: a fresh load (or navigation) to a #/trail/... URL
+  // opens the TRACEN learning trail view directly.
+  const [currentView, setCurrentView] = useState<ViewType>(() =>
+    window.location.hash.startsWith("#/trail") ? "trail" : "mission"
+  );
   const [online, setOnline] = useState<boolean>(false);
   const [showDeckModal, setShowDeckModal] = useState<boolean>(false);
 
@@ -26,6 +30,16 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     checkConnection();
+  }, []);
+
+  useEffect(() => {
+    const onHashChange = () => {
+      if (window.location.hash.startsWith("#/trail")) {
+        setCurrentView("trail");
+      }
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
   return (

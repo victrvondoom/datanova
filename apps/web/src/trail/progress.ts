@@ -10,6 +10,9 @@
 export interface ProgressState {
   /** topics the user opened */
   visited: number[];
+  /** topics whose simulation the user actually interacted with
+   * (persisted evidence — survives reloads, unlike React state) */
+  simInteracted: number[];
   /** topics whose learning interaction + knowledge check were completed */
   completed: number[];
   /** topic quiz answers: topicId -> {chosen, correct} */
@@ -31,6 +34,7 @@ const STORAGE_KEY = "tracen-trail-progress-v1";
 
 export const emptyProgress = (): ProgressState => ({
   visited: [],
+  simInteracted: [],
   completed: [],
   quiz: {},
   finalQuiz: {},
@@ -46,6 +50,7 @@ export function loadProgress(storage: ProgressStorage): ProgressState {
     const parsed = JSON.parse(raw) as Partial<ProgressState>;
     return {
       visited: Array.isArray(parsed.visited) ? parsed.visited : [],
+      simInteracted: Array.isArray(parsed.simInteracted) ? parsed.simInteracted : [],
       completed: Array.isArray(parsed.completed) ? parsed.completed : [],
       quiz: parsed.quiz && typeof parsed.quiz === "object" ? parsed.quiz : {},
       finalQuiz:
@@ -87,6 +92,11 @@ export function completeTopic(p: ProgressState, topicId: number, ev: CompletionE
   if (!ev.simulationInteracted || !ev.quizCorrect) return p;
   if (p.completed.includes(topicId)) return p;
   return { ...p, completed: [...p.completed, topicId].sort((a, b) => a - b) };
+}
+
+export function markSimInteracted(p: ProgressState, topicId: number): ProgressState {
+  if (p.simInteracted.includes(topicId)) return p;
+  return { ...p, simInteracted: [...p.simInteracted, topicId].sort((a, b) => a - b) };
 }
 
 export function recordQuizAnswer(

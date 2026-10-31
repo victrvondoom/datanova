@@ -99,17 +99,35 @@ Visiting a page never marks it complete (tested explicitly in
 (Topic 04's routing behavior is exercised through its interactive stage
 walkthrough; its distinct LB-vs-proxy comparison panel is content-verified.)
 
-## Known limitations & follow-ups
+## Follow-up completion (second pass — all four items closed)
 
-1. **oxlint leaves 1 warning** (`set-state-in-effect` in `TrailApp.tsx`):
-   the route-driven visit-recording effect intentionally persists progress
-   on navigation. Benign; documented rather than suppressed.
-2. **Simulation interaction state is session-scoped** (React state, not
-   persisted): reloading mid-topic re-arms the "interact" requirement. The
-   completion record itself IS persisted. This is a deliberate simplicity
-   trade-off, not a data-loss bug.
-3. The full AEGIS journey spec (`e2e/journey.spec.ts`) requires the live
-   FastAPI backend; the trail spec is backend-independent (works offline).
-4. No backend is used by the trail — per the master prompt, no
+1. **oxlint: 0 warnings, 0 errors.** The visit recorder was restructured:
+   visits are recorded from the `hashchange` event (and at load time via
+   the state initializer), so no `setState` runs synchronously inside an
+   effect body. Browser back/forward and in-app navigation behave
+   identically.
+2. **Simulation-interaction evidence is now persisted** in the progress
+   store (`ProgressState.simInteracted`, with storage migration for older
+   payloads). Completion can be earned across sessions; the full E2E flow
+   verifies the evidence survives reload AND is cleared by reset.
+3. **prefers-reduced-motion** is implemented (`motion-reduce:transition-none`
+   on the two continuously animated bars) and asserted automatically in
+   `e2e/trail-a11y.spec.ts` (transition-property must be `none` under
+   emulated reduced motion).
+4. **Visual regression baselines** exist for the two most important screens
+   (`e2e/__snapshots__/trail-a11y.spec.ts/*.png`, tolerant 2% pixel-ratio
+   diff, animations disabled). Regenerate after intentional design changes
+   with `npx playwright test e2e/trail-a11y.spec.ts --update-snapshots`.
+5. **Deep-link boot fixed** (found during the follow-up pass): a fresh page
+   load on a `#/trail/...` URL now opens the trail view directly
+   (`App.tsx` hash-aware view init + hashchange listener).
+
+## Known limitations (remaining, honest)
+
+1. The full AEGIS journey spec (`e2e/journey.spec.ts`) requires the live
+   FastAPI backend; the trail specs are backend-independent (work offline).
+2. No backend is used by the trail — per the master prompt, no
    backend/database was introduced solely for progress tracking
    (localStorage is the chosen persistence).
+3. Visual baselines are platform-suffixed (`-win32`) and may need
+   regeneration on other platforms; tolerance is 2% of pixels.

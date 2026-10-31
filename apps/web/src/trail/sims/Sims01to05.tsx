@@ -92,7 +92,7 @@ export const TokenBucketSim: React.FC<{ onInteract: () => void }> = ({ onInterac
           <Stat label="Bucket fill" value={`${Math.round((bucket.tokens / bucket.capacity) * 100)}%`} />
         </div>
         <div className="h-3 rounded-full bg-slate-900 border border-slate-700 overflow-hidden mb-3" role="img" aria-label={`Bucket fill level: ${Math.round(bucket.tokens)} of ${bucket.capacity} tokens`}>
-          <div className="h-full bg-sky-400/70 transition-all duration-200" style={{ width: `${(bucket.tokens / bucket.capacity) * 100}%` }} />
+          <div className="h-full bg-sky-400/70 transition-all duration-200 motion-reduce:transition-none" style={{ width: `${(bucket.tokens / bucket.capacity) * 100}%` }} />
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Node label="Bot (IP 1.1)" sub={`${bucket.rejected} rejected`} state={bucket.tokens < 1 ? "blocked" : "processing"} />

@@ -9,6 +9,7 @@ import {
   emptyProgress,
   isTopicComplete,
   loadProgress,
+  markSimInteracted,
   markVisited,
   overallProgress,
   recordQuizAnswer,
@@ -83,6 +84,38 @@ describe("progress persistence", () => {
     expect(cleared).toEqual(emptyProgress());
     expect(st._dump().size).toBe(0);
     expect(loadProgress(st)).toEqual(emptyProgress());
+  });
+
+  it("persists simulation-interaction evidence across reloads (left-out work fix)", () => {
+    const st = memStorage();
+    let p = emptyProgress();
+    p = markSimInteracted(p, 1);
+    p = markSimInteracted(p, 1); // idempotent
+    expect(p.simInteracted).toEqual([1]);
+    p = markSimInteracted(p, 7);
+    expect(p.simInteracted).toEqual([1, 7]);
+    saveProgress(st, p);
+    const reloaded = loadProgress(st);
+    expect(reloaded.simInteracted).toEqual([1, 7]);
+    // completion can now be earned across sessions: sim evidence from a
+    // previous session + quiz in this one
+    const afterQuiz = recordQuizAnswer(reloaded, 1, 1, true);
+    const completed = completeTopic(afterQuiz, 1, {
+      simulationInteracted: reloaded.simInteracted.includes(1),
+      quizCorrect: afterQuiz.quiz[1].correct,
+    });
+    expect(isTopicComplete(completed, 1)).toBe(true);
+  });
+
+  it("migrates pre-simInteracted storage gracefully", () => {
+    const st = memStorage();
+    st.setItem(
+      "tracen-trail-progress-v1",
+      JSON.stringify({ visited: [3], completed: [3], quiz: {}, finalQuiz: {}, finalQuizCompleted: false, caseStudyCompleted: false, lastTopic: 3 })
+    );
+    const p = loadProgress(st);
+    expect(p.visited).toEqual([3]);
+    expect(p.simInteracted).toEqual([]);
   });
 
   it("does not duplicate completed topics", () => {

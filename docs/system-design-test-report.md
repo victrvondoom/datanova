@@ -5,18 +5,18 @@
 All results below are from actual executions on this machine; commands are
 listed so every result is reproducible.
 
-## 1. Unit + content tests — `npx vitest run` (59 tests)
+## 1. Unit + content tests — `npx vitest run` (61 tests)
 
 ```
 Test Files  3 passed (3)
-     Tests  59 passed (59)
+     Tests  61 passed (61)
 ```
 
 | Suite | File | Tests | Covers |
 |-------|------|-------|--------|
 | Content | `src/trail/__tests__/content.test.ts` | 14 | exactly 20 topics; sequential unique numbering 1..20; no duplicates; 5 stages with the handbook's topic placement (entry=1, routing=2-5, execution=6-9, reliability=10-14, async=15-20); every topic has problem/explanation/analogy/technical/walkthrough(≥4)/failure/tradeoffs/takeaway/quiz; every quiz answer index valid; prev/next resolvable; topic hrefs well-formed; 22 required glossary terms, unique, defined, linked to valid topics; the handbook's 5 original final-quiz questions; hash router parsing incl. `#/trail/topic/21` → landing |
 | Simulations | `src/trail/__tests__/sims.test.ts` | 38 | token consumption + refill + 429 with retry-after; cache miss→hit, stale-after-DB-update, TTL expiry, force refresh; round-robin distribution, unhealthy-node ejection, 503 when all dead; gateway 200/401/429/503/502 with reached-service semantics; CI deploy / deploy-skipped on failing test / build failure; image-vs-container lifecycle, no-run-without-image; kube crash → reconcile → desired state restored, scale up/down, bounds; stale direct-IP fail vs service-name resolve; breaker opens at threshold, fast-fails without calling downstream, half-opens after cooldown, closes on success; timeout success vs bounded fast-fail at the deadline; retryable 5xx/network vs never 4xx, max-attempt stop; exponential delays 1s/2s/4s/8s with bounded ±25% jitter; synchronized vs decorrelated retry waves; idempotent single-charge vs double-charge without key; queue processing, retry-to-DLQ after 3 failures, no processing without workers; pub/sub broadcast + offline backlog + drain on recovery; EDA trace-id propagation + event-sourced balance fold (50−10+60=100); 2PC commit/abort/partial-failure with locked rows; saga forward completion + backward compensation on ship failure; cron duplicate execution without lock vs single execution with lock; UTC→NY hour conversion incl. DST |
-| Progress | `src/trail/__tests__/progress.test.ts` | 7 | fresh visitor empty; corrupted storage recovered; visiting ≠ completing; completion requires sim interaction AND correct quiz; storage round-trip persistence; reset clears storage AND state; no duplicate completions |
+| Progress | `src/trail/__tests__/progress.test.ts` | 9 | fresh visitor empty; corrupted storage recovered; visiting ≠ completing; completion requires sim interaction AND correct quiz; storage round-trip persistence; reset clears storage AND state; no duplicate completions |
 
 ## 2. Production build — `npm run build`
 
@@ -28,15 +28,13 @@ vite build → ✓ built in 1.52s   (production bundle)
 ## 3. Lint — `npx oxlint src/trail`
 
 ```
-Found 1 warning and 0 errors.
+Found 0 warnings and 0 errors.
 ```
 
-The single warning is `react(set-state-in-effect` in `TrailApp.tsx` — the
-route-driven visit recorder (functional, idempotent setState inside an
-effect that fires only on route changes). Accepted deliberately and
-documented in the implementation plan; not suppressed.
+(The prior `set-state-in-effect` warning was resolved structurally — visits
+now record from the hashchange event / state initializer — not suppressed.)
 
-## 4. E2E user flows — `npx playwright test e2e/trail.spec.ts` (4 tests)
+## 4. E2E user flows — `npx playwright test e2e/trail.spec.ts e2e/trail-a11y.spec.ts` (7 tests)
 
 Run against the production build served by `vite preview` on :4173:
 
@@ -59,6 +57,17 @@ The no-console-errors test fails on any `pageerror` (uncaught JS exception)
 while navigating all five stage tabs and deep-linking to
 `#/trail/topic/20`.
 
+`e2e/trail-a11y.spec.ts` additionally covers:
+- **prefers-reduced-motion**: under emulated reduced motion, the animated
+  bars' computed `transition-property` must be `none` (both the token-bucket
+  fill and the landing progress bar).
+- **visual regression baselines**: `toHaveScreenshot` pixel-diff for the
+  landing page and the Topic 01 simulation (animations disabled, 2%
+  tolerance); baselines committed under `e2e/__snapshots__/`.
+- The full-flow test now also verifies that simulation-interaction evidence
+  **survives a reload** (persisted, shown as "interaction recorded ✓") and
+  is **cleared by the confirmed reset**.
+
 ## 5. Responsive & accessibility verification
 
 - Mobile screenshot at 390×844 (Topic 01):
@@ -80,8 +89,8 @@ playback), and the mobile viewport.
 ## 7. What is NOT tested (honestly)
 
 - The pre-existing AEGIS E2E (`e2e/journey.spec.ts`) needs the live FastAPI
-  backend and was not part of this trail campaign; the trail spec is fully
+  backend and was not part of this trail campaign; the trail specs are fully
   backend-independent.
-- No visual-regression screenshots diffing (single-capture evidence only).
-- `prefers-reduced-motion` behavior is implemented via CSS-transition-only
-  animation but not asserted in an automated test.
+- Visual baselines cover two screens only (landing + Topic 01) and are
+  platform-suffixed (`-win32`); other screens rely on the single-capture
+  screenshot evidence.

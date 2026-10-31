@@ -50,7 +50,7 @@ export const LandingView: React.FC<{
         <span className="text-sm font-mono text-sky-300">{progressPct}% complete · {completed.length}/20 topics</span>
       </div>
       <div className="h-3 rounded-full bg-slate-900 border border-slate-700 overflow-hidden">
-        <div className="h-full bg-sky-400/70 transition-all" style={{ width: `${progressPct}%` }} />
+        <div className="h-full bg-sky-400/70 transition-all motion-reduce:transition-none" style={{ width: `${progressPct}%` }} />
       </div>
     </section>
 
