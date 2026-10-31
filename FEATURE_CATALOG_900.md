@@ -1,6 +1,6 @@
 # AEGIS-Fraud X — Feature Catalog (900+)
 
-**Generated:** 2026-10-31 08:32:43 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
+**Generated:** 2026-10-31 08:37:21 UTC · **Total features:** 901 · **Domains:** 30 × ≥30
 
 This catalog is GENERATED and VALIDATED by `scripts/generate_feature_catalog.py`
 (uniqueness, domain counts, status vocabulary, and evidence-file existence are
@@ -9,7 +9,7 @@ sources: repository inspection, fraud-domain practice, workflow failure
 analysis, and risk analysis. Acceptance criteria are outcome-derived — no
 invented numeric targets. Field policy is documented in the generator.
 
-Status distribution: {"verified": 183, "missing": 573, "partial": 137, "blocked": 2, "not_applicable": 6}
+Status distribution: {"verified": 185, "missing": 568, "partial": 140, "blocked": 2, "not_applicable": 6}
 
 ## D01 — Data Ingestion and Connectors
 
@@ -221,9 +221,9 @@ Status distribution: {"verified": 183, "missing": 573, "partial": 137, "blocked"
 
 - **AFX-F0181 Baseline Model Zoo** [P1 · verified] — LogReg/RF/LightGBM/XGBoost candidates. Problem: Champion claims need baselines. Outcome: All candidates trained under one protocol. Evidence: `packages/models/classifiers.py`, `scripts/run_benchmarks.py`
 - **AFX-F0182 Rule-Based Baseline** [P1 · verified] — Expert-rule scorer as floor. Problem: ML value is unmeasurable without a floor. Outcome: Rule baseline reported in every benchmark. Evidence: `packages/models/rule_based.py`
-- **AFX-F0183 Imbalance-Aware Training** [P1 · missing] — Class weighting for rare fraud. Problem: Rare positives are ignored by default. Outcome: Weighted training with documented rationale. Evidence: *(new proposal)* Reason: LightGBM collapse at 0.17% prevalence documented as finding
+- **AFX-F0183 Imbalance-Aware Training** [P1 · partial] — Class weighting for rare fraud. Problem: Rare positives are ignored by default. Outcome: Weighted training with documented rationale. Evidence: `scripts/run_lgbm_prevalence_experiment.py`, `scripts/run_ulb_evaluation.py`, `packages/models/classifiers.py`, `tests/unit/test_models.py`, `reports/LGBM_PREVALENCE_EXPERIMENT.md` Reason: Imbalance strategy now an explicit, tested contract (balanced/none); band-appropriate selection demonstrated for ULB
 - **AFX-F0184 Calibrated Ensemble** [P2 · missing] — Blend candidates with calibration. Problem: Single models leave accuracy behind. Outcome: Ensemble evaluated under same protocol. Evidence: *(new proposal)* Reason: New proposal
-- **AFX-F0185 Prevalence Robustness Testing** [P1 · missing] — Evaluate configs across prevalence levels. Problem: Configs tuned to one prevalence collapse. Outcome: Config contract per prevalence band. Evidence: *(new proposal)* Reason: Queued as NEXT-08 after ULB finding
+- **AFX-F0185 Prevalence Robustness Testing** [P1 · partial] — Evaluate configs across prevalence levels. Problem: Configs tuned to one prevalence collapse. Outcome: Config contract per prevalence band. Evidence: `scripts/run_lgbm_prevalence_experiment.py`, `scripts/run_ulb_evaluation.py`, `packages/models/classifiers.py`, `tests/unit/test_models.py`, `reports/LGBM_PREVALENCE_EXPERIMENT.md` Reason: Config contract established for the ~0.17% band with validation-only selection; other prevalence bands untested
 - **AFX-F0186 Seed-Variance Reporting** [P2 · missing] — Report metric variance across seeds. Problem: Single-seed results overstate stability. Outcome: Mean and spread across seeds. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0187 Graph-Augmented Model** [P1 · verified] — Combine tabular and graph signals. Problem: Coordination is invisible to tabular models. Outcome: Graph-feature model evaluated. Evidence: `packages/models/classifiers.py`, `reports/ABLATION_STUDY.md`
 - **AFX-F0188 Monotonicity Constraints** [P2 · missing] — Encode domain monotonicity in GBDTs. Problem: Unconstrained models learn nonsense in places. Outcome: Monotone features constrained where justified. Evidence: *(new proposal)* Reason: New proposal
@@ -245,7 +245,7 @@ Status distribution: {"verified": 183, "missing": 573, "partial": 137, "blocked"
 - **AFX-F0204 Metric Confidence Intervals** [P1 · verified] — Bootstrap CIs on headline metrics. Problem: Point estimates overstate precision. Outcome: CIs on champion metrics. Evidence: `packages/evaluation/bootstrap.py`, `benchmarks/runs/benchmark_summary.json`
 - **AFX-F0205 One-Command Benchmark Reproduction** [P1 · verified] — Regenerate all evidence. Problem: Results must be reproducible. Outcome: Single script reproduces headline numbers. Evidence: `scripts/run_benchmarks.py`, `EVIDENCE.md`
 - **AFX-F0206 Validation-Based Champion Selection** [P0 · verified] — Select champion on validation only. Problem: Test-based selection is leakage. Outcome: Selection rule enforced by gate. Evidence: `scripts/run_benchmarks.py`, `tests/release/test_gate_benchmark_protocol.py`
-- **AFX-F0207 LightGBM Prevalence Fix** [P2 · missing] — Tune LGBM for low prevalence. Problem: Default config collapses at 0.17%. Outcome: LGBM competitive across prevalence bands. Evidence: *(new proposal)* Reason: Queued NEXT-08; honest finding recorded
+- **AFX-F0207 LightGBM Prevalence Fix** [P2 · verified] — Tune LGBM for low prevalence. Problem: Default config collapses at 0.17%. Outcome: LGBM competitive across prevalence bands. Evidence: `scripts/run_lgbm_prevalence_experiment.py`, `scripts/run_ulb_evaluation.py`, `packages/models/classifiers.py`, `tests/unit/test_models.py`, `reports/LGBM_PREVALENCE_EXPERIMENT.md`
 - **AFX-F0208 PaySim Model Evaluation** [P1 · blocked] — Evaluate candidates on PaySim. Problem: Second external dataset needed. Outcome: PaySim artifact with same protocol. Evidence: `packages/data/adapters/paysim.py`, `DATA_PROVENANCE.md` Reason: Dataset blocked on Kaggle credentials
 - **AFX-F0209 ULB Model Evaluation** [P1 · verified] — Evaluate candidates on ULB. Problem: Real-data validation required. Outcome: ULB artifact with champion and CIs. Evidence: `scripts/run_ulb_evaluation.py`, `benchmarks/runs/ulb_evaluation.json`
 - **AFX-F0210 Calibration Transfer Analysis** [P2 · missing] — Test calibration across datasets. Problem: Calibration may not transfer. Outcome: Calibration quality compared per dataset. Evidence: *(new proposal)* Reason: New proposal
@@ -788,8 +788,8 @@ Status distribution: {"verified": 183, "missing": 573, "partial": 137, "blocked"
 - **AFX-F0683 Data Classification Tags** [P2 · missing] — Sensitivity labels per field. Problem: Unclassified data is mishandled. Outcome: Classification in schema docs. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0684 Access Audit Logging** [P2 · missing] — Who accessed what data. Problem: Access without audit is unauditable. Outcome: Access log with actor/target. Evidence: *(new proposal)* Reason: No auth actors exist yet; design prerequisite for case data
 - **AFX-F0685 Third-Party Sharing Controls** [P2 · missing] — Govern external data flows. Problem: Sharing without contracts is exposure. Outcome: Declared sharing register. Evidence: *(new proposal)* Reason: No external flows today
-- **AFX-F0686 Documented Threat Model** [P1 · missing] — Assets/threats/controls analysis. Problem: Security without a model is luck. Outcome: Threat model document with STRIDE mapping. Evidence: *(new proposal)* Reason: Required by master prompt; not yet written
-- **AFX-F0687 NIST AI RMF Mapping** [P2 · missing] — Voluntary risk-management alignment. Problem: AI risk management is ad hoc. Outcome: Control-to-behavior mapping documented. Evidence: *(new proposal)* Reason: Voluntary reference; no compliance claim intended
+- **AFX-F0686 Documented Threat Model** [P1 · verified] — Assets/threats/controls analysis. Problem: Security without a model is luck. Outcome: Threat model document with STRIDE mapping. Evidence: `THREAT_MODEL.md`
+- **AFX-F0687 NIST AI RMF Mapping** [P2 · partial] — Voluntary risk-management alignment. Problem: AI risk management is ad hoc. Outcome: Control-to-behavior mapping documented. Evidence: `THREAT_MODEL.md` Reason: Voluntary NIST AI RMF referenced for AI-specific risks in the threat model; no conformance claimed
 - **AFX-F0688 Key Zeroization** [P3 · missing] — Secure key disposal. Problem: Old keys linger in memory/disk. Outcome: Documented disposal procedure. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0689 Memory Hygiene for Sensitive Data** [P3 · missing] — Bound sensitive data lifetime in memory. Problem: Long-lived secrets in RAM are risk. Outcome: Minimized lifetime for secrets. Evidence: *(new proposal)* Reason: New proposal
 - **AFX-F0690 DNS Rebinding Resistance** [P2 · missing] — Resist browser-based intranet attacks. Problem: Local APIs are reachable from browsers. Outcome: Host header validation. Evidence: *(new proposal)* Reason: Local dev server accepts any Host today

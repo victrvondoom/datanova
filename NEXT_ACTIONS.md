@@ -13,7 +13,6 @@ batches, ranked by the catalog's documented scoring.
 | NEXT-01 | PaySim external evaluation — still blocked on Kaggle credentials | P1 | credentials + `datasets/external/paysim.csv` | Same protocol as ULB; artifact + report + dataset card | 2–4 h post-unblock |
 | NEXT-02 | Docker post-fix verification (libgomp1 fix unverified — Docker Desktop outage) | P1 | Docker Desktop healthy | `docker compose up --build` + `/api/health` returns `bundle_validated` | 30 min |
 | NEXT-04 | Frontend containerization (needs `VITE_API_BASE` env-configurable client) | P2 | NEXT-02 | Web container + compose service; E2E green against containerized stack | 4–6 h |
-| NEXT-08 | LightGBM prevalence robustness (collapse at 0.17% prevalence) | P2 | none | Config contract per prevalence band; ULB re-run shows competitive LGBM or documented rejection | 3 h |
-| NEXT-09 | Threat model document (`privacy_threat_model`): STRIDE-style assets/threats/controls/residual risks mapping to implemented behavior | P1 | none | Document with control-to-test traceability; no compliance claims | 3 h |
+| NEXT-08 | ~~LightGBM prevalence robustness~~ **DONE** (TRK-030): cause identified and fixed; remaining: config bands for other prevalence levels | P3 | none | Per-band config matrix | 2 h |
 | NEXT-10 | Feature-registry generation (`feat_semantic_names_registry`, `explain_feature_definitions_ui`): generate per-feature definitions/units from the pipeline | P2 | none | Registry generated from code; UI layer optional follow-up | 3 h |
 | NEXT-07 | Remote repository + branch protection (CI config is prospective) | P3 | User decision on hosting | Required status checks: `release-gates`, `quality`, `frontend` | 1 h + user |

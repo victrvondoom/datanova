@@ -172,3 +172,23 @@ savings **$33,201.56 (86.1%)**, FPR **0.20%**, thresholds tau=(0.2222, 0.2322, 1
   137 partial, 573 missing, 2 blocked, 6 N-A.**
 - Full suite: **95/95 passed**; mypy clean (51 files); ruff clean; frontend
   build clean.
+
+### Implementation batch C (LightGBM prevalence fix + threat model)
+- `python scripts/run_lgbm_prevalence_experiment.py` (VALIDATION-only
+  selection; test never read): status-quo weighting val PR-AUC **0.0345**,
+  capped-30 **0.0636**, unweighted **0.0909**, unweighted-shallow **0.7054**
+  (selected). Root cause of the ULB collapse confirmed: ~600x
+  scale_pos_weight destroys ranking at 0.17% prevalence.
+- Fix applied as an explicit, tested contract
+  (`LightGBMFraudModel(class_weighting="balanced"|"none")`, default unchanged
+  for the synthetic benchmark); ULB evaluation re-run with BOTH configs:
+  default val 0.0223/test 0.0391 vs tuned val 0.7054/test 0.6789 (best
+  Recall@1%FPR of all candidates: 0.8561). Champion unchanged (XGBoost by
+  validation). `tests/unit/test_models.py::test_lightgbm_class_weighting_contract`.
+- `THREAT_MODEL.md`: STRIDE + AI-risk analysis with control-to-test
+  traceability and an honest open-items list (auth, dependency audit,
+  non-root container, request size limits, artifact signing).
+- Catalog re-validated: **901 features — 185 verified / 140 partial /
+  568 missing / 2 blocked / 6 N-A.**
+- Full suite: **96/96 passed**; mypy clean (52 files); ruff clean; frontend
+  build clean. Docker Desktop still unresponsive (NEXT-02 remains blocked).

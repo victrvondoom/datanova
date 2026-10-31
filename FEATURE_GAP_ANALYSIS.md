@@ -5,7 +5,7 @@ Highest-impact missing capabilities, evidence-driven.
 ## P0 integrity/safety gaps: 0
 
 
-## P1 core-intelligence/ops gaps: 55
+## P1 core-intelligence/ops gaps: 52
 
 - **AFX-F0020 Exactly-Once Effect Semantics** (D01): Ensure side effects occur once despite retries
 - **AFX-F0027 Ingress Authentication** (D01): Authenticate ingest callers
@@ -19,8 +19,6 @@ Highest-impact missing capabilities, evidence-driven.
 - **AFX-F0140 Training Window Alignment** (D05): Align feature windows with label timing
 - **AFX-F0169 Replay Idempotency** (D06): Replays must not duplicate effects
 - **AFX-F0177 Decision Audit Emission** (D06): Emit decision events for downstream audit
-- **AFX-F0183 Imbalance-Aware Training** (D07): Class weighting for rare fraud
-- **AFX-F0185 Prevalence Robustness Testing** (D07): Evaluate configs across prevalence levels
 - **AFX-F0201 Model Failure Fallback** (D07): Defined behavior when inference fails
 - **AFX-F0232 Experiment Early Warnings** (D08): Flag suspicious metric jumps
 - **AFX-F0351 Graph State Recovery** (D12): Rebuild graph from events after restart
@@ -51,7 +49,6 @@ Highest-impact missing capabilities, evidence-driven.
 - **AFX-F0663 Log Redaction** (D23): No sensitive data in logs
 - **AFX-F0675 Dependency Vulnerability Auditing** (D23): Scan dependencies for CVEs
 - **AFX-F0681 API Abuse Prevention** (D23): Throttle abuse
-- **AFX-F0686 Documented Threat Model** (D23): Assets/threats/controls analysis
 - **AFX-F0698 Change Management for Policies** (D24): Controlled policy change process
 - **AFX-F0703 Override Governance** (D24): Overrides are tracked and reviewed
 - **AFX-F0730 Dependency Capture in Artifacts** (D25): Record training environment

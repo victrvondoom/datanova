@@ -149,7 +149,16 @@ def main():
     models = {
         "Logistic Regression": LogisticRegressionFraudModel(),
         "Random Forest": RandomForestFraudModel(n_estimators=100),
-        "LightGBM (Tabular)": LightGBMFraudModel(n_estimators=200),
+        "LightGBM (repo default)": LightGBMFraudModel(n_estimators=200),
+        # Validation-selected for ~0.17% prevalence (see
+        # reports/LGBM_PREVALENCE_EXPERIMENT.md; selection on VALIDATION only)
+        "LightGBM (prevalence-tuned)": LightGBMFraudModel(
+            n_estimators=300,
+            learning_rate=0.03,
+            max_depth=4,
+            min_child_samples=100,
+            class_weighting="none",
+        ),
         "XGBoost": XGBoostFraudModel(n_estimators=200),
     }
 

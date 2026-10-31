@@ -48,3 +48,33 @@ def test_probability_calibrator():
     assert np.all(calibrated <= 1.0)
     # Monotonicity check for isotonic
     assert np.all(np.diff(calibrated) >= -1e-6)
+
+def test_lightgbm_class_weighting_contract():
+    """class_weighting selects the imbalance strategy; invalid values rejected."""
+    import numpy as np
+    import pytest as _pytest
+
+    from packages.models.classifiers import LightGBMFraudModel
+
+    # Invalid strategy is rejected up front
+    try:
+        LightGBMFraudModel(class_weighting="bogus")
+        raise AssertionError("Expected ValueError for invalid class_weighting")
+    except ValueError:
+        pass
+
+    # 'none' must train with scale_pos_weight = 1.0 (prevalence-tuned band)
+    rng = np.random.default_rng(7)
+    X = rng.uniform(0, 1, (400, 3))
+    y = (X[:, 0] > 0.9).astype(int)  # 10% positive
+    model = LightGBMFraudModel(n_estimators=10, class_weighting="none")
+    model.fit(X, y, feature_names=["a", "b", "c"])
+    assert model.clf is not None
+    assert model.clf.scale_pos_weight == 1.0
+
+    # 'balanced' (default, historical behavior) weights by class ratio
+    model_b = LightGBMFraudModel(n_estimators=10)
+    model_b.fit(X, y, feature_names=["a", "b", "c"])
+    pos = max(1, int((y == 1).sum()))
+    neg = max(1, int((y == 0).sum()))
+    assert model_b.clf.scale_pos_weight == _pytest.approx(neg / pos)

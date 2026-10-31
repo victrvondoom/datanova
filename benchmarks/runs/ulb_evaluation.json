@@ -1,6 +1,6 @@
 {
   "evaluation": "ULB_CREDIT_CARD_EXTERNAL",
-  "generated": "2026-10-31T06:50:44.925118",
+  "generated": "2026-10-31T08:36:01.818117",
   "provenance": {
     "dataset": "ULB Credit Card Fraud Detection (Dal Pozzolo et al., ULB/Worldline)",
     "source": "OpenML dataset 1597 (creditcard), ARFF mirror of the Kaggle release",
@@ -49,13 +49,21 @@
       "test_brier": 0.000399,
       "test_ece": 0.000148
     },
-    "LightGBM (Tabular)": {
+    "LightGBM (repo default)": {
       "validation_pr_auc": 0.02226,
       "test_pr_auc": 0.03908,
       "test_roc_auc": 0.8628,
       "test_recall_at_fpr_1pct": 0.42121,
       "test_brier": 0.001261,
       "test_ece": 0.000421
+    },
+    "LightGBM (prevalence-tuned)": {
+      "validation_pr_auc": 0.70542,
+      "test_pr_auc": 0.67893,
+      "test_roc_auc": 0.97147,
+      "test_recall_at_fpr_1pct": 0.85606,
+      "test_brier": 0.000529,
+      "test_ece": 0.000296
     },
     "XGBoost": {
       "validation_pr_auc": 0.76957,

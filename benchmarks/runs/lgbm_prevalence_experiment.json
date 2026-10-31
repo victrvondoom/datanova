@@ -1,0 +1,54 @@
+{
+  "generated": "2026-10-31T08:35:08.979744",
+  "protocol": "train -> validation selection only; test never read",
+  "train_prevalence": 0.002009,
+  "results": {
+    "default_full_weight (status quo)": {
+      "params": {
+        "scale_pos_weight": 496.7631578947368,
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 6
+      },
+      "validation_pr_auc": 0.03446,
+      "validation_roc_auc": 0.8963,
+      "validation_recall_at_fpr_1pct": 0.44835
+    },
+    "capped_weight_30": {
+      "params": {
+        "scale_pos_weight": 30.0,
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 6
+      },
+      "validation_pr_auc": 0.06359,
+      "validation_roc_auc": 0.83102,
+      "validation_recall_at_fpr_1pct": 0.66789
+    },
+    "no_weighting": {
+      "params": {
+        "scale_pos_weight": 1.0,
+        "n_estimators": 200,
+        "learning_rate": 0.05,
+        "max_depth": 6
+      },
+      "validation_pr_auc": 0.09092,
+      "validation_roc_auc": 0.7732,
+      "validation_recall_at_fpr_1pct": 0.52899
+    },
+    "no_weighting_shallow": {
+      "params": {
+        "scale_pos_weight": 1.0,
+        "n_estimators": 300,
+        "learning_rate": 0.03,
+        "max_depth": 4,
+        "min_child_samples": 100
+      },
+      "validation_pr_auc": 0.70542,
+      "validation_roc_auc": 0.97956,
+      "validation_recall_at_fpr_1pct": 0.81029
+    }
+  },
+  "selected_configuration": "no_weighting_shallow",
+  "conclusion": "The status-quo full weighting (neg/pos ~= 600 at 0.17% prevalence) is the suspected cause of the ULB collapse; the selected config should replace it in the ULB evaluation (selection: validation only)."
+}

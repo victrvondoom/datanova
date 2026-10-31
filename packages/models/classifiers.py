@@ -65,11 +65,26 @@ class RandomForestFraudModel(BaseFraudClassifier):
 
 
 class LightGBMFraudModel(BaseFraudClassifier):
-    def __init__(self, n_estimators: int = 150, learning_rate: float = 0.05, max_depth: int = 6):
-        super().__init__(model_id="lightgbm_fraud_detector", version="1.2.0")
+    def __init__(
+        self,
+        n_estimators: int = 150,
+        learning_rate: float = 0.05,
+        max_depth: int = 6,
+        min_child_samples: int = 20,
+        class_weighting: str = "balanced",
+    ):
+        """class_weighting: 'balanced' (scale_pos_weight = neg/pos; the
+        historical default, which COLLAPSES on very low prevalence — see
+        reports/LGBM_PREVALENCE_EXPERIMENT.md) or 'none' (weight 1.0;
+        validation-selected for <0.5% prevalence bands)."""
+        super().__init__(model_id="lightgbm_fraud_detector", version="1.3.0")
+        if class_weighting not in ("balanced", "none"):
+            raise ValueError("class_weighting must be 'balanced' or 'none'")
         self.n_estimators = n_estimators
         self.learning_rate = learning_rate
         self.max_depth = max_depth
+        self.min_child_samples = min_child_samples
+        self.class_weighting = class_weighting
         self.clf: Optional[lgb.LGBMClassifier] = None
 
     def fit(
@@ -78,12 +93,13 @@ class LightGBMFraudModel(BaseFraudClassifier):
         self.feature_names = feature_names or []
         pos_count = max(1, int(np.sum(y == 1)))
         neg_count = max(1, int(np.sum(y == 0)))
-        scale_pos_weight = neg_count / pos_count
+        scale_pos_weight = (neg_count / pos_count) if self.class_weighting == "balanced" else 1.0
 
         self.clf = lgb.LGBMClassifier(
             n_estimators=self.n_estimators,
             learning_rate=self.learning_rate,
             max_depth=self.max_depth,
+            min_child_samples=self.min_child_samples,
             scale_pos_weight=scale_pos_weight,
             random_state=42,
             verbose=-1,

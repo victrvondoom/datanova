@@ -1,6 +1,6 @@
 # AEGIS-Fraud X — ULB Credit Card External Evaluation
 
-**Generated:** 2026-10-31 06:50:45 UTC
+**Generated:** 2026-10-31 08:36:02 UTC
 **Dataset:** ULB Credit Card Fraud Detection (284,807 rows; 492 fraud, 0.173%)
 **Source:** OpenML dataset 1597 (public mirror of the original release)
 **Source ARFF SHA-256:** `fdaf12730dc1fc426f318b71349f24f5c5fd00aa1152940be7e7509ae3d89d2a`
@@ -25,7 +25,8 @@ ULB amounts are EUR. The cost analysis treats amounts as USD-equivalent; all dol
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Logistic Regression | 0.7537 | 0.7618 | 0.9804 | 0.8644 | 0.0005 | 0.0002 |
 | Random Forest | 0.7665 | 0.7725 | 0.9593 | 0.8406 | 0.0004 | 0.0001 |
-| LightGBM (Tabular) | 0.0223 | 0.0391 | 0.8628 | 0.4212 | 0.0013 | 0.0004 |
+| LightGBM (repo default) | 0.0223 | 0.0391 | 0.8628 | 0.4212 | 0.0013 | 0.0004 |
+| LightGBM (prevalence-tuned) | 0.7054 | 0.6789 | 0.9715 | 0.8561 | 0.0005 | 0.0003 |
 | XGBoost | 0.7696 | 0.7408 | 0.9693 | 0.8295 | 0.0005 | 0.0002 |
 
 **Champion (validation-selected):** `XGBoost`

@@ -10,7 +10,7 @@
 | D04 | Feature Engineering | Derive defensible predictive signals | 30 | 11 | 19 |
 | D05 | Feature Store and Feature Contracts | Reuse consistent training and serving features | 30 | 10 | 20 |
 | D06 | Real-Time Event and Stream Processing | Process transaction events reliably | 30 | 9 | 21 |
-| D07 | Fraud Model Architecture | Improve predictive modeling | 30 | 14 | 16 |
+| D07 | Fraud Model Architecture | Improve predictive modeling | 30 | 17 | 13 |
 | D08 | Training and Experiment Management | Reproducible training and comparison | 30 | 12 | 17 |
 | D09 | Calibration and Probability Integrity | Ensure probability semantics are valid | 30 | 19 | 11 |
 | D10 | Decision Policy and Optimization | Select feasible actions under documented costs | 30 | 21 | 9 |
@@ -26,7 +26,7 @@
 | D20 | API, SDK, and Developer Interfaces | Provide reliable integration surfaces | 30 | 17 | 13 |
 | D21 | External Integrations | Connect authorized data and operational systems | 30 | 2 | 27 |
 | D22 | Identity and Access Control | Restrict access appropriately | 30 | 1 | 28 |
-| D23 | Privacy and Security | Protect sensitive data and system integrity | 30 | 9 | 21 |
+| D23 | Privacy and Security | Protect sensitive data and system integrity | 30 | 11 | 19 |
 | D24 | Governance and Audit | Maintain decision and model accountability | 30 | 6 | 23 |
 | D25 | Model Registry and Deployment | Version, validate, and promote models | 30 | 10 | 20 |
 | D26 | Monitoring and Drift Detection | Detect operational and statistical changes | 30 | 4 | 26 |

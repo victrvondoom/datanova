@@ -30,12 +30,12 @@ lower domain, then catalog order (deterministic).
 | 14 | AFX-F0525 | Decision Replay | D18 | P2 | missing | 2.67 |
 | 15 | AFX-F0665 | Retention Enforcement | D23 | P2 | missing | 2.67 |
 | 16 | AFX-F0032 | Source Registry | D02 | P1 | partial | 2.40 |
-| 17 | AFX-F0120 | Feature Computation Budget | D04 | P2 | partial | 2.33 |
-| 18 | AFX-F0268 | Calibration Visibility in UI | D09 | P2 | partial | 2.33 |
-| 19 | AFX-F0039 | Right-to-Erasure Workflow | D02 | P3 | missing | 2.18 |
-| 20 | AFX-F0081 | Label-Derived Feature Scan | D03 | P1 | missing | 2.06 |
-| 21 | AFX-F0122 | Train/Serve Parity Tests | D05 | P1 | missing | 2.06 |
-| 22 | AFX-F0185 | Prevalence Robustness Testing | D07 | P1 | missing | 2.06 |
+| 17 | AFX-F0185 | Prevalence Robustness Testing | D07 | P1 | partial | 2.40 |
+| 18 | AFX-F0120 | Feature Computation Budget | D04 | P2 | partial | 2.33 |
+| 19 | AFX-F0268 | Calibration Visibility in UI | D09 | P2 | partial | 2.33 |
+| 20 | AFX-F0039 | Right-to-Erasure Workflow | D02 | P3 | missing | 2.18 |
+| 21 | AFX-F0081 | Label-Derived Feature Scan | D03 | P1 | missing | 2.06 |
+| 22 | AFX-F0122 | Train/Serve Parity Tests | D05 | P1 | missing | 2.06 |
 | 23 | AFX-F0351 | Graph State Recovery | D12 | P1 | missing | 2.06 |
 | 24 | AFX-F0483 | Case Queue Management | D17 | P1 | missing | 2.06 |
 | 25 | AFX-F0549 | Override Workflow | D19 | P1 | missing | 2.06 |

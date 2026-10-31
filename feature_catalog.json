@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-31T08:32:43.769957",
+  "generated": "2026-10-31T08:37:21.175910",
   "total_features": 901,
   "features": [
     {
@@ -6628,9 +6628,15 @@
       "primary_user": "ML engineer",
       "expected_outcome": "Weighted training with documented rationale",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "LightGBM collapse at 0.17% prevalence documented as finding",
+      "repository_evidence": [
+        "scripts/run_lgbm_prevalence_experiment.py",
+        "scripts/run_ulb_evaluation.py",
+        "packages/models/classifiers.py",
+        "tests/unit/test_models.py",
+        "reports/LGBM_PREVALENCE_EXPERIMENT.md"
+      ],
+      "implementation_status": "partial",
+      "status_reason": "Imbalance strategy now an explicit, tested contract (balanced/none); band-appropriate selection demonstrated for ULB",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -6698,9 +6704,15 @@
       "primary_user": "ML engineer",
       "expected_outcome": "Config contract per prevalence band",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "Queued as NEXT-08 after ULB finding",
+      "repository_evidence": [
+        "scripts/run_lgbm_prevalence_experiment.py",
+        "scripts/run_ulb_evaluation.py",
+        "packages/models/classifiers.py",
+        "tests/unit/test_models.py",
+        "reports/LGBM_PREVALENCE_EXPERIMENT.md"
+      ],
+      "implementation_status": "partial",
+      "status_reason": "Config contract established for the ~0.17% band with validation-only selection; other prevalence bands untested",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -7502,9 +7514,15 @@
       "dependencies": [
         "model_prevalence_robustness"
       ],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "Queued NEXT-08; honest finding recorded",
+      "repository_evidence": [
+        "scripts/run_lgbm_prevalence_experiment.py",
+        "scripts/run_ulb_evaluation.py",
+        "packages/models/classifiers.py",
+        "tests/unit/test_models.py",
+        "reports/LGBM_PREVALENCE_EXPERIMENT.md"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "Cause found (extreme class weighting) via validation-only experiment; tuned config: val 0.7054/test 0.6789 with contract test; evaluated in ULB artifact",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -24738,9 +24756,11 @@
       "primary_user": "Security engineer",
       "expected_outcome": "Threat model document with STRIDE mapping",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "Required by master prompt; not yet written",
+      "repository_evidence": [
+        "THREAT_MODEL.md"
+      ],
+      "implementation_status": "verified",
+      "status_reason": "STRIDE + AI-risk analysis with control-to-test traceability, honest open-items list, no compliance claims",
       "priority": "P1",
       "risk": "medium",
       "estimated_effort": "medium",
@@ -24773,9 +24793,11 @@
       "primary_user": "Security engineer",
       "expected_outcome": "Control-to-behavior mapping documented",
       "dependencies": [],
-      "repository_evidence": [],
-      "implementation_status": "missing",
-      "status_reason": "Voluntary reference; no compliance claim intended",
+      "repository_evidence": [
+        "THREAT_MODEL.md"
+      ],
+      "implementation_status": "partial",
+      "status_reason": "Voluntary NIST AI RMF referenced for AI-specific risks in the threat model; no conformance claimed",
       "priority": "P2",
       "risk": "medium",
       "estimated_effort": "medium",

@@ -64,14 +64,22 @@ rows after exact-duplicate removal, 0.167% fraud; OpenML 1597, SHA-256 in
 | Logistic Regression | 0.7537 | 0.7618 | 0.8644 |
 | Random Forest | 0.7665 | 0.7725 | 0.8406 |
 | LightGBM (repo default config) | 0.0223 | 0.0391 | 0.4212 |
+| LightGBM (prevalence-tuned*) | 0.7054 | 0.6789 | **0.8561** |
 | **XGBoost (champion by validation)** | **0.7696** | 0.7408 | 0.8295 |
+
+*The prevalence-tuned LightGBM configuration (unweighted, shallow) was selected
+on VALIDATION only after a prevalence-robustness experiment
+(`reports/LGBM_PREVALENCE_EXPERIMENT.md`) showed the repo default's ~600x
+class weighting collapses ranking at 0.17% prevalence (val PR-AUC 0.0345 -> 0.7054).
 
 - Champion 95% CI (test PR-AUC): [0.648, 0.824].
 - Exact policy (validation-fitted, frozen): simulated test savings **63.2%**
   at 0.20% FPR (amounts treated as USD-equivalent — documented assumption).
-- **Honest finding:** the repository's default LightGBM configuration collapses
-  at 0.17% prevalence; reported, not hidden. PaySim evaluation is blocked on
-  dataset credentials (see `DATA_PROVENANCE.md`).
+- **Honest finding (resolved):** the repository's default LightGBM
+  configuration collapsed at 0.17% prevalence (val 0.0223); the cause (extreme
+  class weighting) was identified by a validation-only experiment and the
+  tuned configuration is now evaluated alongside it. PaySim evaluation remains
+  blocked on dataset credentials (see `DATA_PROVENANCE.md`).
 - Full artifact: `benchmarks/runs/ulb_evaluation.json` · report:
   `reports/ULB_EVALUATION.md` · card: `DATASET_CARDS.md`.
 
