@@ -54,5 +54,7 @@ class PaySimAdapter:
         df["category"] = df["type"].str.lower()
         df["dataset_designation"] = DatasetDesignation.PAYSIM.value
 
-        df = df.sort_values("timestamp").reset_index(drop=True)
+        # Stable sort: rows sharing a step (hour) keep their original relative
+        # order so downstream consumers cannot be desynchronized.
+        df = df.sort_values("timestamp", kind="stable").reset_index(drop=True)
         return df

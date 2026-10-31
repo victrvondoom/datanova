@@ -1,5 +1,5 @@
 {
-  "dataset_name": "Synthetic_Bench_10k",
+  "dataset_name": "Synthetic_Bench_10000",
   "source_url_or_origin": "SyntheticTransactionGenerator(seed=42)",
   "record_count": 10000,
   "fraud_count": 199,

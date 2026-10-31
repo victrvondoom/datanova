@@ -33,21 +33,36 @@ class ULBCreditCardAdapter:
         sample_limit: Optional[int] = None,
     ) -> pd.DataFrame:
         """
-        Loads the ULB CSV, standardizes column names, computes realistic timestamps from 'Time' delta,
-        and returns clean DataFrame.
+        Loads the ULB CSV and standardizes it via `standardize_frame`.
         """
         if not self.is_available():
             raise FileNotFoundError(
                 f"ULB dataset not found at '{self.data_path}'. "
                 "Download creditcard.csv and place it in datasets/external/ to run real-world ULB benchmarks."
             )
-
         df = pd.read_csv(self.data_path, nrows=sample_limit)
+        return self.standardize_frame(df, base_timestamp=base_timestamp)
+
+    def standardize_frame(
+        self,
+        df: pd.DataFrame,
+        base_timestamp: datetime = datetime(2026, 1, 1, 0, 0, 0),
+    ) -> pd.DataFrame:
+        """
+        Standardizes an in-memory ULB frame (columns Time, Amount, Class, V1..V28).
+
+        The sort is STABLE: ULB rows arrive chronologically and many share the
+        same 'Time' second; an unstable sort would shuffle rows within a second
+        and silently misalign any caller-supplied data with the sorted output.
+        """
+        df = df.reset_index(drop=True)
 
         # Check required columns
         required = {"Time", "Amount", "Class"}
         if not required.issubset(df.columns):
             raise ValueError(f"ULB dataset missing mandatory columns: {required - set(df.columns)}")
+
+        df = df.copy()
 
         # Convert Time (elapsed seconds) to chronological timestamp
         df["timestamp"] = [base_timestamp + timedelta(seconds=float(s)) for s in df["Time"]]
@@ -57,12 +72,19 @@ class ULBCreditCardAdapter:
         # Create stable synthetic transaction IDs
         df["transaction_id"] = [f"ulb_tx_{i:07d}" for i in range(len(df))]
 
-        # Sender/receiver: ULB is card-level anonymized without merchant identifiers
-        df["sender_id"] = [f"ulb_card_{i % 5000:05d}" for i in range(len(df))]
-        df["receiver_id"] = "anonymized_merchant"
+        # Sender/receiver: ULB is card-level anonymized PCA data with NO
+        # account, customer, or merchant identifiers. We must NOT fabricate
+        # recurring entity identities (fake "accounts" would create bogus
+        # graph relationships). Each row gets a unique pseudo-ID and a fixed
+        # anonymized counterparty; downstream graph features are therefore
+        # meaningless for ULB and must not be computed on this dataset.
+        df["sender_id"] = [f"ulb_anon_{i:07d}" for i in range(len(df))]
+        df["receiver_id"] = "ulb_anonymized_counterparty"
         df["channel"] = "pos"
         df["dataset_designation"] = DatasetDesignation.ULB_CREDIT_CARD.value
 
-        # Ensure chronological ordering
-        df = df.sort_values("timestamp").reset_index(drop=True)
+        # Ensure chronological ordering with a STABLE sort (ties keep their
+        # original relative order; an unstable sort would reshuffle rows that
+        # share the same second and desynchronize downstream consumers).
+        df = df.sort_values("timestamp", kind="stable").reset_index(drop=True)
         return df

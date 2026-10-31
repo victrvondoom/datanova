@@ -10,16 +10,24 @@ import numpy as np
 
 from packages.data.schemas import CostConfiguration, DecisionPolicy
 from packages.optimization.cost_engine import CostEngine
+from packages.optimization.exact_optimizer import ExactPolicyOptimizer, InfeasiblePolicyError
 
 
 class PolicyOptimizer:
     """
-    Finds Pareto-optimal decision thresholds balancing fraud loss, investigation labor, and customer churn.
+    Authoritative policy optimizer: delegates to ExactPolicyOptimizer, which
+    enumerates the complete space of realizable threshold policies
+    (distinct-value cuts) and returns the provably optimal feasible policy.
+
+    The legacy coarse percentile grid is retained as
+    `optimize_policy_coarse_grid` for optimization-regret diagnostics ONLY;
+    it is not used for deployed policy selection.
     """
 
     def __init__(self, cost_config: Optional[CostConfiguration] = None):
         self.cost_config = cost_config or CostConfiguration()
         self.cost_engine = CostEngine(self.cost_config)
+        self.exact = ExactPolicyOptimizer(self.cost_config)
 
     def optimize_policy(
         self,
@@ -29,8 +37,23 @@ class PolicyOptimizer:
         grid_resolution: int = 20,
     ) -> Tuple[DecisionPolicy, Dict[str, float]]:
         """
-        Grid search optimization finding best (tau_allow, tau_review, tau_block)
-        under constraints: FPR <= max_fpr and Review Volume <= daily_capacity.
+        Exact constrained optimization over all realizable threshold policies.
+        Raises InfeasiblePolicyError when no realizable policy satisfies the
+        hard FPR / review-capacity constraints (never returns an infeasible
+        policy as success).
+        """
+        return self.exact.solve(calibrated_probs, amounts, labels)
+
+    def optimize_policy_coarse_grid(
+        self,
+        calibrated_probs: np.ndarray,
+        amounts: np.ndarray,
+        labels: np.ndarray,
+    ) -> Tuple[DecisionPolicy, Dict[str, float]]:
+        """
+        LEGACY coarse percentile-grid search (diagnostic use only: measuring
+        optimization regret against the exact solver). Its fallback performs NO
+        constraint check and may return policies that violate constraints.
         """
         n = len(calibrated_probs)
         # Normalized daily capacity limit as maximum review rate

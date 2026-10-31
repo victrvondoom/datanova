@@ -1,0 +1,9 @@
+{
+  "path": "experiments\\champion_bundle.pkl",
+  "run_id": "bench_20261031T065255_42_10000",
+  "model_id": "xgboost_fraud_detector",
+  "model_version": "1.1.0",
+  "feature_count": 33,
+  "checksum": "a706a7c4f6f52d6396efc01178a5f8d971034d39244a575d47916e8afe5c7556",
+  "benchmark_artifact_sha256": "5d8f8b328eba9edb9f534f6868fd2c3839cd010204df5e7e5014405d5a7a0123"
+}

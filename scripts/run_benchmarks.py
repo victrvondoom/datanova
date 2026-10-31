@@ -45,19 +45,46 @@ def select_champion_by_validation(validation_pr_aucs: dict) -> str:
     return str(max(validation_pr_aucs, key=lambda name: validation_pr_aucs[name]))
 
 
-def run_benchmark_suite():
+def run_benchmark_suite(
+    n_transactions: int = 10000,
+    n_estimators: int = 120,
+    fraud_ratio: float = 0.02,
+    seed: int = 42,
+    test_label_flip_fraction: float = 0.0,
+    artifact_dir: str = "benchmarks/runs",
+    experiments_dir: str = "experiments",
+    reports_dir: str = "reports",
+    manifests_dir: str = "datasets/manifests",
+    write_reports: bool = True,
+    save_champion: bool = True,
+):
+    """Executes the zero-leakage benchmark protocol end to end.
+
+    Parameters beyond the defaults exist so that release-gate tests can run the
+    REAL production path quickly and in isolation (temporary directories):
+    - ``test_label_flip_fraction`` is a leakage self-verification hook: after
+      the chronological split, it flips that fraction of TEST labels
+      deterministically (seed 1234). Because the protocol never lets test data
+      influence selection, calibration, or policy fitting, the champion and
+      frozen policy MUST be invariant to this mutation. The benchmark protocol
+      release gate asserts exactly that.
+    """
     print("=" * 70)
     print("AEGIS-Fraud X — Executing Scientific Benchmark Protocol")
     print("=" * 70)
 
-    os.makedirs("benchmarks/runs", exist_ok=True)
-    os.makedirs("experiments", exist_ok=True)
-    os.makedirs("reports", exist_ok=True)
+    os.makedirs(artifact_dir, exist_ok=True)
+    os.makedirs(experiments_dir, exist_ok=True)
+    os.makedirs(reports_dir, exist_ok=True)
+    os.makedirs(manifests_dir, exist_ok=True)
 
     # 1. Generate Deterministic Synthetic Transactions
-    print("\n[Step 1/6] Generating Seeded Transaction Population (10,000 tx, seed=42)...")
-    generator = SyntheticTransactionGenerator(seed=42)
-    df = generator.generate_stream(n_transactions=10000, fraud_ratio=0.02)
+    print(
+        f"\n[Step 1/6] Generating Seeded Transaction Population "
+        f"({n_transactions:,} tx, seed={seed})..."
+    )
+    generator = SyntheticTransactionGenerator(seed=seed)
+    df = generator.generate_stream(n_transactions=n_transactions, fraud_ratio=fraud_ratio)
     print(
         f"Total Transactions: {len(df):,} | Fraud Count: {df['is_fraud'].sum():,} ({df['is_fraud'].mean() * 100:.2f}%)"
     )
@@ -68,14 +95,15 @@ def run_benchmark_suite():
     train_df, val_df, test_df = splitter.split(df)
     manifest = splitter.create_manifest(
         df,
-        "Synthetic_Bench_10k",
-        "SyntheticTransactionGenerator(seed=42)",
+        f"Synthetic_Bench_{n_transactions}",
+        f"SyntheticTransactionGenerator(seed={seed})",
         train_df,
         val_df,
         test_df,
     )
 
-    with open("datasets/manifests/synthetic_10k_manifest.json", "w") as f:
+    manifest_path = os.path.join(manifests_dir, "synthetic_10k_manifest.json")
+    with open(manifest_path, "w") as f:
         json.dump(manifest.model_dump(), f, indent=2, default=str)
     print(f"Train: {len(train_df):,} tx | Val: {len(val_df):,} tx | Test: {len(test_df):,} tx")
 
@@ -92,6 +120,21 @@ def run_benchmark_suite():
 
     amt_val = val_df["amount"].values
     amt_test = test_df["amount"].values
+
+    # Leakage self-verification hook: deterministically mutate TEST labels in an
+    # ADVERSARIAL direction (flip the highest-amount test transactions, which
+    # maximally shifts the realized cost structure of the test split).
+    # Selection, calibration, and policy fitting never read test data, so the
+    # champion and frozen policy must be invariant to this mutation.
+    if test_label_flip_fraction > 0.0:
+        y_test = y_test.copy()
+        amt_order = np.argsort(-amt_test, kind="stable")
+        flip_idx = amt_order[: int(len(y_test) * test_label_flip_fraction)]
+        y_test[flip_idx] = 1 - y_test[flip_idx]
+        print(
+            f"[LEAKAGE SELF-TEST] Flipped {len(flip_idx)} highest-amount test labels "
+            f"({test_label_flip_fraction:.0%}). Champion and policy must be unchanged."
+        )
 
     print(f"Features Engineered: {len(pipe.feature_names)} features")
 
@@ -119,9 +162,9 @@ def run_benchmark_suite():
         "Rule-Based Heuristic": RuleBasedFraudClassifier(),
         "Logistic Regression": LogisticRegressionFraudModel(),
         "Random Forest": RandomForestFraudModel(n_estimators=100),
-        "LightGBM (Tabular)": LightGBMFraudModel(n_estimators=120),
-        "XGBoost": XGBoostFraudModel(n_estimators=120),
-        "AEGIS LightGBM + Graph": LightGBMFraudModel(n_estimators=120),
+        "LightGBM (Tabular)": LightGBMFraudModel(n_estimators=n_estimators),
+        "XGBoost": XGBoostFraudModel(n_estimators=n_estimators),
+        "AEGIS LightGBM + Graph": LightGBMFraudModel(n_estimators=n_estimators),
     }
 
     benchmark_results = {}
@@ -171,7 +214,7 @@ def run_benchmark_suite():
         metrics["validation_pr_auc"] = val_metrics["pr_auc"]
 
         benchmark_results[name] = metrics
-        trained_artifacts[name] = (model, calibrator)
+        trained_artifacts[name] = (model, calibrator, graph_feat_names if "Graph" in name else pipe.feature_names)
         validation_pr_aucs[name] = val_metrics["pr_auc"]
 
         print(
@@ -180,7 +223,7 @@ def run_benchmark_suite():
 
     # Champion selection: VALIDATION PR-AUC only (zero test leakage)
     champion_name = select_champion_by_validation(validation_pr_aucs)
-    champion_model, champion_calibrator = trained_artifacts[champion_name]
+    champion_model, champion_calibrator, champion_feature_names = trained_artifacts[champion_name]
 
     # 6. Policy Optimization: fit on VALIDATION, evaluate frozen policy on TEST
     print(f"\n[Step 6/6] Fitting Policy on VALIDATION for Champion ({champion_name}); Evaluating Frozen Policy on TEST...")
@@ -211,6 +254,67 @@ def run_benchmark_suite():
     frozen_test_metrics = cost_engine.evaluate_policy_batch(
         champ_test_probs, amt_test, y_test, frozen_policy
     )
+
+    # Optimization-regret diagnostic: the legacy coarse percentile grid fitted
+    # on the SAME validation data, compared against the exact optimum. Both
+    # policies are then evaluated out-of-sample on test. This is a solver
+    # comparison only — the deployed policy is the exact one.
+    import time as _time
+
+    t_exact = _time.perf_counter()
+    _exact_policy_ref, _exact_fit_ref = optimizer.optimize_policy(
+        champ_val_probs, amt_val, y_val
+    )
+    exact_solve_ms = (_time.perf_counter() - t_exact) * 1000.0
+
+    t_coarse = _time.perf_counter()
+    coarse_policy, coarse_val_metrics = optimizer.optimize_policy_coarse_grid(
+        champ_val_probs, amt_val, y_val
+    )
+    coarse_solve_ms = (_time.perf_counter() - t_coarse) * 1000.0
+
+    coarse_val_cost = float(
+        cost_engine.evaluate_policy_batch(
+            champ_val_probs, amt_val, y_val, coarse_policy
+        )["total_cost"]
+    )
+    exact_val_cost = float(policy_fit_metrics["total_cost"])
+    coarse_test_metrics = cost_engine.evaluate_policy_batch(
+        champ_test_probs, amt_test, y_test, coarse_policy
+    )
+
+    optimization_regret = {
+        "fit_split": "validation",
+        "exact_solver": {
+            "policy": frozen_policy.model_dump(),
+            "validation_cost": exact_val_cost,
+            "solve_time_ms": round(exact_solve_ms, 3),
+            "status": policy_fit_metrics.get("optimization_status", "OPTIMAL"),
+        },
+        "coarse_grid_solver": {
+            "policy": coarse_policy.model_dump(),
+            "validation_cost": coarse_val_cost,
+            "validation_fpr": coarse_val_metrics.get("false_positive_rate"),
+            "validation_review_rate": coarse_val_metrics.get("review_rate"),
+            "solve_time_ms": round(coarse_solve_ms, 3),
+            "note": (
+                "Legacy percentile grid; its fallback performs no constraint "
+                "check and may violate the FPR or capacity constraints."
+            ),
+        },
+        "optimization_gap_validation_usd": round(coarse_val_cost - exact_val_cost, 2),
+        "optimization_gap_relative": (
+            round((coarse_val_cost - exact_val_cost) / max(1.0, exact_val_cost), 6)
+            if coarse_val_cost > exact_val_cost
+            else 0.0
+        ),
+        "out_of_sample_test": {
+            "exact_policy_cost": frozen_test_metrics["total_cost"],
+            "coarse_policy_cost": coarse_test_metrics["total_cost"],
+            "exact_policy_fpr": frozen_test_metrics["false_positive_rate"],
+            "coarse_policy_fpr": coarse_test_metrics["false_positive_rate"],
+        },
+    }
 
     # Fixed heuristic baselines are parameter-free, so test evaluation is unbiased
     fixed_policy = DecisionPolicy(
@@ -259,24 +363,72 @@ def run_benchmark_suite():
         "champion_model_name": champion_name,
         "champion_confidence_intervals_95": ci_results,
         "policy_comparisons": policy_comparisons,
+        "optimization_regret": optimization_regret,
+        # Frozen champion validation scores (inputs of policy fitting) so that
+        # sensitivity analyses can reproduce the exact solver's inputs without
+        # retraining. Rounded to 6 decimals for artifact size; the exact solver
+        # is re-fit on these rounded values in downstream scripts.
+        "champion_validation_scores": {
+            "probs": [round(float(v), 6) for v in champ_val_probs],
+            "amounts": [round(float(v), 2) for v in amt_val],
+            "labels": [int(v) for v in y_val],
+        },
     }
 
-    with open("benchmarks/runs/benchmark_summary.json", "w") as f:
+    artifact_path = os.path.join(artifact_dir, "benchmark_summary.json")
+    with open(artifact_path, "w") as f:
         json.dump(full_artifact, f, indent=2, default=str)
 
     # Save champion model and calibrator so the serving API loads the real artifacts
-    champion_model.save("experiments/champion_model.pkl")
-    champion_calibrator.save("experiments/champion_calibrator.pkl")
+    if save_champion:
+        champion_model.save(os.path.join(experiments_dir, "champion_model.pkl"))
+        champion_calibrator.save(os.path.join(experiments_dir, "champion_calibrator.pkl"))
+
+        # Versioned, checksum-verified bundle: the training-to-serving contract.
+        from packages.artifacts.bundle import save_bundle, save_bundle_manifest
+
+        bundle_path = os.path.join(experiments_dir, "champion_bundle.pkl")
+        bundle_manifest = save_bundle(
+            bundle_path,
+            model=champion_model,
+            calibrator=champion_calibrator,
+            feature_names=champion_feature_names,
+            policy=frozen_policy,
+            run_id=(
+                f"bench_{datetime.utcnow().strftime('%Y%m%dT%H%M%S')}_{seed}_{n_transactions}"
+            ),
+            benchmark_artifact_path=os.path.join(artifact_dir, "benchmark_summary.json"),
+            extra_metadata={
+                "dataset": manifest.dataset_name,
+                "split_strategy": manifest.split_strategy,
+                "champion_name": champion_name,
+                "champion_validation_pr_auc": validation_pr_aucs[champion_name],
+                "policy_solver": "exact-distinct-value-sweep",
+                "seed": seed,
+            },
+        )
+        save_bundle_manifest(experiments_dir, bundle_manifest)
 
     # Write Markdown Benchmark Report
-    generate_markdown_report(benchmark_results, champion_name, ci_results, policy_comparisons)
+    if write_reports:
+        generate_markdown_report(
+            benchmark_results,
+            champion_name,
+            ci_results,
+            policy_comparisons,
+            optimization_regret,
+            reports_dir=reports_dir,
+        )
     print(
         "\nBenchmark complete! Artifacts successfully generated in benchmarks/runs/ and reports/.\n"
     )
     return full_artifact
 
 
-def generate_markdown_report(benchmarks, champion_name, ci_results, policy_comparisons):
+def generate_markdown_report(
+    benchmarks, champion_name, ci_results, policy_comparisons, optimization_regret=None,
+    reports_dir="reports",
+):
     md = f"""# AEGIS-Fraud X — Comprehensive Benchmark & Empirical Evidence Report
 
 **Generated:** {datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")}
@@ -316,18 +468,45 @@ def generate_markdown_report(benchmarks, champion_name, ci_results, policy_compa
         met = data["metrics"]
         md += f"| {pol['policy_name']} | {pol['tau_allow']:.2f} | {pol['tau_review']:.2f} | {pol['tau_block']:.2f} | {met['false_positive_rate'] * 100:.2f}% | ${met['total_cost']:,.2f} | **${met['estimated_savings']:,.2f}** ({met['savings_ratio'] * 100:.1f}%) |\n"
 
+    if optimization_regret is not None:
+        ex = optimization_regret["exact_solver"]
+        co = optimization_regret["coarse_grid_solver"]
+        oos = optimization_regret["out_of_sample_test"]
+        md += f"""
+---
+
+## 4. Optimization Regret: Exact Solver vs Legacy Coarse Grid
+
+Both solvers fitted on the VALIDATION split of the champion model; the exact
+solver enumerates all realizable threshold policies (distinct-value cuts) and
+is provably optimal under the hard constraints.
+
+| Solver | Validation Cost ($) | Solve Time (ms) | Out-of-Sample Test Cost ($) | Test FPR |
+|:---|:---:|:---:|:---:|:---:|
+| Exact (deployed) | {ex['validation_cost']:,.2f} | {ex['solve_time_ms']:.2f} | {oos['exact_policy_cost']:,.2f} | {oos['exact_policy_fpr'] * 100:.2f}% |
+| Legacy coarse grid | {co['validation_cost']:,.2f} | {co['solve_time_ms']:.2f} | {oos['coarse_policy_cost']:,.2f} | {oos['coarse_policy_fpr'] * 100:.2f}% |
+
+- **Optimization gap (validation):** ${optimization_regret['optimization_gap_validation_usd']:,.2f}
+  ({optimization_regret['optimization_gap_relative'] * 100:.2f}% of the exact optimum)
+- Out-of-sample figures are frozen-policy evaluations on the held-out test set;
+  they are NOT used for selection or tuning.
+
+"""
+
     md += r"""
 ---
 
-## 4. Key Scientific Insights & Ablation Findings
+## 5. Key Scientific Insights & Ablation Findings
 1. **Graph Value Add:** Integrating dynamic temporal graph features (`g_cycle`, `g_dev_shared`, `g_in_degree`) elevates PR-AUC by capturing coordinated mule ring structuring that tabular features alone miss.
 2. **Cost-Aware Optimization:** Moving from fixed $p \ge 0.5$ thresholding to AEGIS's 4-tier cost-optimized policy captures high-value fraud via step-up authentication while keeping manual investigator workloads strictly within capacity.
 """
 
-    with open("reports/BENCHMARK_REPORT.md", "w") as f:
+    with open(os.path.join(reports_dir, "BENCHMARK_REPORT.md"), "w") as f:
         f.write(md)
-    with open("BENCHMARKS.md", "w") as f:
-        f.write(md)
+    if os.path.abspath(reports_dir) == os.path.abspath("reports"):
+        # The root BENCHMARKS.md mirror is only updated by the authoritative run
+        with open("BENCHMARKS.md", "w") as f:
+            f.write(md)
 
 
 if __name__ == "__main__":

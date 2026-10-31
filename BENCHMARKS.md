@@ -1,6 +1,6 @@
 # AEGIS-Fraud X — Comprehensive Benchmark & Empirical Evidence Report
 
-**Generated:** 2026-10-31 06:14:13 UTC
+**Generated:** 2026-10-31 06:52:55 UTC
 **Evaluation Protocol:** Strict Chronological Train (60%) -> Val (20%) -> Test (20%)
 **Dataset:** Deterministic Synthetic Benchmark (10,000 transactions, 2% ground truth fraud)
 
@@ -12,7 +12,7 @@
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | **Rule-Based Heuristic** | **0.0949** | 0.6091 | 0.1245 | 0.0198 | 0.0041 | 0.00 ms | $35,750.07 |
 | **Logistic Regression** | **0.4509** | 0.9646 | 0.4303 | 0.0143 | 0.0039 | 0.00 ms | $27,844.57 |
-| **Random Forest** | **0.7190** | 0.9783 | 0.6724 | 0.0096 | 0.0036 | 0.01 ms | $9,581.30 |
+| **Random Forest** | **0.7190** | 0.9783 | 0.6724 | 0.0096 | 0.0036 | 0.02 ms | $9,581.30 |
 | **LightGBM (Tabular)** | **0.7240** | 0.9891 | 0.6887 | 0.0086 | 0.0043 | 0.00 ms | $5,960.88 |
 | **XGBoost** | **0.7147** | 0.9915 | 0.7141 | 0.0091 | 0.0048 | 0.00 ms | $7,442.83 |
 | **AEGIS LightGBM + Graph** | **0.7667** | 0.9905 | 0.7753 | 0.0082 | 0.0037 | 0.00 ms | $5,940.88 |
@@ -34,10 +34,29 @@
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|
 | Fixed-Threshold (p>=0.5) | 0.50 | 0.50 | 0.50 | 0.10% | $7,107.83 | **$31,470.00** (81.6%) |
 | Conservative Heuristic | 0.30 | 0.70 | 0.95 | 0.10% | $7,107.83 | **$31,470.00** (81.6%) |
-| Cost-Aware-Optimized | 0.22 | 0.23 | 1.00 | 0.20% | $5,376.27 | **$33,201.56** (86.1%) |
+| Cost-Aware-Optimized | 0.22 | 1.00 | 1.00 | 0.20% | $5,376.27 | **$33,201.56** (86.1%) |
 
 ---
 
-## 4. Key Scientific Insights & Ablation Findings
+## 4. Optimization Regret: Exact Solver vs Legacy Coarse Grid
+
+Both solvers fitted on the VALIDATION split of the champion model; the exact
+solver enumerates all realizable threshold policies (distinct-value cuts) and
+is provably optimal under the hard constraints.
+
+| Solver | Validation Cost ($) | Solve Time (ms) | Out-of-Sample Test Cost ($) | Test FPR |
+|:---|:---:|:---:|:---:|:---:|
+| Exact (deployed) | 4,711.44 | 2.34 | 5,376.27 | 0.20% |
+| Legacy coarse grid | 4,711.44 | 42.52 | 5,376.27 | 0.20% |
+
+- **Optimization gap (validation):** $0.00
+  (0.00% of the exact optimum)
+- Out-of-sample figures are frozen-policy evaluations on the held-out test set;
+  they are NOT used for selection or tuning.
+
+
+---
+
+## 5. Key Scientific Insights & Ablation Findings
 1. **Graph Value Add:** Integrating dynamic temporal graph features (`g_cycle`, `g_dev_shared`, `g_in_degree`) elevates PR-AUC by capturing coordinated mule ring structuring that tabular features alone miss.
 2. **Cost-Aware Optimization:** Moving from fixed $p \ge 0.5$ thresholding to AEGIS's 4-tier cost-optimized policy captures high-value fraud via step-up authentication while keeping manual investigator workloads strictly within capacity.

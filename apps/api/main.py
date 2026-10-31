@@ -38,6 +38,7 @@ from packages.data.schemas import (
     Transaction,
 )
 from packages.data.synthetic import SyntheticTransactionGenerator
+from packages.artifacts.bundle import BundleValidationError, load_bundle
 from packages.explainability.receipts import AuditReceiptGenerator
 from packages.explainability.shap_engine import ExplainabilityEngine
 from packages.features.pipeline import FeaturePipeline
@@ -82,9 +83,20 @@ class ModelState:
         self.drift_monitor: Optional[DriftMonitor] = None
         self.sample_X: Optional[np.ndarray] = None
         self.calibration_source: str = "uninitialized"
+        self.artifact_status: str = "not_loaded"
+        self.artifact_run_id: Optional[str] = None
 
 
 state = ModelState()
+
+
+# Artifact bundle location (overridable for deployments and tests)
+CHAMPION_BUNDLE_PATH = os.environ.get(
+    "AEGIS_BUNDLE_PATH", "experiments/champion_bundle.pkl"
+)
+CHAMPION_CALIBRATOR_PATH = os.environ.get(
+    "AEGIS_CALIBRATOR_PATH", "experiments/champion_calibrator.pkl"
+)
 
 
 def init_engine():
@@ -103,13 +115,35 @@ def init_engine():
     state.temporal_graph = TemporalFraudGraph(retention_hours=168)
     state.graph_extractor = GraphFeatureExtractor(window_hours=24)
 
-    # Load champion model from disk if available
-    model_path = "experiments/champion_model.pkl"
-    if os.path.exists(model_path):
+    # Load the versioned artifact bundle (training-to-serving contract).
+    # A bundle that fails validation is REJECTED, never silently substituted.
+    bundle_path = CHAMPION_BUNDLE_PATH
+    legacy_model_path = "experiments/champion_model.pkl"
+    state.artifact_run_id = None
+    _calibrator_from_bundle = False
+    if os.path.exists(bundle_path):
         try:
-            state.model = BaseFraudClassifier.load(model_path)
+            payload = load_bundle(bundle_path)
+            state.model = payload["model"]
+            state.calibrator = payload["calibrator"]
+            state.current_policy = DecisionPolicy(**payload["policy"])
+            state.artifact_run_id = payload["run_id"]
+            state.artifact_status = "bundle_validated"
+            _calibrator_from_bundle = True
+        except BundleValidationError as e:
+            state.model = None
+            state.calibrator = None
+            state.artifact_status = f"bundle_rejected: {e}"
+    elif os.path.exists(legacy_model_path):
+        try:
+            state.model = BaseFraudClassifier.load(legacy_model_path)
+            state.artifact_status = "legacy_model_loaded"
         except Exception:
             state.model = None
+            state.artifact_status = "legacy_model_load_failed"
+    else:
+        state.model = None
+        state.artifact_status = "no_artifacts"
 
     # Load benchmark summary
     bench_path = "benchmarks/runs/benchmark_summary.json"
@@ -144,37 +178,40 @@ def init_engine():
     else:
         state.sample_X = X_tab
 
-    # Calibrator setup: load the artifact fitted on the validation split by
-    # scripts/run_benchmarks.py. If absent, fit on the real reference population
-    # (model scores + ground-truth labels) instead of fabricated data.
-    calibrator_path = "experiments/champion_calibrator.pkl"
+    # Calibrator setup: the validated bundle carries the calibrator fitted on
+    # the validation split. Otherwise load the standalone artifact, or fit on
+    # the real reference population — never on fabricated data.
+    calibrator_path = CHAMPION_CALIBRATOR_PATH
     calibration_source = "base-rate-prior"
-    if state.model is not None and os.path.exists(calibrator_path):
-        try:
-            state.calibrator = ProbabilityCalibrator.load(calibrator_path)
-            calibration_source = "validation-artifact"
-        except Exception:
-            state.calibrator = None
-    else:
-        state.calibrator = None
-
-    if state.calibrator is None:
-        state.calibrator = ProbabilityCalibrator(method="isotonic")
-        if state.model is not None and state.sample_X is not None:
-            ref_scores = state.model.predict_proba(state.sample_X)
-            ref_labels = np.asarray(
-                state.sample_transactions["is_fraud"].values, dtype=int
-            )
-            state.calibrator.fit(ref_scores, ref_labels)
-            calibration_source = "reference-data"
+    if _calibrator_from_bundle and state.calibrator is not None and state.calibrator.fitted:
+        calibration_source = "validation-artifact"
+    elif not _calibrator_from_bundle:
+        if state.model is not None and os.path.exists(calibrator_path):
+            try:
+                state.calibrator = ProbabilityCalibrator.load(calibrator_path)
+                calibration_source = "validation-artifact"
+            except Exception:
+                state.calibrator = None
         else:
-            # No model available: calibrate against the reference population's
-            # base-rate prior so outputs are at least statistically grounded.
-            base_rate = float(
-                state.sample_transactions["is_fraud"].mean()
-            )
-            raw = np.linspace(0.0, 1.0, 100)
-            state.calibrator.fit(raw, np.full(100, base_rate))
+            state.calibrator = None
+
+        if state.calibrator is None:
+            state.calibrator = ProbabilityCalibrator(method="isotonic")
+            if state.model is not None and state.sample_X is not None:
+                ref_scores = state.model.predict_proba(state.sample_X)
+                ref_labels = np.asarray(
+                    state.sample_transactions["is_fraud"].values, dtype=int
+                )
+                state.calibrator.fit(ref_scores, ref_labels)
+                calibration_source = "reference-data"
+            else:
+                # No model available: calibrate against the reference population's
+                # base-rate prior so outputs are at least statistically grounded.
+                base_rate = float(
+                    state.sample_transactions["is_fraud"].mean()
+                )
+                raw = np.linspace(0.0, 1.0, 100)
+                state.calibrator.fit(raw, np.full(100, base_rate))
     state.calibration_source = calibration_source
 
     if state.model:
@@ -228,6 +265,10 @@ def health_check():
         "graph_nodes": state.temporal_graph.graph.number_of_nodes() if state.temporal_graph else 0,
         "graph_edges": state.temporal_graph.graph.number_of_edges() if state.temporal_graph else 0,
         "active_policy": state.current_policy.model_dump() if state.current_policy else {},
+        # Artifact provenance: which trained artifacts produced this engine
+        "artifact_status": state.artifact_status,
+        "artifact_run_id": state.artifact_run_id,
+        "calibration_source": state.calibration_source,
     }
 
 
