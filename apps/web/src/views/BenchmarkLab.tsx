@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BarChart3, TrendingUp, Zap, Award, Layers, CheckCircle } from "lucide-react";
+import { BarChart3, Award } from "lucide-react";
 import { fetchBenchmarks } from "../api";
 
 export const BenchmarkLab: React.FC = () => {

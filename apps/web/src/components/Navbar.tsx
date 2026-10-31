@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, Sun, Moon, Activity, Download, CheckCircle2 } from "lucide-react";
+import { Shield, Sun, Moon, Download } from "lucide-react";
 
 interface NavbarProps {
   darkMode: boolean;

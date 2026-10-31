@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Activity, AlertTriangle, ShieldCheck, Zap, RefreshCw, AlertCircle, CheckCircle } from "lucide-react";
+import { Activity, AlertTriangle, ShieldCheck, Zap, RefreshCw, AlertCircle } from "lucide-react";
 import { evaluateDrift, simulateStress } from "../api";
 
 export const DriftLab: React.FC = () => {
@@ -30,7 +30,10 @@ export const DriftLab: React.FC = () => {
   };
 
   useEffect(() => {
-    runDriftCheck();
+    // deferred off the render commit (avoids cascading setState in the
+    // effect body)
+    const t = window.setTimeout(() => runDriftCheck(), 0);
+    return () => window.clearTimeout(t);
   }, []);
 
   const handleTriggerStress = async (scenario: "smurfing" | "spoofing" | "none") => {

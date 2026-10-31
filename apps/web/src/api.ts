@@ -30,7 +30,7 @@ export async function fetchBenchmarks() {
     const res = await fetch(`${getApiBase()}/benchmarks`);
     if (!res.ok) throw new Error("Benchmarks failed");
     return await res.json();
-  } catch (e) {
+  } catch {
     // Offline fallback to the last measured benchmark run (2026-10-31 protocol).
     // `degraded: true` marks this as a stale snapshot, not a live measurement.
     return {
@@ -63,7 +63,7 @@ export async function fetchReplayBatch(offset: number = 0, limit: number = 30): 
     const res = await fetch(`${getApiBase()}/stream/replay-batch?offset=${offset}&limit=${limit}`);
     if (!res.ok) throw new Error("Replay batch failed");
     return await res.json();
-  } catch (e) {
+  } catch {
     // Generate realistic client fallback replay records
     const records = Array.from({ length: limit }).map((_, i) => {
       const idx = offset + i;
@@ -132,7 +132,7 @@ export async function fetchGraphSubgraph(): Promise<SubgraphResponse> {
     const res = await fetch(`${getApiBase()}/graph/subgraph?limit_nodes=35`);
     if (!res.ok) throw new Error("Subgraph fetch failed");
     return await res.json();
-  } catch (e) {
+  } catch {
     // Deterministic fallback graph with mule rings
     const nodes = [
       { id: "mule_001", label: "Mule Ring Alpha (Node 1)", type: "mule_account", risk_score: 0.94, in_degree: 3, out_degree: 2 },
@@ -182,7 +182,7 @@ export async function optimizePolicy(params: {
     });
     if (!res.ok) throw new Error("Policy optimization failed");
     return await res.json();
-  } catch (e) {
+  } catch {
     // Dynamic recalculation fallback
     const allow = Math.max(0.05, Math.min(0.25, 0.15 * (params.investigation_cost / 15)));
     const review = Math.max(0.30, Math.min(0.60, 0.42 * (params.review_capacity_daily / 100)));
@@ -205,7 +205,7 @@ export async function evaluateDrift() {
     const res = await fetch(`${getApiBase()}/drift/evaluate`, { method: "POST" });
     if (!res.ok) throw new Error("Drift check failed");
     return await res.json();
-  } catch (e) {
+  } catch {
     return {
       status: "STABLE",
       degraded: true,
@@ -229,7 +229,7 @@ export async function scoreTransaction(tx: any): Promise<PredictionResult> {
     });
     if (!res.ok) throw new Error("Score request failed");
     return await res.json();
-  } catch (e) {
+  } catch {
     // NOTE: offline fallback is a heuristic ILLUSTRATION, not model inference.
     const isHigh = tx.amount > 1000 || (tx.channel === "p2p" && tx.amount > 500);
     const prob = isHigh ? 0.84 : 0.03;
@@ -274,7 +274,7 @@ export async function injectTransaction(req: {
     });
     if (!res.ok) throw new Error("Injection failed");
     return await res.json();
-  } catch (e) {
+  } catch {
     const now = new Date().toISOString();
     const isFraud = req.is_fraud_simulated;
     const prob = isFraud ? 0.91 : 0.04;
@@ -326,7 +326,7 @@ export async function simulateStress(scenario: "smurfing" | "spoofing" | "volume
     });
     if (!res.ok) throw new Error("Stress simulation failed");
     return await res.json();
-  } catch (e) {
+  } catch {
     if (scenario === "smurfing") {
       return {
         status: "CRITICAL_DRIFT",
@@ -379,7 +379,7 @@ export async function verifyReceipt(receipt: any) {
     });
     if (!res.ok) throw new Error("Verify receipt failed");
     return await res.json();
-  } catch (e) {
+  } catch {
     // Cryptographic verification is ONLY performed server-side. Offline we
     // must never claim a receipt is authentic: report the verification as
     // unavailable rather than fabricating a validity verdict.

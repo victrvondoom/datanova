@@ -6,8 +6,6 @@ import {
   ShieldAlert,
   ShieldCheck,
   CheckCircle,
-  AlertCircle,
-  DollarSign,
   Fingerprint,
   PlusCircle,
   X,
@@ -57,7 +55,10 @@ export const TransactionStream: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    loadBatch(0);
+    // deferred off the render commit (avoids cascading setState in the
+    // effect body); the cleanup cancels the load if the view unmounts first
+    const t = window.setTimeout(() => loadBatch(0), 0);
+    return () => window.clearTimeout(t);
   }, [loadBatch]);
 
   // Streaming ticker loop
@@ -249,6 +250,13 @@ export const TransactionStream: React.FC = () => {
             <div className="text-[11px] font-semibold text-slate-400">AEGIS Loss / Labor</div>
             <div className="text-sm font-bold text-accent-teal">
               ${aegisCostTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+          </div>
+          <div className="h-8 w-px bg-slate-200 dark:border-navy-700 bg-slate-200 dark:bg-navy-700" />
+          <div>
+            <div className="text-[11px] font-semibold text-slate-400">Fraud Value Intercepted</div>
+            <div className="text-sm font-bold text-amber-500">
+              ${preventedLossTotal.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </div>
           </div>
         </div>

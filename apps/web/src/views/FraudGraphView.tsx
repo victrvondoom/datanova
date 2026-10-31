@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Network, Search, Filter, ShieldAlert, Cpu, Share2, Layers, RefreshCw, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { Network, Search, ShieldAlert, RefreshCw, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { fetchGraphSubgraph } from "../api";
 import { GraphNode, GraphEdge } from "../types";
 
@@ -30,7 +30,10 @@ export const FraudGraphView: React.FC = () => {
   };
 
   useEffect(() => {
-    loadGraph();
+    // deferred off the render commit (avoids cascading setState in the
+    // effect body)
+    const t = window.setTimeout(() => loadGraph(), 0);
+    return () => window.clearTimeout(t);
   }, []);
 
   const filteredNodes = useMemo(() => {

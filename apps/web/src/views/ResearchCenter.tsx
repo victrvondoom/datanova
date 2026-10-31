@@ -1,5 +1,5 @@
 import React from "react";
-import { BookOpenCheck, FileText, Download, ShieldCheck, CheckCircle2, ExternalLink } from "lucide-react";
+import { BookOpenCheck, FileText, CheckCircle2 } from "lucide-react";
 
 export const ResearchCenter: React.FC = () => {
   const artifacts = [

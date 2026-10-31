@@ -274,3 +274,33 @@ savings **$33,201.56 (86.1%)**, FPR **0.20%**, thresholds tau=(0.2222, 0.2322, 1
   549 missing / 2 blocked / 6 N-A / 1 implemented_unverified.**
 - Full suite: **141/141 passed**; mypy clean (58 files); ruff clean;
   frontend build clean. Docker Desktop still unresponsive (NEXT-02).
+
+### Frontend hygiene & dynamization pass (post-trail)
+
+- oxlint over the entire frontend `src/` (31 files): **0 warnings, 0
+  errors** (was 39 warnings). Fixes were structural, not suppressions:
+  9 unused `catch (e)` bindings → bare `catch` in `api.ts`; ~25 unused
+  lucide imports removed; 4 mount effects (DriftLab, FraudGraphView,
+  TransactionStream, ExplainabilityView) deferred off the render commit
+  via `setTimeout(0)` + cleanup so no setState runs synchronously inside
+  an effect body.
+- Dead state turned into live UI ("everything dynamic"):
+  - TransactionStream now displays **"Fraud Value Intercepted"** — the
+    previously-unread `preventedLossTotal` accumulator is a live counter
+    in the savings strip.
+  - ExplainabilityView shows a dynamic **tamper-state chip** ("last
+    payload: TAMPERED / authentic") driven by the previously-unread
+    `isTampered` state.
+  - Sidebar **Champion Status Card is now live**: model id, artifact
+    status, PR-AUC and latency fetched from the real API (30s refresh +
+    on focus), honestly marked `(cached)` when the backend is offline —
+    replacing hardcoded "0.7147 / <0.02ms / XGBoost" text.
+  - Sidebar trail badge now shows **live learning progress**
+    (`{completed}/20 done`) from localStorage, synced on hashchange and
+    the storage event.
+- Verification: vitest 61/61; production build clean; **AEGIS journey E2E
+  re-verified in both phases against the modified views** — online phase
+  (live backend on :8002, real score → TreeSHAP → receipt → verification)
+  PASSED, offline-degraded phase (API stopped, banner + no false
+  authenticity) PASSED; trail E2E 7/7; backend suite 141/141, mypy clean,
+  ruff clean.

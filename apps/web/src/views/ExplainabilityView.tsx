@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { FileCheck2, Fingerprint, ShieldCheck, AlertCircle, Copy, Check, Send, Sparkles, RefreshCw } from "lucide-react";
+import { FileCheck2, Fingerprint, ShieldCheck, AlertCircle, Copy, Check, Send, Sparkles } from "lucide-react";
 import { scoreTransaction, verifyReceipt } from "../api";
 import { PredictionResult } from "../types";
 
@@ -71,7 +71,11 @@ export const ExplainabilityView: React.FC = () => {
   };
 
   useEffect(() => {
-    handleScore();
+    // deferred off the render commit (avoids cascading setState in the
+    // effect body); mount-only by design — the form has its own submit
+    const t = window.setTimeout(() => handleScore(), 0);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleApplyPreset = (preset: "mule" | "smurfing" | "legit" | "high_value") => {
@@ -371,7 +375,20 @@ export const ExplainabilityView: React.FC = () => {
           {/* Live Cryptographic Verification Workbench */}
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-slate-700 dark:text-slate-300">Live Tamper-Evidence Workbench:</span>
+              <span className="font-bold text-slate-700 dark:text-slate-300">
+                Live Tamper-Evidence Workbench:
+                {verifyResult && (
+                  <span
+                    className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                      isTampered
+                        ? "bg-rose-500/15 text-rose-500 border border-rose-500/30"
+                        : "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
+                    }`}
+                  >
+                    {isTampered ? "last payload: TAMPERED" : "last payload: authentic"}
+                  </span>
+                )}
+              </span>
               <span className="text-[10px] text-slate-400">Calls /api/receipts/verify</span>
             </div>
 

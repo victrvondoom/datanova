@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Sliders, DollarSign, Users, ShieldAlert, CheckCircle2, ArrowRight, RefreshCw, Zap } from "lucide-react";
+import React, { useState } from "react";
+import { Sliders, CheckCircle2, RefreshCw } from "lucide-react";
 import { optimizePolicy } from "../api";
 
 export const DecisionLab: React.FC = () => {
