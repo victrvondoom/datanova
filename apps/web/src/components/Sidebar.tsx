@@ -10,6 +10,7 @@ import {
   FileCheck2,
   BookOpenCheck,
   GraduationCap,
+  Workflow,
 } from "lucide-react";
 
 export type ViewType =
@@ -21,7 +22,8 @@ export type ViewType =
   | "drift"
   | "explain"
   | "research"
-  | "trail";
+  | "trail"
+  | "studio";
 
 interface SidebarProps {
   currentView: ViewType;
@@ -57,6 +59,17 @@ function readTrailCompleted(): number {
   }
 }
 
+function readStudioCount(): number {
+  try {
+    const raw = window.localStorage.getItem("tracen-studio-v1");
+    if (!raw) return 0;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed.workspaces) ? parsed.workspaces.length : 0;
+  } catch {
+    return 0;
+  }
+}
+
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView }) => {
   // Live champion status: from the real API when reachable, honestly marked
   // as a cached snapshot when offline. Refreshed periodically and on regaining focus.
@@ -64,6 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
 
   // Dynamic trail badge: reflects real learning progress in localStorage.
   const [trailCompleted, setTrailCompleted] = useState<number>(() => readTrailCompleted());
+  const [studioSaved, setStudioSaved] = useState<number>(() => readStudioCount());
 
   useEffect(() => {
     let cancelled = false;
@@ -96,12 +110,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
   }, []);
 
   useEffect(() => {
-    const sync = () => setTrailCompleted(readTrailCompleted());
+    const sync = () => {
+      setTrailCompleted(readTrailCompleted());
+      setStudioSaved(readStudioCount());
+    };
+    const poll = window.setInterval(sync, 2000);
     window.addEventListener("hashchange", sync);
     window.addEventListener("storage", sync);
     return () => {
       window.removeEventListener("hashchange", sync);
       window.removeEventListener("storage", sync);
+      window.clearInterval(poll);
     };
   }, []);
 
@@ -115,10 +134,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
     { id: "explain" as ViewType, label: "Explainability Explorer", icon: FileCheck2, badge: "TreeSHAP" },
     { id: "research" as ViewType, label: "Evidence & Research", icon: BookOpenCheck, badge: "Artifacts" },
     { id: "trail" as ViewType, label: "Vibe Coding Trail", icon: GraduationCap, badge: `${trailCompleted}/20 done` },
+    { id: "studio" as ViewType, label: "Architecture Studio", icon: Workflow, badge: studioSaved > 0 ? `${studioSaved} saved` : "5 scenarios" },
   ];
 
   return (
-    <aside className="w-64 border-r flex flex-col justify-between p-4 bg-white dark:bg-navy-900 border-slate-200 dark:border-navy-700 transition-colors">
+    <aside className="hidden md:flex w-64 shrink-0 border-r flex-col justify-between p-4 bg-white dark:bg-navy-900 border-slate-200 dark:border-navy-700 transition-colors">
       <div className="space-y-1.5">
         <div className="px-3 py-2 text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
           Core Laboratories

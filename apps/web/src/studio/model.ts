@@ -449,9 +449,9 @@ const clampCoord = (v: number): number => (Number.isFinite(v) ? Math.max(0, Math
 
 /** Grid placement: next free slot, deterministic (no randomness). */
 export function nextPosition(a: Architecture): { x: number; y: number } {
-  const cols = 5;
+  const cols = 4;
   for (let i = 0; i < 500; i++) {
-    const x = 40 + (i % cols) * 190;
+    const x = 40 + (i % cols) * 240; // 168px nodes + 72px gaps: room for arrowheads and labels
     const y = 40 + Math.floor(i / cols) * 120;
     if (!a.nodes.some((n) => Math.abs(n.x - x) < 150 && Math.abs(n.y - y) < 80)) return { x, y };
   }

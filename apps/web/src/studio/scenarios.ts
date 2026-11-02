@@ -32,7 +32,6 @@ const k = (...kinds: Kind[]): Test => ({ t: "kind", kinds });
 const chain = (...c: Kind[][]): Test => ({ t: "chain", chain: c });
 const path = (from: Kind[], to: Kind[]): Test => ({ t: "path", from, to });
 const any = (...tests: Test[]): Test => ({ t: "anyOf", tests });
-const all = (...tests: Test[]): Test => ({ t: "allOf", tests });
 const prop = (kinds: Kind[], key: string, op: "eq" | "ne" | "gt" | "in", value: string | number | boolean | Array<string | number | boolean>): Test => ({
   t: "prop", kinds, where: [{ key, op, value }],
 });

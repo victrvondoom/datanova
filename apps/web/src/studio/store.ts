@@ -3,7 +3,7 @@
  * learning app; no backend). Includes strict validation of imported data.
  */
 import {
-  Architecture, ArchNode, ConnType, Connection, KIND_DEFS, KIND_LIST, Props, PropValue, canConnect, defaultProps, emptyArchitecture, isKind,
+  Architecture, ArchNode, ConnType, Connection, KIND_DEFS, KIND_LIST, Props, canConnect, defaultProps, emptyArchitecture, isKind,
 } from "./model";
 import { Adr, ADR_STATUSES, AdrStatus, normalizeDraft } from "./adr";
 import { CapacityInputs, DEFAULT_CAPACITY, sanitize } from "./capacity";

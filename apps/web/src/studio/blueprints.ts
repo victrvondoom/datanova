@@ -15,7 +15,7 @@ export class Builder {
     this.arch = addNode(this.arch, kind, { name: name ?? KIND_DEFS[kind].label });
     const node = this.arch.nodes[this.arch.nodes.length - 1];
     this.ids.set(key, node.id);
-    this.arch = moveNode(this.arch, node.id, 40 + col * 200, 40 + row * 110);
+    this.arch = moveNode(this.arch, node.id, 40 + col * 240, 40 + row * 115);
     if (group) this.arch = setGroup(this.arch, node.id, group);
     for (const [k, v] of Object.entries(props)) {
       const def = KIND_DEFS[kind].props.find((p) => p.key === k);
@@ -49,8 +49,8 @@ function pdfBaseline(): Architecture {
     .n("api", "app_service", 1, 1, { paymentLike: true }, "PDF API")
     .n("ai", "external_service", 2, 0, { provider: "AI model API (simulated)" }, "AI API")
     .n("db", "postgres", 2, 2, {}, "Jobs DB")
-    .c("client", "api", "sync", "upload + generate")
-    .c("api", "ai", "sync", "generate PDF")
+    .c("client", "api", "sync", "request")
+    .c("api", "ai", "sync", "generate")
     .c("api", "db", "data")
     .build();
 }
@@ -138,7 +138,7 @@ function ecExample(): Architecture {
     .c("saga", "ship", "sync", "ship")
     .c("inv", "idb", "data")
     .c("bill", "idem", "data")
-    .c("bill", "pay", "sync", "charge (simulated)")
+    .c("bill", "pay", "sync", "charge (sim)")
     .c("checkout", "rec", "sync", "recommend")
     .c("checkout", "bus", "event", "order placed")
     .c("bus", "an", "event")
@@ -176,7 +176,7 @@ function rtExample(): Architecture {
     .c("collab", "auth", "sync", "verify token")
     .c("collab", "presence", "data")
     .c("collab", "db", "data", "persist edits")
-    .c("collab", "q", "async", "export / snapshot only")
+    .c("collab", "q", "async", "export only")
     .c("q", "w", "async")
     .c("q", "dlq", "async")
     .build();
@@ -241,7 +241,7 @@ function payBaseline(): Architecture {
     .n("rec", "app_service", 2, 2, {}, "Receipt Service")
     .n("db", "postgres", 3, 1, {}, "Ledger DB")
     .c("client", "pay", "sync")
-    .c("pay", "prov", "sync", "charge (simulated)")
+    .c("pay", "prov", "sync", "charge (sim)")
     .c("pay", "rew", "sync", "grant points")
     .c("pay", "rec", "sync", "send receipt")
     .c("pay", "db", "data")
@@ -268,8 +268,8 @@ function payExample(): Architecture {
     .c("gw", "pay", "sync")
     .c("pay", "idem", "data", "claim key")
     .c("pay", "db", "data", "ledger")
-    .c("pay", "saga", "sync", "start workflow")
-    .c("pay", "prov", "sync", "charge (simulated)")
+    .c("pay", "saga", "sync", "workflow")
+    .c("pay", "prov", "sync", "charge (sim)")
     .c("saga", "rec", "sync", "issue receipt")
     .c("pay", "bus", "event", "payment settled")
     .c("bus", "rec", "event")

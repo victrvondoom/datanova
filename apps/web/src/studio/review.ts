@@ -2,7 +2,7 @@
  * Architecture review across ten categories. Every statement is derived from
  * what is actually in the diagram or the findings — no opaque score.
  */
-import { Architecture, KIND_DEFS, bool, nodesOfKind, num, str } from "./model";
+import { Architecture, KIND_DEFS, archFingerprint, bool, nodesOfKind, num, str } from "./model";
 import { CapacityInputs, DEFAULT_CAPACITY, computeCapacity, fmtRatio, fromArchitecture } from "./capacity";
 import { SURVIVED, runAllFailures } from "./failures";
 import { Scenario } from "./scenarios";
@@ -24,6 +24,8 @@ export interface ReviewCategoryResult {
 
 export interface ReviewResult {
   generatedAt: string;
+  /** structural fingerprint of the architecture that was reviewed (detects stale reviews) */
+  fingerprint: string;
   categories: ReviewCategoryResult[];
   findingCount: number;
 }
@@ -144,5 +146,5 @@ export function reviewArchitecture(a: Architecture, scenario: Scenario, adrs: Ad
     [adrs.length === 0 ? "No decisions recorded" : "", a.nodes.some((n) => n.group) ? "" : "No component groups to show boundaries"].filter(Boolean),
     ["Could a new teammate explain this diagram after ten minutes?", "Which decision would they most likely question?"], [], "Record an ADR for the decision you are least sure about.");
 
-  return { generatedAt: now, categories: out, findingCount: findings.length };
+  return { generatedAt: now, fingerprint: archFingerprint(a), categories: out, findingCount: findings.length };
 }

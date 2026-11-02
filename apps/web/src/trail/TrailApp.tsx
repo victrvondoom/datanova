@@ -21,6 +21,7 @@ import { parseHash } from "./router";
 import { LandingView, JourneyView, GlossaryView, QuizView } from "./Views";
 import { TopicPage } from "./TopicPage";
 import { CaseStudyView } from "./CaseStudy";
+import { StudioApp } from "../studio/StudioApp";
 
 const BROWSER_STORAGE = {
   getItem: (k: string) => window.localStorage.getItem(k),
@@ -85,6 +86,9 @@ export const TrailApp: React.FC = () => {
 
   const pct = overallProgress(progress, TOPICS.length);
 
+  // The Architecture Studio is a sibling area of the trail with its own shell.
+  if (route.page === "studio") return <StudioApp tab={route.tab} navigate={navigate} />;
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-6">
       {/* Trail header / nav */}
@@ -101,6 +105,7 @@ export const TrailApp: React.FC = () => {
           <Button variant={route.page === "glossary" ? "primary" : "ghost"} onClick={() => navigate({ page: "glossary" })}>Glossary</Button>
           <Button variant={route.page === "quiz" ? "primary" : "ghost"} onClick={() => navigate({ page: "quiz" })}>Quiz</Button>
           <Button variant={route.page === "case-study" ? "primary" : "ghost"} onClick={() => navigate({ page: "case-study" })}>Case study</Button>
+          <Button variant="ghost" onClick={() => navigate({ page: "studio", tab: "scenarios" })}>Architecture Studio →</Button>
           <Button
             variant="danger"
             onClick={() => {

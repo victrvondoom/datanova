@@ -5,7 +5,13 @@
  */
 import { useEffect, useState } from "react";
 
+export const STUDIO_TABS = [
+  "scenarios", "design", "requirements", "validate", "capacity", "failures", "compare", "review", "decisions", "challenge", "export",
+] as const;
+export type StudioTab = (typeof STUDIO_TABS)[number];
+
 export type TrailRoute =
+  | { page: "studio"; tab: StudioTab }
   | { page: "landing" }
   | { page: "journey" }
   | { page: "topic"; id: number }
@@ -16,6 +22,10 @@ export type TrailRoute =
 export function parseHash(hash: string): TrailRoute {
   const clean = hash.replace(/^#\/?/, "");
   const parts = clean.split("/").filter(Boolean);
+  if (parts[0] === "studio") {
+    const tab = STUDIO_TABS.find((t) => t === parts[1]);
+    return { page: "studio", tab: tab ?? "scenarios" };
+  }
   if (parts[0] !== "trail") return { page: "landing" };
   if (parts[1] === "topic" && parts[2]) {
     const id = parseInt(parts[2], 10);
@@ -31,6 +41,8 @@ export function parseHash(hash: string): TrailRoute {
 
 export function routeToHash(r: TrailRoute): string {
   switch (r.page) {
+    case "studio":
+      return r.tab === "scenarios" ? "#/studio" : `#/studio/${r.tab}`;
     case "journey":
       return "#/trail/journey";
     case "topic":

@@ -10,6 +10,9 @@ export default defineConfig({
   use: {
     baseURL: "http://localhost:4173",
     headless: true,
+    // Optional: point at a pre-installed Chromium (e.g. PW_CHROMIUM_PATH=/opt/pw-browsers/chromium/chrome)
+    // when the Playwright-managed browser download is unavailable.
+    launchOptions: process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {},
   },
   reporter: [["list"]],
 });

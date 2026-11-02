@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Navbar } from "./components/Navbar";
 import { Sidebar, ViewType } from "./components/Sidebar";
+import { VIEW_OPTIONS } from "./components/viewOptions";
 import { MissionControl } from "./views/MissionControl";
 import { TransactionStream } from "./views/TransactionStream";
 import { FraudGraphView } from "./views/FraudGraphView";
@@ -16,9 +17,25 @@ export const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState<boolean>(true);
   // Deep-link support: a fresh load (or navigation) to a #/trail/... URL
   // opens the TRACEN learning trail view directly.
-  const [currentView, setCurrentView] = useState<ViewType>(() =>
-    window.location.hash.startsWith("#/trail") ? "trail" : "mission"
+  const [currentView, setCurrentViewState] = useState<ViewType>(() =>
+    window.location.hash.startsWith("#/studio") ? "studio" : window.location.hash.startsWith("#/trail") ? "trail" : "mission"
   );
+  // The trail and the Architecture Studio are one learning product with two
+  // hash-routed areas; switching sidebar view keeps the URL in sync.
+  const setCurrentView = (v: ViewType) => {
+    if (v === "studio" && !window.location.hash.startsWith("#/studio")) window.location.hash = "#/studio";
+    if (v === "trail" && !window.location.hash.startsWith("#/trail")) window.location.hash = "#/trail";
+    setCurrentViewState(v);
+  };
+  // Rendered only on narrow screens (not merely CSS-hidden) so desktop DOM and selectors are unchanged.
+  const [narrow, setNarrow] = useState<boolean>(() => typeof window.matchMedia === "function" && window.matchMedia("(max-width: 767px)").matches);
+  useEffect(() => {
+    if (typeof window.matchMedia !== "function") return;
+    const mq = window.matchMedia("(max-width: 767px)");
+    const on = () => setNarrow(mq.matches);
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
   const [online, setOnline] = useState<boolean>(false);
   const [showDeckModal, setShowDeckModal] = useState<boolean>(false);
 
@@ -34,9 +51,8 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     const onHashChange = () => {
-      if (window.location.hash.startsWith("#/trail")) {
-        setCurrentView("trail");
-      }
+      if (window.location.hash.startsWith("#/studio")) setCurrentViewState("studio");
+      else if (window.location.hash.startsWith("#/trail")) setCurrentViewState("trail");
     };
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
@@ -74,11 +90,29 @@ export const App: React.FC = () => {
           </div>
         )}
 
+        {/* Small screens: the sidebar is hidden, so offer a compact view switcher */}
+        {narrow && (
+        <nav className="border-b border-slate-200 dark:border-navy-700 px-3 py-2" aria-label="Switch view">
+          <label className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+            View
+            <select
+              className="flex-1 rounded-lg border border-slate-300 dark:border-navy-600 bg-white dark:bg-navy-800 px-2 py-1.5 text-sm text-slate-800 dark:text-slate-100"
+              value={currentView}
+              onChange={(e) => setCurrentView(e.target.value as ViewType)}
+            >
+              {VIEW_OPTIONS.map((o) => (
+                <option key={o.id} value={o.id}>{o.label}</option>
+              ))}
+            </select>
+          </label>
+        </nav>
+        )}
+
         {/* Main Content Area */}
         <div className="flex flex-1 overflow-hidden">
           <Sidebar currentView={currentView} setCurrentView={setCurrentView} />
 
-          <main className="flex-1 overflow-y-auto p-6 lg:p-8 max-w-7xl mx-auto w-full">
+          <main className="flex-1 min-w-0 overflow-y-auto p-3 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
             {currentView === "mission" && <MissionControl onNavigate={(v) => setCurrentView(v as ViewType)} />}
             {currentView === "stream" && <TransactionStream />}
             {currentView === "graph" && <FraudGraphView />}
@@ -87,7 +121,7 @@ export const App: React.FC = () => {
             {currentView === "drift" && <DriftLab />}
             {currentView === "explain" && <ExplainabilityView />}
             {currentView === "research" && <ResearchCenter />}
-            {currentView === "trail" && <TrailApp />}
+            {(currentView === "trail" || currentView === "studio") && <TrailApp />}
           </main>
         </div>
       </div>

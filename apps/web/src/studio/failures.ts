@@ -336,7 +336,7 @@ function dispatch(a: Architecture, def: FailureDef, failureId: FailureId, params
     case "dependency-unhealthy": return externalFailure(a, def, pick((n) => syncCallers(a, n).length > 0) ?? pick(), cap, "down", SUSTAINED);
     case "consumer-crash": return consumerCrash(a, def, pick((n) => incoming(a, n.id, "async").length > 0) ?? pick(), cap);
     case "backlog-growth": return backlogGrowth(a, def, pick(), cap, params);
-    case "poison-job": return poisonJob(a, def, pick(), cap);
+    case "poison-job": return poisonJob(a, def, pick());
     case "duplicate-payment": return duplicatePayment(a, def, params.targetId ? pick() : pick(isPaymentLike), params);
     case "cron-multi": return cronMulti(a, def, pick());
     case "subscriber-down": return subscriberDown(a, def, pick((n) => incoming(a, n.id, "event").length > 0), cap);
@@ -652,7 +652,7 @@ function backlogGrowth(a: Architecture, def: FailureDef, target: ArchNode | unde
 }
 
 // 8 ------------------------------------------------------------------
-function poisonJob(a: Architecture, def: FailureDef, target: ArchNode | undefined, cap: CapacityInputs): FailureResult {
+function poisonJob(a: Architecture, def: FailureDef, target: ArchNode | undefined): FailureResult {
   if (!target) return notApplicable(def.id, a, def);
   const consumers = consumersOf(a, target.id);
   if (consumers.length === 0) return notApplicable(def.id, a, def, `${nm(target)} has no consumer, so no job is ever attempted.`);

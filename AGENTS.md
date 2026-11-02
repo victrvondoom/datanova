@@ -73,3 +73,45 @@ in the existing dashboard. Conventions for any change to it:
    `npm run test && npm run build && npx oxlint src/trail` in `apps/web`,
    plus `npx playwright test e2e/trail.spec.ts` against
    `vite preview --port 4173` for user-flow changes.
+
+## TRACEN Architecture Studio (Campaign 02 — `#/studio`)
+
+The Studio (`apps/web/src/studio/`) is a sibling area of the trail inside the same dashboard. It applies Foundations
+Topics 01–20 to design, simulate, review and improve real architectures. Read `docs/architecture-studio-design.md` first.
+Do **not** invent Topics 21–40; every "which topic teaches this" link must point at one of the existing 20.
+
+1. **Logic is pure and tested.** Behaviour lives in DOM-free modules (`model`, `graph`, `validation`, `requirements`,
+   `capacity`, `failures`, `compare`, `review`, `adr`, `challenge`, `store`, `exporters`, `blueprints`). `*View.tsx`,
+   `Canvas.tsx`, `Inspector.tsx` only render state and dispatch operations. A feature without a logic test is not done.
+2. **Scenarios are data** (`scenarios.ts`): requirements carry structural `needs`; never hard-code a single correct
+   architecture. Worked examples (`blueprints.ts`) are one valid design among many, never shown inside the guided challenge.
+3. **Never hard-code a simulation outcome.** Failure results must follow from the learner's configuration; a missing
+   mechanism must show the failure unprotected; recovery only where a mechanism exists; "not applicable" must never
+   read as "handled".
+4. **Completion is earned.** Challenge gates (`challenge.ts`) are computed from real work; do not weaken them, add a score,
+   or reward component count. Structural evidence is not proof, and learner marks never replace evidence.
+5. **Honest numbers.** Capacity figures are labelled assumptions (not load tests); cost figures are relative units, not
+   prices; payment behaviour is always simulated. Any new formula goes into `capacity.ts::FORMULAS`.
+6. **Imports are untrusted.** Every import path goes through `store.ts::parseWorkspaceImport` /
+   `validateArchitectureShape`; never trust challenge progress or review results from a file. Exports pass through redaction.
+7. **No new runtime dependencies**; hash routes (`trail/router.ts::STUDIO_TABS`); `localStorage` only behind `StudioStorage`.
+8. **State = label + icon + colour**, never colour alone; every control has an accessible name; honour
+   `prefers-reduced-motion`; no page-level horizontal overflow at 375px.
+9. **Docs must match code.** `src/studio/__tests__/docs.test.ts` fails when a rule, failure, formula, scenario, component or
+   challenge step is not documented in `docs/`.
+10. Add a regression test for every corrected Studio bug.
+
+Verification before claiming done (in `apps/web`):
+
+```bash
+npm run test && npm run build && npx oxlint
+PW_CHROMIUM_PATH=<chromium> npx playwright test e2e/studio.spec.ts   # against `vite preview --port 4173`
+STUDIO_EVIDENCE=1 npx playwright test e2e/studio-evidence.spec.ts    # regenerates docs/studio-evidence/*.png
+```
+
+### Campaign checkpoints
+
+- **Campaign 01 (trail)** — verified complete at the start of Campaign 02 (61 unit tests, build, lint clean). Tag
+  `checkpoint/pre-campaign-02` marks the state before Campaign 02.
+- **Campaign 02 (Studio)** — all ten phases implemented; see `docs/architecture-studio-plan.md` for the milestone log, the
+  scenario matrix and the **known limitations / remaining work** table. Resume from that table, not from scratch.
