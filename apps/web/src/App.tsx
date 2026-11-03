@@ -11,6 +11,7 @@ import { ExplainabilityView } from "./views/ExplainabilityView";
 import { ResearchCenter } from "./views/ResearchCenter";
 import { TrailApp } from "./trail/TrailApp";
 import { LabApp } from "./lab/LabApp";
+import { AtlasApp } from "./atlas/AtlasApp";
 import { checkHealth } from "./api";
 
 export const App: React.FC = () => {
@@ -20,7 +21,8 @@ export const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>(() =>
     window.location.hash.startsWith("#/trail") ? "trail"
       : window.location.hash.startsWith("#/lab") ? "lab"
-        : "mission"
+        : window.location.hash.startsWith("#/atlas") ? "atlas"
+          : "mission"
   );
   const [online, setOnline] = useState<boolean>(false);
   const [showDeckModal, setShowDeckModal] = useState<boolean>(false);
@@ -42,6 +44,9 @@ export const App: React.FC = () => {
       }
       if (window.location.hash.startsWith("#/lab")) {
         setCurrentView("lab");
+      }
+      if (window.location.hash.startsWith("#/atlas")) {
+        setCurrentView("atlas");
       }
     };
     window.addEventListener("hashchange", onHashChange);
@@ -84,7 +89,7 @@ export const App: React.FC = () => {
         <div className="flex flex-1 overflow-hidden">
           <Sidebar currentView={currentView} setCurrentView={setCurrentView} />
 
-          <main className="flex-1 overflow-y-auto p-6 lg:p-8 max-w-7xl mx-auto w-full">
+          <main className={currentView === "atlas" ? "flex-1 overflow-hidden w-full" : "flex-1 overflow-y-auto p-6 lg:p-8 max-w-7xl mx-auto w-full"}>
             {currentView === "mission" && <MissionControl onNavigate={(v) => setCurrentView(v as ViewType)} />}
             {currentView === "stream" && <TransactionStream />}
             {currentView === "graph" && <FraudGraphView />}
@@ -95,6 +100,7 @@ export const App: React.FC = () => {
             {currentView === "research" && <ResearchCenter />}
             {currentView === "trail" && <TrailApp />}
           {currentView === "lab" && <LabApp />}
+          {currentView === "atlas" && <div className="flex-1 overflow-hidden !p-0 !m-0 !max-w-none"><AtlasApp /></div>}
           </main>
         </div>
       </div>
