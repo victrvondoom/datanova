@@ -13,6 +13,7 @@ import { analyzeLatency } from "../engines/latency";
 import { errorBudget, consumeBudget } from "../engines/slo";
 import { saturate } from "../engines/resource";
 import { monthlyCost, complexity, frontier } from "../engines/tradeoff";
+import { fullSensitivity } from "../engines/sensitivity";
 import { flawedCheckoutModel } from "../samples";
 import { Panel, Callout, Metric, FindingsList, OkBadge, StateBadge } from "../ui";
 
@@ -127,6 +128,40 @@ export const ReasoningPanel: React.FC<{ model: ArchitectureModel }> = ({ model }
             hint="vs the flawed checkout fixture" />
         </div>
         <FindingsList findings={[]} emptyText={sat.explanation} />
+      </Panel>
+
+      <Panel title="Sensitivity and uncertainty" subtitle="Which conclusions are fragile? Sweep the declared assumptions.">
+        {(() => {
+          const sens = fullSensitivity(model, model.operations.find((o) => o.criticality >= 4)?.id ?? model.operations[0]?.id ?? "op-upload");
+          return (
+            <div className="space-y-2">
+              <p className="text-[11px] text-slate-400">Most influential parameters: {sens.mostInfluential.join(", ")}</p>
+              {sens.results.map((r) => (
+                <div key={r.parameter} className="rounded-lg border border-slate-700/50 bg-slate-900/40 p-2.5">
+                  <div className="text-xs font-semibold text-slate-100">{r.parameter}
+                    <span className="ml-2 font-mono text-[10px] text-slate-400">declared: {r.declaredValue}</span>
+                  </div>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {r.runs.map((run) => (
+                      <span key={run.multiplier} className="rounded bg-slate-800/70 px-1.5 py-0.5 text-[10px] font-mono text-slate-300">
+                        {run.multiplier}x: {run.outputs.criticalPathLatencyMs}ms, bottleneck {run.outputs.bottleneck} @ {run.outputs.bottleneckUtilization}%
+                        {run.missesDeadline === true ? <span className="text-rose-300"> (miss)</span>
+                          : run.missesDeadline === false ? <span className="text-emerald-300"> (meet)</span> : null}
+                      </span>
+                    ))}
+                  </div>
+                  {r.fragileConclusions.length > 0 && (
+                    <ul className="mt-1">
+                      {r.fragileConclusions.map((c, i) => <li key={i} className="text-[11px] text-amber-200">{"⚠"} {c}</li>)}
+                    </ul>
+                  )}
+                  {r.fragileConclusions.length === 0 && <p className="text-[11px] text-slate-500 mt-1">No conclusion flips across this sweep.</p>}
+                </div>
+              ))}
+              <Callout kind="honest">All swept outputs are modeled values from declared assumptions — validate fragile conclusions before relying on them.</Callout>
+            </div>
+          );
+        })()}
       </Panel>
     </div>
   );

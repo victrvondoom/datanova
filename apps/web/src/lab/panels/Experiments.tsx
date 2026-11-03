@@ -10,6 +10,8 @@ import { stateAt, windowEvents } from "../engines/flightrecorder";
 import { addIdempotency, addRetryPolicy, makeAsync, type MutationResult } from "../engines/mutations";
 import { runExperiment } from "../engines/counterfactual";
 import { exportPackage, parsePackage, reproducePackage } from "../engines/package";
+import { scenarioTemplate, runScenario, type ScenarioTemplateId as TemplateId } from "../engines/scenario";
+import { recoveryTimeline, recoveryBottlenecks } from "../engines/recovery-timeline";
 import { Panel, FindingsList, Callout, Metric, Btn, StateBadge } from "../ui";
 
 export const ExperimentsPanel: React.FC<{
@@ -26,6 +28,8 @@ export const ExperimentsPanel: React.FC<{
   const window = useMemo(() => windowEvents(chaos.recording, replaySeq, replaySeq + 4), [chaos, replaySeq]);
 
   const [mutation, setMutation] = useState<MutationResult | null>(null);
+  const [templateId, setTemplateId] = useState<TemplateId>("peak-hour-outage");
+  const [scenarioRun, setScenarioRun] = useState<ReturnType<typeof runScenario> | null>(null);
   const [pkgText, setPkgText] = useState("");
   const [pkgNote, setPkgNote] = useState("");
 
@@ -151,6 +155,78 @@ export const ExperimentsPanel: React.FC<{
                 </div>
               </div>
             )}
+          </div>
+        )}
+      </Panel>
+
+      <Panel title="Scenario runner" subtitle="Versioned workload + fault scenarios bound to this architecture's genome"
+        right={
+          <div className="flex items-center gap-2">
+            <label htmlFor="scenario-template" className="text-xs text-slate-300">Template</label>
+            <select id="scenario-template" value={templateId}
+              onChange={(e) => setTemplateId(e.target.value as TemplateId)}
+              className="rounded-md bg-slate-800 border border-slate-600 px-2 py-1 text-xs text-slate-100">
+              <option value="peak-hour-outage">Peak-hour outage</option>
+              <option value="burst-overload">Burst overload</option>
+              <option value="dependency-brownout">Dependency brownout</option>
+            </select>
+            <Btn onClick={() => setScenarioRun(runScenario(model, scenarioTemplate(templateId, model, 50)))}>
+              Run scenario
+            </Btn>
+          </div>
+        }>
+        {scenarioRun === null ? (
+          <p className="text-xs text-slate-400">
+            Pick a template and run it: the workload simulation, fault plan, and expectation review all execute
+            deterministically against the current architecture.
+          </p>
+        ) : (
+          <div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+              <Metric label="Arrived / processed" value={`${scenarioRun.workload.totalArrived} / ${scenarioRun.workload.totalProcessed}`} />
+              <Metric label="Dropped" value={scenarioRun.workload.totalDropped} />
+              <Metric label="Expectations" value={`${scenarioRun.expectationResults.filter((r) => r.outcome === "pass").length}/${scenarioRun.expectationResults.length} pass`} />
+              <Metric label="Deterministic" value={scenarioRun.deterministic ? "yes" : "no"} />
+            </div>
+            <ul className="space-y-1 mb-3">
+              {scenarioRun.expectationResults.map((r) => (
+                <li key={r.expectationId} className="text-[11px]">
+                  <StateBadge severity={r.outcome === "pass" ? "info" : "critical"} />
+                  <span className={`ml-2 font-mono font-bold ${r.outcome === "pass" ? "text-emerald-300" : "text-rose-300"}`}>
+                    [{r.outcome}]
+                  </span>
+                  <span className="ml-1 font-mono text-slate-400">{r.kind}</span>
+                  <span className="ml-1 text-slate-300">{r.detail}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="rounded-lg border border-slate-700/50 bg-slate-900/40 p-2.5">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Recovery timeline (folded from the recording)</div>
+              {(() => {
+                const tl = recoveryTimeline(model, scenarioRun.faults.recording);
+                const bottlenecks = recoveryBottlenecks(tl);
+                return (
+                  <div>
+                    {tl.components.length === 0 && <p className="text-[11px] text-slate-400">No faults were injected by this scenario.</p>}
+                    {tl.components.map((c) => (
+                      <p key={c.componentId} className="text-[11px] text-slate-300">
+                        <span className="font-mono text-slate-400">{c.componentId}</span>: {c.finalPhase}
+                        <span className="text-slate-500"> ({c.steps.map((st) => st.phase).join(" → ")})</span>
+                      </p>
+                    ))}
+                    {bottlenecks.map((b) => (
+                      <p key={b.componentId} className="text-[11px] text-amber-200">
+                        Bottleneck {b.componentId}: {b.reason} {"—"} {b.unblockingAction}
+                      </p>
+                    ))}
+                    {tl.anomalies.map((a, i) => (
+                      <p key={i} className="text-[11px] text-rose-300">Anomaly #{a.seq}: {a.problem}</p>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+            <Callout kind="honest">{scenarioRun.assumptions[scenarioRun.assumptions.length - 1]}</Callout>
           </div>
         )}
       </Panel>

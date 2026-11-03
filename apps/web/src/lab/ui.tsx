@@ -7,6 +7,7 @@
 import React from "react";
 import { AlertTriangle, CheckCircle2, Info, XCircle } from "lucide-react";
 import type { Finding, Severity } from "./model";
+import { kindOfSource, type EvidenceKind } from "./engines/evidence";
 
 export const Panel: React.FC<{ title: string; subtitle?: string; children: React.ReactNode; right?: React.ReactNode }> =
   ({ title, subtitle, children, right }) => (
@@ -61,6 +62,22 @@ export const EvidenceChips: React.FC<{ evidence: { ref: string; detail: string }
   </div>
 );
 
+const KIND_CLS: Record<EvidenceKind, string> = {
+  observed: "bg-emerald-500/10 text-emerald-300 border-emerald-500/40",
+  simulated: "bg-violet-500/10 text-violet-300 border-violet-500/40",
+  inferred: "bg-amber-500/10 text-amber-300 border-amber-500/40",
+  "user-authored": "bg-sky-500/10 text-sky-300 border-sky-500/40",
+};
+
+/** Evidence-kind chip: label + icon + color (never color alone). */
+export const EvidenceKindChip: React.FC<{ kind: EvidenceKind }> = ({ kind }) => (
+  <span className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${KIND_CLS[kind]}`}
+    title={`Evidence kind: ${kind}`}>
+    <Info size={11} aria-hidden />
+    {kind}
+  </span>
+);
+
 export const FindingsList: React.FC<{ findings: Finding[]; emptyText?: string }> = ({ findings, emptyText = "No findings." }) => (
   <ul className="space-y-2">
     {findings.length === 0 && <li className="text-xs text-slate-400">{emptyText}</li>}
@@ -68,6 +85,7 @@ export const FindingsList: React.FC<{ findings: Finding[]; emptyText?: string }>
       <li key={f.id} className="rounded-lg border border-slate-700/50 bg-slate-900/40 p-2.5">
         <div className="flex items-center gap-2 flex-wrap">
           <StateBadge severity={f.severity} />
+          <EvidenceKindChip kind={kindOfSource(f.source)} />
           <span className="text-xs font-semibold text-slate-100">{f.title}</span>
         </div>
         <p className="text-xs text-slate-300 mt-1 leading-relaxed">{f.detail}</p>

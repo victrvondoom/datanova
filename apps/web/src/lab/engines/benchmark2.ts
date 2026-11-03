@@ -16,7 +16,8 @@ import {
 import { docflowModel, flawedCheckoutModel } from "../samples";
 import { propagate } from "./causal";
 import { runExperiment, type CounterfactualExperiment } from "./counterfactual";
-import { checkContract, type ConsistencyContract } from "./consistency";
+import { checkContract } from "./consistency";
+import type { ConsistencyContract } from "../model";
 import { analyzeBoundaries } from "./trust";
 import { generateTenantMatrix } from "./tenantmatrix";
 import { evaluateRecovery, type RecoveryCriterion } from "./recovery";
@@ -24,7 +25,7 @@ import { startRecording, record } from "./flightrecorder";
 import { explainComponent, checkGrounding } from "./explain";
 import { analyzeIntent } from "./intent";
 import { critiqueArchitecture } from "./critic";
-import { buildEvidencePack, captureFinding, checkEvidenceIntegrity } from "./evidence";
+import { buildEvidencePack, captureFinding, checkEvidenceIntegrity, type EvidenceArtifact } from "./evidence";
 import { extractGenome } from "./genome";
 
 export type ScenarioOutcome = "pass" | "fail" | "not-applicable" | "insufficient-evidence";
@@ -369,7 +370,7 @@ function provenanceDimension(): DimensionResult {
         : `integrity issues: ${integrity.issues.slice(0, 3).map((i) => `${i.artifactId}: ${i.problem}`).join("; ")}`,
     });
     // a fabricated artifact must be REJECTED
-    const bad = [...artifacts, {
+    const bad: EvidenceArtifact[] = [...artifacts, {
       id: "ev-bad", kind: "simulated", source: "engine:test", summary: "claim",
       createdAt, modelVersion: 1, assumptions: [], refs: ["component:ghost"],
     }];

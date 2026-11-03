@@ -73,6 +73,12 @@ const SOURCE_KINDS: { prefix: string; kind: EvidenceKind }[] = [
   { prefix: "obs", kind: "inferred" },
 ];
 
+/** UI helper: what kind of evidence does a finding's source engine produce? */
+export function kindOfSource(source: string): EvidenceKind {
+  const hit = SOURCE_KINDS.find((s) => source.startsWith(s.prefix));
+  return hit?.kind ?? "inferred";
+}
+
 /** Capture a finding as an evidence artifact (kind derived from its source). */
 export function captureFinding(
   f: Finding,

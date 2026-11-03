@@ -58,3 +58,17 @@ the original C03 test evidence **and** the re-verification run performed in
 this campaign (the full suite was re-run at campaign start and again at the
 end). No score is fabricated, no synthetic result is presented as real-world
 validation, and no simulation output is presented as production telemetry.
+
+## Final status (computed from `task-ledger.md`)
+
+- Major tasks: **45/45 VERIFIED** (0 in progress, 0 blocked, 0 not started).
+- Work packages: **225/225 VERIFIED** — 100% verified completion.
+- Final verification (all executed; exact commands in
+  `test-and-evidence-report.md`): vitest **286/286** · oxlint **0** ·
+  `npm run build` ✓ · Playwright **24/24** (phase A offline 23 + phase B
+  online 1) · pytest **141/141** + release gates **12/12** · mypy clean ·
+  ruff clean.
+- Outstanding honest gaps (see `known-limitations.md`): manual
+  screen-reader testing **NOT YET RUN** (protocol delivered); benchmark v2
+  is a synthetic self-consistency instrument, not external validation.
+

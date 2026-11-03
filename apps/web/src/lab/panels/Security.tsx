@@ -9,6 +9,7 @@ import { crossings, analyzeBoundaries } from "../engines/trust";
 import { analyzeLineage } from "../engines/lineage";
 import { decide, enforcementPoints, enforcementGaps, leastPrivilegeReview } from "../engines/authz";
 import { injectTenantFailures, compareStrategies } from "../engines/tenant";
+import { generateTenantMatrix } from "../engines/tenantmatrix";
 import { reviewAdversarially, THREAT_LIBRARY } from "../engines/adversarial";
 import { Panel, FindingsList, StateBadge, Callout } from "../ui";
 
@@ -95,6 +96,29 @@ export const SecurityPanel: React.FC<{ model: ArchitectureModel }> = ({ model })
 
       <Panel title="Multi-tenant isolation" subtitle="Where tenant context is established, propagated — and where it can be lost">
         <FindingsList findings={tenant.findings} emptyText="Every tenant-scoped store enforces isolation." />
+        {(() => {
+          const matrix = generateTenantMatrix(model);
+          return (
+            <div className="mt-3 rounded-lg border border-slate-700/50 bg-slate-900/40 p-2.5">
+              <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">
+                Isolation test matrix ({matrix.cases.length} cases, {matrix.passed} pass, {matrix.violations} violations)
+              </div>
+              <ul className="max-h-40 overflow-y-auto space-y-0.5">
+                {matrix.results.map((r) => (
+                  <li key={r.caseId} className={`text-[11px] ${r.outcome === "pass" ? "text-slate-300" : "text-amber-200"}`}>
+                    [{r.outcome}] {r.caseId}: {r.detail}
+                  </li>
+                ))}
+              </ul>
+              {matrix.uncoveredEntities.length > 0 && (
+                <p className="text-[11px] text-amber-200 mt-1">
+                  Holders with no isolation mechanism: {matrix.uncoveredEntities.map((u) => `${u.holder} (${u.entityId})`).join(", ")}
+                </p>
+              )}
+              <Callout kind="honest">{matrix.assumptions[0]}</Callout>
+            </div>
+          );
+        })()}
         <div className="grid md:grid-cols-3 gap-2 mt-3">
           {compareStrategies().map((s) => (
             <div key={s.strategy} className="rounded-lg border border-slate-700/50 bg-slate-900/40 p-2.5">

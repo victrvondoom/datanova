@@ -9,6 +9,7 @@ import { parseModel, serializeModel, type ArchitectureModel } from "./model";
 import { BUILTIN_ARCHETYPES, loadLabState, resetLabState, saveLabState, type LabState, type LearningMode } from "./store";
 import { LAB_TABS, TAB_LABELS, useLabTab } from "./router";
 import { OverviewPanel } from "./panels/Overview";
+import { IntentPanel } from "./panels/Intent";
 import { CausalityPanel } from "./panels/Causality";
 import { ReasoningPanel } from "./panels/Reasoning";
 import { DataPanel } from "./panels/Data";
@@ -94,6 +95,12 @@ export const LabApp: React.FC = () => {
       )}
 
       <main>
+        {tab === "intent" && (
+          <IntentPanel onAdopt={(m) => {
+            setModel(m);
+            setState((st) => ({ ...st, archId: "custom" }));
+          }} />
+        )}
         {tab === "overview" && <OverviewPanel model={model} mode={state.mode} />}
         {tab === "causality" && <CausalityPanel model={model} />}
         {tab === "reasoning" && <ReasoningPanel model={model} />}

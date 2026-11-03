@@ -10,7 +10,7 @@
  */
 
 import {
-  type ArchitectureModel, type Requirement, emptyModel, newId,
+  type ArchitectureModel, type Requirement, emptyModel,
 } from "../model";
 
 export interface IntentSpecInput {
@@ -125,11 +125,15 @@ export function compileIntent(raw: IntentSpecInput): CompiledIntent {
   }) : null;
   if (raw.latencyDeadlineMs === undefined) unresolved.push("latency deadline — add requirement INT-3 after deciding");
 
-  const nfrAvail = raw.availabilityPercent !== undefined ? addReq({
+  addReq(raw.availabilityPercent !== undefined ? {
     id: "INT-4", kind: "nfr", category: "availability",
     statement: `Availability >= ${raw.availabilityPercent}% monthly.`,
     acceptance: `Modeled availability meets ${raw.availabilityPercent}% over a rolling 30-day window.`,
-  }) : null;
+  } : {
+    id: "INT-4", kind: "nfr", category: "availability",
+    statement: "Availability target is UNRESOLVED (set it after review).",
+    acceptance: "The availability target is measurable once decided.",
+  });
   if (raw.availabilityPercent === undefined) unresolved.push("availability target — add requirement INT-4 after deciding");
 
   const nfrRaw = addReq({

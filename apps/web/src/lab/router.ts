@@ -5,13 +5,14 @@
 import { useEffect, useState } from "react";
 
 export const LAB_TABS = [
-  "overview", "causality", "reasoning", "data", "security",
+  "intent", "overview", "causality", "reasoning", "data", "security",
   "experiments", "review", "capstone",
 ] as const;
 
 export type LabTab = (typeof LAB_TABS)[number];
 
 export const TAB_LABELS: Record<LabTab, string> = {
+  intent: "1. Intent",
   overview: "Architecture & Intent",
   causality: "Causality & Blast Radius",
   reasoning: "Capacity & Latency",

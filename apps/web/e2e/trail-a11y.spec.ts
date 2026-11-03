@@ -35,9 +35,19 @@ test("prefers-reduced-motion disables bar animations", async ({ page }) => {
 test.describe("visual baselines (regenerate with --update-snapshots)", () => {
   test.use({ colorScheme: "dark" });
 
+  // The global "Backend offline" banner appears asynchronously once the
+  // health probes fail (~1.5-4.5s) and SHIFTS THE ENTIRE LAYOUT DOWN. Waiting
+  // for it (the documented e2e phase runs with the API stopped) makes the
+  // screenshots deterministic; racing it was the real flake root cause.
+  const waitForSettledLayout = async (page: import("@playwright/test").Page): Promise<void> => {
+    // .first() = the global banner (mission control also renders the text)
+    await expect(page.getByText("Backend offline", { exact: true }).first()).toBeVisible({ timeout: 10_000 });
+  };
+
   test("trail landing matches baseline", async ({ page }) => {
     await page.goto("/");
     await page.evaluate(() => window.localStorage.clear());
+    await waitForSettledLayout(page);
     await page.getByText("Vibe Coding Trail", { exact: false }).first().click();
     await expect(page.getByRole("heading", { name: "Vibe Coding Trail" })).toBeVisible();
     await expect(page).toHaveScreenshot("trail-landing.png", {
@@ -49,12 +59,13 @@ test.describe("visual baselines (regenerate with --update-snapshots)", () => {
 
   test("topic 01 token bucket matches baseline", async ({ page }) => {
     // The bucket refills on a setInterval, so the fill bar drifts in real
-    // time -> nondeterministic screenshots. Freeze the page clock: the burst
-    // is a synchronous state update, so the bucket level after the click is
-    // exactly capacity-10 and never changes before the screenshot.
-    await page.clock.install();
+    // time -> nondeterministic screenshots. Freeze the page clock AFTER the
+    // layout settles (the health-check banner arrives asynchronously and
+    // shifts the whole page — see waitForSettledLayout).
     await page.goto("/");
     await page.evaluate(() => window.localStorage.clear());
+    await waitForSettledLayout(page);
+    await page.clock.install();
     await page.goto("/#/trail/topic/01");
     await page.getByRole("button", { name: "Burst ×10" }).click();
     await expect(page.getByText("Accepted (200)", { exact: true })).toBeVisible();

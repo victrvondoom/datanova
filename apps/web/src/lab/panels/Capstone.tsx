@@ -6,11 +6,16 @@
 import React, { useMemo, useState } from "react";
 import type { ArchitectureModel } from "../model";
 import { runCapstone } from "../engines/capstone";
-import { runBenchmark, renderBenchmarkReport } from "../engines/benchmark";
+import { runBenchmark } from "../engines/benchmark";
+import { runBenchmarkV2, renderBenchmarkV2Report } from "../engines/benchmark2";
+import {
+  captureFinding, buildEvidencePack, serializeEvidencePack, checkEvidenceIntegrity, kindSummary,
+} from "../engines/evidence";
+import { extractGenome } from "../engines/genome";
 import { recordRevision } from "../engines/mission";
 import { Panel, Callout, Metric, Btn, EvidenceChips } from "../ui";
 
-export const CapstonePanel: React.FC<{ model: ArchitectureModel }> = ({ model: _model }) => {
+export const CapstonePanel: React.FC<{ model: ArchitectureModel }> = ({ model }) => {
   const [runAt, setRunAt] = useState<string | null>(null);
   const capstone = useMemo(
     () => runCapstone({
@@ -19,6 +24,7 @@ export const CapstonePanel: React.FC<{ model: ArchitectureModel }> = ({ model: _
       revisions: recordRevision([], "after-first-analysis", "scaled workers", "MC-5 doubled peak traffic"),
     }), [runAt]);
   const benchmark = useMemo(() => runBenchmark(null, runAt ?? "not yet run"), [runAt]);
+  const benchmarkV2 = useMemo(() => runBenchmarkV2(runAt ?? "not yet run"), [runAt]);
   const [exported, setExported] = useState("");
 
   return (
@@ -28,6 +34,32 @@ export const CapstonePanel: React.FC<{ model: ArchitectureModel }> = ({ model: _
           <Btn onClick={() => setRunAt(new Date().toISOString())}>Run the capstone lifecycle</Btn>
           <Btn onClick={() => setExported(JSON.stringify(capstone.evidence, null, 2))}>Export evidence package</Btn>
         </div>}>
+        {(() => {
+          // Evidence pack: capture the intelligence findings as typed artifacts
+          const findings = [...capstone.intelligence.criticFindings, ...capstone.intelligence.securityFindings];
+          const artifacts = findings.map((f) => captureFinding(f, {
+            createdAt: runAt ?? "not yet run",
+            archFingerprint: extractGenome(model).fingerprint,
+          }));
+          const pack = buildEvidencePack("capstone-pack", artifacts, runAt ?? "not yet run");
+          const integrity = checkEvidenceIntegrity(model, artifacts);
+          const kinds = kindSummary(artifacts);
+          return (
+            <div className="rounded-lg border border-slate-700/50 bg-slate-900/40 p-3 mb-3">
+              <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">Evidence pack</h4>
+                <Btn onClick={() => setExported(serializeEvidencePack(pack))}>Export evidence pack (JSON)</Btn>
+              </div>
+              <p className="text-[11px] text-slate-300">
+                {artifacts.length} artifacts — kinds: simulated {kinds.simulated}, inferred {kinds.inferred},
+                observed {kinds.observed} (none: this lab produces no production telemetry), user-authored {kinds["user-authored"]}.
+              </p>
+              <p className={`text-[11px] ${integrity.ok ? "text-emerald-300" : "text-rose-300"}`}>
+                Integrity: {integrity.ok ? "all references resolve, provenance complete" : integrity.issues.map((i) => i.problem).join("; ")}
+              </p>
+            </div>
+          );
+        })()}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
           <Metric label="Architecture" value={capstone.evidence.architectureSummary.name}
             hint={`${capstone.evidence.architectureSummary.components} components, ${capstone.evidence.architectureSummary.connections} connections`} />
@@ -83,16 +115,15 @@ export const CapstonePanel: React.FC<{ model: ArchitectureModel }> = ({ model: _
         )}
       </Panel>
 
-      <Panel title="Intelligence benchmark" subtitle="Reasoning quality measured against a ground-truth corpus — executed, not invented"
+      <Panel title="Intelligence benchmark v2" subtitle="Eight dimensions of reasoning quality, executed against a synthetic corpus — not real-world validation"
         right={<span className="text-[10px] text-slate-400">
-          precision {benchmark.summary.precision} / recall {benchmark.summary.recall}
+          v1 critic: precision {benchmark.summary.precision} / recall {benchmark.summary.recall}
         </span>}>
-        <pre className="max-h-72 overflow-auto rounded-lg border border-slate-700/50 bg-slate-900/60 p-3 text-[10px] leading-relaxed text-slate-300 whitespace-pre-wrap">
-          {renderBenchmarkReport(benchmark)}
+        <pre className="max-h-80 overflow-auto rounded-lg border border-slate-700/50 bg-slate-900/60 p-3 text-[10px] leading-relaxed text-slate-300 whitespace-pre-wrap">
+          {renderBenchmarkV2Report(benchmarkV2)}
         </pre>
         <Callout kind="honest">
-          Benchmark metrics come from running the critic against the corpus in this session.
-          Changing validation rules requires re-running the suite and updating the ground truth with the change.
+          {benchmarkV2.limitations[0]}
         </Callout>
       </Panel>
 

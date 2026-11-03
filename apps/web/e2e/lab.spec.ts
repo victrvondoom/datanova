@@ -75,8 +75,53 @@ test("capstone: run the lifecycle and read the evidence package", async ({ page 
   await expect(page.getByText(/Open questions and limitations/).first()).toBeVisible();
   await expect(page.getByText(/Intelligence benchmark/).first()).toBeVisible();
   // benchmark report is rendered from an executed run (all ground truth found)
-  await expect(page.getByText(/precision 1, recall 1/).first()).toBeVisible();
-  await expect(page.getByText(/unsupported-claim rate 0/).first()).toBeVisible();
+  await expect(page.getByText(/v1 critic: precision 1 \/ recall 1/).first()).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Intelligence benchmark v2" })).toBeVisible();
+  await expect(page.getByText(/scenarios passed across/).first()).toBeVisible();
+  await expect(page.getByText("## Limitations").first()).toBeVisible();
+});
+
+test("campaign 04: intent -> compiled starter model -> adopt as working architecture", async ({ page }) => {
+  await page.goto("#/lab/intent");
+  await expect(page.getByRole("heading", { name: /1\. Intent/ })).toBeVisible();
+  await page.getByRole("button", { name: "Compile and review intent" }).click();
+  await expect(page.getByText("Intent review")).toBeVisible();
+  await expect(page.getByText(/No intent problems detected/)).toBeVisible();
+  await expect(page.getByText(/Unresolved fields/)).toBeVisible(); // example intent leaves the staleness bound open
+  await expect(page.getByText("Compiled starter architecture")).toBeVisible();
+  await page.getByRole("button", { name: "Adopt as my architecture" }).click();
+  // the adopted starter becomes the working model on the overview canvas
+  await page.goto("#/lab/overview");
+  await expect(page.getByRole("img", { name: /Architecture canvas: 6 components/ })).toBeVisible();
+  // and it survives a reload (persisted via the lab store)
+  await page.reload();
+  await expect(page.getByRole("img", { name: /Architecture canvas: 6 components/ })).toBeVisible();
+});
+
+test("campaign 04: scenario runner executes a versioned scenario end to end", async ({ page }) => {
+  await page.goto("#/lab/experiments");
+  await page.getByRole("button", { name: "Run scenario" }).click();
+  await expect(page.getByText("Scenario runner")).toBeVisible();
+  await expect(page.getByText(/Expectations/).first()).toBeVisible();
+  await expect(page.getByText(/\[pass\]/).first()).toBeVisible();
+  await expect(page.getByText(/Recovery timeline/)).toBeVisible();
+  // the recovery timeline shows the faulted component's phases
+  await expect(page.getByText(/faulted/).first()).toBeVisible();
+});
+
+test("campaign 04: capstone exports an evidence pack with typed provenance", async ({ page }) => {
+  await page.goto("#/lab/capstone");
+  await page.getByRole("button", { name: "Run the capstone lifecycle" }).click();
+  await expect(page.getByText(/Evidence pack/).first()).toBeVisible();
+  await expect(page.getByText(/Integrity: all references resolve, provenance complete/)).toBeVisible();
+  await expect(page.getByText(/observed 0/)).toBeVisible(); // no production telemetry, honestly
+  await page.getByRole("button", { name: "Export evidence pack (JSON)" }).click();
+  await expect(page.getByText("Evidence package export")).toBeVisible();
+  await expect(page.getByLabel("Evidence package JSON")).toBeVisible();
+  // the benchmark v2 report renders with all eight dimensions
+  await expect(page.getByRole("heading", { name: "Intelligence benchmark v2" })).toBeVisible();
+  await expect(page.getByText("| model-validation |")).toBeVisible();
+  await expect(page.getByText("| provenance |")).toBeVisible();
 });
 
 test("lab state persists across reload and reset works", async ({ page }) => {

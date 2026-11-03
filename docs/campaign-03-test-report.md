@@ -79,13 +79,21 @@ across reload + deep links + reset.
 2. The `trail-a11y` visual baselines are now deterministic: the token-bucket
    refill `setInterval` is frozen with Playwright's clock API (the burst is a
    synchronous state update, so the bucket level is exactly capacity-10 at
-   screenshot time — the regenerated screenshot was pixel-identical to the
-   committed baseline), and the suite runs with `workers: 1` because concurrent
+   screenshot time), and the suite runs with `workers: 1` because concurrent
    browser instances caused rasterization variance in the pixel diff.
-   Baselines depend on the documented backend state (the global
-   "Backend offline" banner is part of the page).
-3. The lab has no dedicated screen-reader E2E (the trail has one); the lab UI
-   follows the same labeled-control + badge(label+icon+color) conventions and
-   all interactive controls are labeled, but SR-only navigation was not
-   automated.
-4. The benchmark scores the critic rule set only (documented in every report).
+   **Root cause found and fixed in Campaign 04:** the global "Backend
+   offline" banner arrives asynchronously (~1.5–4.5 s) and shifts the whole
+   page; the test now waits for the banner *before* freezing the clock, and
+   the committed baseline is stable across three consecutive full-spec runs
+   (see `docs/campaign-04/decision-log.md` D06). Baselines depend on the
+   documented backend state (the banner is part of the page).
+3. ~~The lab has no dedicated screen-reader E2E~~ — **closed in Campaign 04:**
+   `e2e/lab-a11y.spec.ts` (6 browser-level a11y tests) + the manual
+   screen-reader protocol in `docs/campaign-04/screen-reader-protocol.md`
+   (protocol delivered; real-AT execution still outstanding, honestly
+   tracked in `docs/campaign-04/known-limitations.md`).
+4. ~~The benchmark scores the critic rule set only~~ — **closed in Campaign
+   04:** benchmark v2 (`engines/benchmark2.ts`) scores 8 dimensions over 29
+   synthetic scenarios with a CI regression gate; it remains a synthetic
+   self-consistency instrument, not external validation
+   (`docs/campaign-04/known-limitations.md`).
