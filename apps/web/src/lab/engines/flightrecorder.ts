@@ -87,7 +87,7 @@ export function stateAt(rec: Recording, upToSeq: number): ReplayState {
     .forEach((e) => {
       lastSeq = e.seq;
       if (e.componentId === undefined) return;
-      if (e.type === "status-change" || e.type === "fault") {
+      if (e.type === "status-change" || e.type === "fault" || e.type === "recovery") {
         statuses[e.componentId] = e.to ?? "unknown";
       } else if (e.type === "queue-depth") {
         queueDepth[e.componentId] = (queueDepth[e.componentId] ?? 0) + 1;

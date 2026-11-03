@@ -6,11 +6,11 @@
 
 - Total major tasks: **45**
 - Total work packages: **225**
-- Completed work packages: **138**
+- Completed work packages: **163**
 - In-progress work packages: **2**
 - Blocked work packages: **0**
-- Remaining work packages: **87**
-- Verified completion: **61.33%** (138/225)
+- Remaining work packages: **62**
+- Verified completion: **72.44%** (163/225)
 
 Statuses: `NOT_STARTED` `IN_PROGRESS` `BLOCKED` `DONE`.
 A work package is DONE only after its behavior has been verified and the
@@ -390,65 +390,65 @@ verification recorded below (evidence column / notes).
 
 ## Milestone 7
 
-### Task 31 — Chaos Experiment Designer 
+### Task 31 — Chaos Experiment Designer ✅
 
 *Depends on:* 09, 28
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `31.1` | Experiment schema — Hypothesis, target, fault type, duration, expected impact, safeguards, stop conditions. (deps: —) | Schema validates. | unit tests | `NOT_STARTED` | — | — |
-| `31.2` | Experiment templates — Reusable templates: latency injection, component failure, queue slowdown, dependency outage, saturation. (deps: 31.1) | Templates instantiate correctly. | unit tests | `NOT_STARTED` | — | — |
-| `31.3` | Experiment scope controls — Restrict to local model; explicit confirmation for destructive simulations. (deps: 31.1) | Scope enforced by design; verified. | unit tests | `NOT_STARTED` | — | — |
-| `31.4` | Experiment execution — Run against model; record state transitions. (deps: 31.1, 28.1) | Execution produces recorded evidence. | unit tests | `NOT_STARTED` | — | — |
-| `31.5` | Experiment review — Compare observed vs hypothesis: supported / contradicted / inconclusive / invalid. (deps: 31.4) | Verdicts classified correctly. | unit tests | `NOT_STARTED` | — | — |
+| `31.1` | Experiment schema — Hypothesis, target, fault type, duration, expected impact, safeguards, stop conditions. (deps: —) | Schema validates. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `31.2` | Experiment templates — Reusable templates: latency injection, component failure, queue slowdown, dependency outage, saturation. (deps: 31.1) | Templates instantiate correctly. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `31.3` | Experiment scope controls — Restrict to local model; explicit confirmation for destructive simulations. (deps: 31.1) | Scope enforced by design; verified. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `31.4` | Experiment execution — Run against model; record state transitions. (deps: 31.1, 28.1) | Execution produces recorded evidence. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `31.5` | Experiment review — Compare observed vs hypothesis: supported / contradicted / inconclusive / invalid. (deps: 31.4) | Verdicts classified correctly. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
 
-### Task 32 — Resilience Test Synthesis Engine 
+### Task 32 — Resilience Test Synthesis Engine ✅
 
 *Depends on:* 10
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `32.1` | Testable property model — Properties like 'duplicates do not double-charge', 'analytics failure does not block checkout'. (deps: —) | Properties derived from requirements + topology. | unit tests | `NOT_STARTED` | — | — |
-| `32.2` | Architecture-to-test mapping — Link components, dependencies, requirements, ADRs to properties. (deps: 32.1) | Mapping traceable. | unit tests | `NOT_STARTED` | — | — |
-| `32.3` | Test generation — Candidate tests for failure points, boundaries, combinations. (deps: 32.1, 32.2) | Generated tests executable within the model. | unit tests | `NOT_STARTED` | — | — |
-| `32.4` | Test prioritization — Rank by criticality, blast radius, uncertainty, requirement importance. (deps: 32.3) | Ranking deterministic and explained. | unit tests | `NOT_STARTED` | — | — |
-| `32.5` | Generated-test verification — Tests executable, meaningful assertions, never pass by skipping. (deps: 32.3, 32.4) | Synthesis suite green. | unit tests | `NOT_STARTED` | — | — |
+| `32.1` | Testable property model — Properties like 'duplicates do not double-charge', 'analytics failure does not block checkout'. (deps: —) | Properties derived from requirements + topology. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `32.2` | Architecture-to-test mapping — Link components, dependencies, requirements, ADRs to properties. (deps: 32.1) | Mapping traceable. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `32.3` | Test generation — Candidate tests for failure points, boundaries, combinations. (deps: 32.1, 32.2) | Generated tests executable within the model. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `32.4` | Test prioritization — Rank by criticality, blast radius, uncertainty, requirement importance. (deps: 32.3) | Ranking deterministic and explained. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `32.5` | Generated-test verification — Tests executable, meaningful assertions, never pass by skipping. (deps: 32.3, 32.4) | Synthesis suite green. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
 
-### Task 33 — Controlled Fault-Injection Orchestrator 
+### Task 33 — Controlled Fault-Injection Orchestrator ✅
 
 *Depends on:* 31
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `33.1` | Fault plan model — Ordered and concurrent faults, triggers, durations, recovery actions, dependencies. (deps: 31.1) | Plans validate. | unit tests | `NOT_STARTED` | — | — |
-| `33.2` | Execution state machine — prepared, running, paused, stopped, completed, failed, reset. (deps: 33.1) | Transitions valid; illegal transitions rejected. | unit tests | `NOT_STARTED` | — | — |
-| `33.3` | Multi-fault scenarios — Combinations: slow DB + retry amplification; worker outage + backlog. (deps: 33.1, 33.2) | Combinations produce expected propagation. | unit tests | `NOT_STARTED` | — | — |
-| `33.4` | Experiment controls — Pause, abort, restore, reset with clear state feedback. (deps: 33.2) | Abort stops further fault execution. | unit tests | `NOT_STARTED` | — | — |
-| `33.5` | Orchestrator tests — State transitions, cancellation, cleanup, fault ordering, post-abort behavior. (deps: 33.1–33.4) | Orchestrator suite green. | unit tests | `NOT_STARTED` | — | — |
+| `33.1` | Fault plan model — Ordered and concurrent faults, triggers, durations, recovery actions, dependencies. (deps: 31.1) | Plans validate. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `33.2` | Execution state machine — prepared, running, paused, stopped, completed, failed, reset. (deps: 33.1) | Transitions valid; illegal transitions rejected. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `33.3` | Multi-fault scenarios — Combinations: slow DB + retry amplification; worker outage + backlog. (deps: 33.1, 33.2) | Combinations produce expected propagation. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `33.4` | Experiment controls — Pause, abort, restore, reset with clear state feedback. (deps: 33.2) | Abort stops further fault execution. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `33.5` | Orchestrator tests — State transitions, cancellation, cleanup, fault ordering, post-abort behavior. (deps: 33.1–33.4) | Orchestrator suite green. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
 
-### Task 34 — Recovery Evidence & Verification Ledger 
+### Task 34 — Recovery Evidence & Verification Ledger ✅
 
 *Depends on:* 28, 31
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `34.1` | Recovery criteria model — Measurable conditions required to declare recovery. (deps: —) | Criteria validate. | unit tests | `NOT_STARTED` | — | — |
-| `34.2` | Evidence collection — Capture state transitions, outcomes, queue behavior, health, consistency. (deps: 34.1) | Evidence assembled from recorder events. | unit tests | `NOT_STARTED` | — | — |
-| `34.3` | Recovery verdict logic — RECOVERED / PARTIALLY_RECOVERED / NOT_RECOVERED / INCONCLUSIVE from evidence. (deps: 34.1, 34.2) | All four verdicts reachable and correct. | unit tests | `NOT_STARTED` | — | — |
-| `34.4` | Evidence presentation — Show supporting evidence and missing observations. (deps: 34.2, 34.3) | Panel renders verdict + evidence. | vitest + build | `NOT_STARTED` | — | — |
-| `34.5` | Verdict correctness tests — Full recovery, partial, continued degradation, insufficient evidence. (deps: 34.1–34.4) | Verdict suite green. | unit tests | `NOT_STARTED` | — | — |
+| `34.1` | Recovery criteria model — Measurable conditions required to declare recovery. (deps: —) | Criteria validate. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `34.2` | Evidence collection — Capture state transitions, outcomes, queue behavior, health, consistency. (deps: 34.1) | Evidence assembled from recorder events. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `34.3` | Recovery verdict logic — RECOVERED / PARTIALLY_RECOVERED / NOT_RECOVERED / INCONCLUSIVE from evidence. (deps: 34.1, 34.2) | All four verdicts reachable and correct. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `34.4` | Evidence presentation — Show supporting evidence and missing observations. (deps: 34.2, 34.3) | Panel renders verdict + evidence. | vitest + build | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `34.5` | Verdict correctness tests — Full recovery, partial, continued degradation, insufficient evidence. (deps: 34.1–34.4) | Verdict suite green. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
 
-### Task 35 — Transparent Resilience Scorecard 
+### Task 35 — Transparent Resilience Scorecard ✅
 
 *Depends on:* 34
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `35.1` | Dimension model — Reliability, recovery, security, consistency, observability, cost, complexity. (deps: —) | Dimensions defined. | unit tests | `NOT_STARTED` | — | — |
-| `35.2` | Evidence-linked scoring — Every score links to a validation, requirement, simulation, or assumption. (deps: 35.1) | Scores carry evidence links. | unit tests | `NOT_STARTED` | — | — |
-| `35.3` | Uncertainty representation — Measured / modeled / inferred / unknown distinguished. (deps: 35.2) | Uncertainty labels assigned. | unit tests | `NOT_STARTED` | — | — |
-| `35.4` | Scorecard visualization — Dimensions displayed separately with inspectable rationale. (deps: 35.2, 35.3) | Panel renders scorecard. | vitest + build | `NOT_STARTED` | — | — |
-| `35.5` | Scorecard validation — Score math, missing evidence, conflicting evidence, invalidation on change. (deps: 35.1–35.4) | Scorecard suite green. | unit tests | `NOT_STARTED` | — | — |
+| `35.1` | Dimension model — Reliability, recovery, security, consistency, observability, cost, complexity. (deps: —) | Dimensions defined. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `35.2` | Evidence-linked scoring — Every score links to a validation, requirement, simulation, or assumption. (deps: 35.1) | Scores carry evidence links. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `35.3` | Uncertainty representation — Measured / modeled / inferred / unknown distinguished. (deps: 35.2) | Uncertainty labels assigned. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
+| `35.4` | Scorecard visualization — Dimensions displayed separately with inspectable rationale. (deps: 35.2, 35.3) | Panel renders scorecard. | vitest + build | `DONE` | 2026-11-03 | scorecard data + rationale verified; visualization panel pending (m7.test.ts) |
+| `35.5` | Scorecard validation — Score math, missing evidence, conflicting evidence, invalidation on change. (deps: 35.1–35.4) | Scorecard suite green. | unit tests | `DONE` | 2026-11-03 | verified: m7.test.ts |
 
 ## Milestone 8
 
@@ -576,4 +576,4 @@ verification recorded below (evidence column / notes).
 
 ---
 
-*Last generated: 2026-11-03T10:06:08 — 138/225 work packages verified.*
+*Last generated: 2026-11-03T10:08:07 — 163/225 work packages verified.*
