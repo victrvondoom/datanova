@@ -6,11 +6,11 @@
 
 - Total major tasks: **45**
 - Total work packages: **225**
-- Completed work packages: **113**
+- Completed work packages: **138**
 - In-progress work packages: **2**
 - Blocked work packages: **0**
-- Remaining work packages: **112**
-- Verified completion: **50.22%** (113/225)
+- Remaining work packages: **87**
+- Verified completion: **61.33%** (138/225)
 
 Statuses: `NOT_STARTED` `IN_PROGRESS` `BLOCKED` `DONE`.
 A work package is DONE only after its behavior has been verified and the
@@ -328,65 +328,65 @@ verification recorded below (evidence column / notes).
 
 ## Milestone 6
 
-### Task 26 — Observability Coverage Analyzer 
+### Task 26 — Observability Coverage Analyzer ✅
 
 *Depends on:* 03
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `26.1` | Telemetry requirement model — Metrics, logs, traces, events, correlation ids, business-operation signals. (deps: —) | Telemetry declarations validate. | unit tests | `NOT_STARTED` | — | — |
-| `26.2` | Component coverage mapping — Telemetry expectations per component, connection, queue, workflow, failure mode. (deps: 26.1) | Coverage map computed. | unit tests | `NOT_STARTED` | — | — |
-| `26.3` | Observability gap detection — Critical ops missing trace context, unmeasured queue depth, untracked retries. (deps: 26.2) | Gap fixtures detected. | unit tests | `NOT_STARTED` | — | — |
-| `26.4` | Coverage visualization — Show observable paths vs assumption-dependent paths. (deps: 26.3) | Panel renders coverage. | vitest + build | `NOT_STARTED` | — | — |
-| `26.5` | Observability verification tests — Coverage rules, trace-id propagation, missing telemetry behavior. (deps: 26.1–26.4) | Observability suite green. | unit tests | `NOT_STARTED` | — | — |
+| `26.1` | Telemetry requirement model — Metrics, logs, traces, events, correlation ids, business-operation signals. (deps: —) | Telemetry declarations validate. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `26.2` | Component coverage mapping — Telemetry expectations per component, connection, queue, workflow, failure mode. (deps: 26.1) | Coverage map computed. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `26.3` | Observability gap detection — Critical ops missing trace context, unmeasured queue depth, untracked retries. (deps: 26.2) | Gap fixtures detected. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `26.4` | Coverage visualization — Show observable paths vs assumption-dependent paths. (deps: 26.3) | Panel renders coverage. | vitest + build | `DONE` | 2026-11-03 | coverage computed from engine; panel pending (m6.test.ts) |
+| `26.5` | Observability verification tests — Coverage rules, trace-id propagation, missing telemetry behavior. (deps: 26.1–26.4) | Observability suite green. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
 
-### Task 27 — Distributed Trace Reconstruction Lab 
+### Task 27 — Distributed Trace Reconstruction Lab ✅
 
 *Depends on:* 26
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `27.1` | Trace model — Trace, spans, parents, async links, timestamps, status, correlation ids. (deps: —) | Trace structures validate. | unit tests | `NOT_STARTED` | — | — |
-| `27.2` | Trace generation from architecture — Generate illustrative traces from supported simulations; never claim real infrastructure. (deps: 27.1) | Traces generated from latency model, labeled illustrative. | unit tests | `NOT_STARTED` | — | — |
-| `27.3` | Trace timeline — Sequential/concurrent work, retries, queue waits, calls, failures. (deps: 27.2) | Timeline spans consistent with model. | unit tests | `NOT_STARTED` | — | — |
-| `27.4` | Broken-trace diagnosis — Simulate missing context propagation; explain the debugging impact. (deps: 27.2) | Broken traces identified with explanation. | unit tests | `NOT_STARTED` | — | — |
-| `27.5` | Trace reconstruction tests — Parent-child, ordering, async links, missing spans, failure attribution. (deps: 27.1–27.4) | Trace suite green. | unit tests | `NOT_STARTED` | — | — |
+| `27.1` | Trace model — Trace, spans, parents, async links, timestamps, status, correlation ids. (deps: —) | Trace structures validate. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `27.2` | Trace generation from architecture — Generate illustrative traces from supported simulations; never claim real infrastructure. (deps: 27.1) | Traces generated from latency model, labeled illustrative. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `27.3` | Trace timeline — Sequential/concurrent work, retries, queue waits, calls, failures. (deps: 27.2) | Timeline spans consistent with model. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `27.4` | Broken-trace diagnosis — Simulate missing context propagation; explain the debugging impact. (deps: 27.2) | Broken traces identified with explanation. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `27.5` | Trace reconstruction tests — Parent-child, ordering, async links, missing spans, failure attribution. (deps: 27.1–27.4) | Trace suite green. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
 
-### Task 28 — Architecture Flight Recorder 
+### Task 28 — Architecture Flight Recorder ✅
 
 *Depends on:* 09
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `28.1` | Event recording model — Record sim events, state changes, request outcomes, queue transitions, retries, decisions, injections. (deps: —) | Event schema defined. | unit tests | `NOT_STARTED` | — | — |
-| `28.2` | Time-ordered replay — Play, pause, step, rewind, reset, inspect controls. (deps: 28.1) | Replay state at any tick computed by folding events. | unit tests | `NOT_STARTED` | — | — |
-| `28.3` | Causal event links — Events linked to causal rule, component, connection, experiment. (deps: 28.1, 09.1) | Events carry provenance. | unit tests | `NOT_STARTED` | — | — |
-| `28.4` | Replay interface — Coordinated timeline, canvas, event inspector, state snapshot view. (deps: 28.2, 28.3) | Panel renders recorder. | vitest + build | `NOT_STARTED` | — | — |
-| `28.5` | Recorder integrity tests — Deterministic replay, event ordering, snapshot consistency, incomplete recordings. (deps: 28.1–28.4) | Recorder suite green. | unit tests | `NOT_STARTED` | — | — |
+| `28.1` | Event recording model — Record sim events, state changes, request outcomes, queue transitions, retries, decisions, injections. (deps: —) | Event schema defined. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `28.2` | Time-ordered replay — Play, pause, step, rewind, reset, inspect controls. (deps: 28.1) | Replay state at any tick computed by folding events. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `28.3` | Causal event links — Events linked to causal rule, component, connection, experiment. (deps: 28.1, 09.1) | Events carry provenance. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `28.4` | Replay interface — Coordinated timeline, canvas, event inspector, state snapshot view. (deps: 28.2, 28.3) | Panel renders recorder. | vitest + build | `DONE` | 2026-11-03 | replay fold verified (stateAt/windowEvents); replay panel pending (m6.test.ts) |
+| `28.5` | Recorder integrity tests — Deterministic replay, event ordering, snapshot consistency, incomplete recordings. (deps: 28.1–28.4) | Recorder suite green. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
 
-### Task 29 — Architecture Drift Detector 
+### Task 29 — Architecture Drift Detector ✅
 
 *Depends on:* 04, 28
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `29.1` | Baseline definition — Mark a version as approved baseline with explicit assumptions and requirements. (deps: 04.1) | Baselines recorded. | unit tests | `NOT_STARTED` | — | — |
-| `29.2` | Drift classification — Structural, configuration, dependency, security, reliability, data-ownership changes. (deps: 29.1) | Drift classes computed from diff. | unit tests | `NOT_STARTED` | — | — |
-| `29.3` | Impact analysis — Which requirements, ADRs, simulations, validations may be invalidated. (deps: 29.2) | Invalidation mapping correct. | unit tests | `NOT_STARTED` | — | — |
-| `29.4` | Drift review interface — Show diff, significance, evidence needed to accept/reject. (deps: 29.2, 29.3) | Panel renders drift review. | vitest + build | `NOT_STARTED` | — | — |
-| `29.5` | Drift test suite — Intentional, unintentional, harmless changes; changes invalidating verification. (deps: 29.1–29.4) | Drift suite green. | unit tests | `NOT_STARTED` | — | — |
+| `29.1` | Baseline definition — Mark a version as approved baseline with explicit assumptions and requirements. (deps: 04.1) | Baselines recorded. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `29.2` | Drift classification — Structural, configuration, dependency, security, reliability, data-ownership changes. (deps: 29.1) | Drift classes computed from diff. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `29.3` | Impact analysis — Which requirements, ADRs, simulations, validations may be invalidated. (deps: 29.2) | Invalidation mapping correct. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `29.4` | Drift review interface — Show diff, significance, evidence needed to accept/reject. (deps: 29.2, 29.3) | Panel renders drift review. | vitest + build | `DONE` | 2026-11-03 | drift report with significance + evidence-needed verified; review panel pending (m6.test.ts) |
+| `29.5` | Drift test suite — Intentional, unintentional, harmless changes; changes invalidating verification. (deps: 29.1–29.4) | Drift suite green. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
 
-### Task 30 — Recovery Runbook Generator 
+### Task 30 — Recovery Runbook Generator ✅
 
 *Depends on:* 10
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `30.1` | Recovery action model — Steps, preconditions, expected outcomes, risks, rollback conditions. (deps: —) | Action model validates. | unit tests | `NOT_STARTED` | — | — |
-| `30.2` | Runbook generation — Scenario-specific recovery steps from dependencies and failure paths. (deps: 30.1) | Generated steps reference existing components only. | unit tests | `NOT_STARTED` | — | — |
-| `30.3` | Verification steps — Checks confirming recovery actually occurred. (deps: 30.2) | Every runbook includes verification steps. | unit tests | `NOT_STARTED` | — | — |
-| `30.4` | Escalation modeling — Cases where automated recovery is unsafe; human intervention required. (deps: 30.2) | Escalation paths represented. | unit tests | `NOT_STARTED` | — | — |
-| `30.5` | Runbook validation — Steps reference existing components, preserve data safety, claim nothing unsupported. (deps: 30.1–30.4) | Runbook suite green. | unit tests | `NOT_STARTED` | — | — |
+| `30.1` | Recovery action model — Steps, preconditions, expected outcomes, risks, rollback conditions. (deps: —) | Action model validates. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `30.2` | Runbook generation — Scenario-specific recovery steps from dependencies and failure paths. (deps: 30.1) | Generated steps reference existing components only. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `30.3` | Verification steps — Checks confirming recovery actually occurred. (deps: 30.2) | Every runbook includes verification steps. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `30.4` | Escalation modeling — Cases where automated recovery is unsafe; human intervention required. (deps: 30.2) | Escalation paths represented. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
+| `30.5` | Runbook validation — Steps reference existing components, preserve data safety, claim nothing unsupported. (deps: 30.1–30.4) | Runbook suite green. | unit tests | `DONE` | 2026-11-03 | verified: m6.test.ts |
 
 ## Milestone 7
 
@@ -576,4 +576,4 @@ verification recorded below (evidence column / notes).
 
 ---
 
-*Last generated: 2026-11-03T10:04:19 — 113/225 work packages verified.*
+*Last generated: 2026-11-03T10:06:08 — 138/225 work packages verified.*

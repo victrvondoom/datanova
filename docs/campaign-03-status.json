@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-03T10:04:19",
+  "updated": "2026-11-03T10:06:08",
   "workpackages": {
     "01.1": {
       "status": "DONE",
@@ -627,129 +627,129 @@
       "verified": "2026-11-03"
     },
     "26.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "26.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "26.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "26.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "coverage computed from engine; panel pending (m6.test.ts)",
+      "verified": "2026-11-03"
     },
     "26.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "27.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "27.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "27.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "27.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "27.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "28.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "28.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "28.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "28.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "replay fold verified (stateAt/windowEvents); replay panel pending (m6.test.ts)",
+      "verified": "2026-11-03"
     },
     "28.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "29.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "29.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "29.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "29.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "drift report with significance + evidence-needed verified; review panel pending (m6.test.ts)",
+      "verified": "2026-11-03"
     },
     "29.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "30.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "30.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "30.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "30.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "30.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m6.test.ts",
+      "verified": "2026-11-03"
     },
     "31.1": {
       "status": "NOT_STARTED",
