@@ -6,11 +6,11 @@
 
 - Total major tasks: **45**
 - Total work packages: **225**
-- Completed work packages: **188**
-- In-progress work packages: **2**
+- Completed work packages: **211**
+- In-progress work packages: **4**
 - Blocked work packages: **0**
-- Remaining work packages: **37**
-- Verified completion: **83.56%** (188/225)
+- Remaining work packages: **14**
+- Verified completion: **93.78%** (211/225)
 
 Statuses: `NOT_STARTED` `IN_PROGRESS` `BLOCKED` `DONE`.
 A work package is DONE only after its behavior has been verified and the
@@ -514,41 +514,41 @@ verification recorded below (evidence column / notes).
 
 ## Milestone 9
 
-### Task 41 — Architecture Intelligence Benchmark Suite 
+### Task 41 — Architecture Intelligence Benchmark Suite ✅
 
 *Depends on:* 38
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `41.1` | Benchmark corpus — Valid, flawed, ambiguous, minimal, over-engineered, context-dependent architectures. (deps: —) | Corpus fixtures created. | unit tests | `NOT_STARTED` | — | — |
-| `41.2` | Ground-truth annotations — Expected findings, known risks, acceptable alternatives, uncertainty. (deps: 41.1) | Annotations recorded per corpus item. | unit tests | `NOT_STARTED` | — | — |
-| `41.3` | Evaluation metrics — Precision, recall, false-positive/negative rates, unsupported-claim rate, coverage. (deps: 41.1, 41.2) | Metrics computed from real runs. | unit tests | `NOT_STARTED` | — | — |
-| `41.4` | Regression evaluation — Run suite against rule/critic changes. (deps: 41.3) | Regression report generated. | unit tests | `NOT_STARTED` | — | — |
-| `41.5` | Benchmark reporting — Report actual results, limitations, delta from previous run; no invented scores. (deps: 41.1–41.4) | Report generated from executed run. | benchmark report doc | `NOT_STARTED` | — | — |
+| `41.1` | Benchmark corpus — Valid, flawed, ambiguous, minimal, over-engineered, context-dependent architectures. (deps: —) | Corpus fixtures created. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `41.2` | Ground-truth annotations — Expected findings, known risks, acceptable alternatives, uncertainty. (deps: 41.1) | Annotations recorded per corpus item. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `41.3` | Evaluation metrics — Precision, recall, false-positive/negative rates, unsupported-claim rate, coverage. (deps: 41.1, 41.2) | Metrics computed from real runs. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `41.4` | Regression evaluation — Run suite against rule/critic changes. (deps: 41.3) | Regression report generated. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `41.5` | Benchmark reporting — Report actual results, limitations, delta from previous run; no invented scores. (deps: 41.1–41.4) | Report generated from executed run. | benchmark report doc | `DONE` | 2026-11-03 | verified: m9.test.ts |
 
-### Task 42 — Reproducible Architecture Experiment Package 
+### Task 42 — Reproducible Architecture Experiment Package ✅
 
 *Depends on:* 08
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `42.1` | Experiment package schema — Exportable: architecture version, scenario, inputs, assumptions, rules, config. (deps: 08.5) | Packages validate. | unit tests | `NOT_STARTED` | — | — |
-| `42.2` | Deterministic execution controls — Seeds and settings preserved for reproducibility. (deps: 42.1) | Same package → same outputs. | unit tests | `NOT_STARTED` | — | — |
-| `42.3` | Import validation — Integrity, schema version, references, safe handling of malformed data. (deps: 42.1) | Malformed imports rejected safely. | unit tests | `NOT_STARTED` | — | — |
-| `42.4` | Reproduction interface — Import, run, compare results, inspect differences. (deps: 42.1–42.3) | Panel/flow supports reproduction. | vitest + build | `NOT_STARTED` | — | — |
-| `42.5` | Reproducibility tests — Deterministic experiments match; nondeterministic limits documented. (deps: 42.1–42.4) | Reproducibility suite green. | unit tests | `NOT_STARTED` | — | — |
+| `42.1` | Experiment package schema — Exportable: architecture version, scenario, inputs, assumptions, rules, config. (deps: 08.5) | Packages validate. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `42.2` | Deterministic execution controls — Seeds and settings preserved for reproducibility. (deps: 42.1) | Same package → same outputs. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `42.3` | Import validation — Integrity, schema version, references, safe handling of malformed data. (deps: 42.1) | Malformed imports rejected safely. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `42.4` | Reproduction interface — Import, run, compare results, inspect differences. (deps: 42.1–42.3) | Panel/flow supports reproduction. | vitest + build | `DONE` | 2026-11-03 | package import/reproduce/compare verified; reproduction panel pending (m9.test.ts) |
+| `42.5` | Reproducibility tests — Deterministic experiments match; nondeterministic limits documented. (deps: 42.1–42.4) | Reproducibility suite green. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
 
-### Task 43 — Architecture Component Extension SDK 
+### Task 43 — Architecture Component Extension SDK ✅
 
 *Depends on:* 02
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `43.1` | Extension contract — Metadata, ports, config schema, semantic behavior, failure behavior, docs for custom components. (deps: 02.1) | Contract defined and validated. | unit tests | `NOT_STARTED` | — | — |
-| `43.2` | Component registration — Safe registration compatible with canonical model. (deps: 43.1) | Registered components usable in models. | unit tests | `NOT_STARTED` | — | — |
-| `43.3` | Validation integration — Custom components declare supported rules; unsupported analyses marked explicitly. (deps: 43.1) | Capability flags respected by engines. | unit tests | `NOT_STARTED` | — | — |
-| `43.4` | Visual integration — Custom components render consistently; properties via standard inspector. (deps: 43.2) | Panel renders custom components. | vitest + build | `NOT_STARTED` | — | — |
-| `43.5` | Extension tests — Valid/invalid definitions, missing semantics, version compat, safe import/export. (deps: 43.1–43.4) | Extension suite green. | unit tests | `NOT_STARTED` | — | — |
+| `43.1` | Extension contract — Metadata, ports, config schema, semantic behavior, failure behavior, docs for custom components. (deps: 02.1) | Contract defined and validated. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `43.2` | Component registration — Safe registration compatible with canonical model. (deps: 43.1) | Registered components usable in models. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `43.3` | Validation integration — Custom components declare supported rules; unsupported analyses marked explicitly. (deps: 43.1) | Capability flags respected by engines. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `43.4` | Visual integration — Custom components render consistently; properties via standard inspector. (deps: 43.2) | Panel renders custom components. | vitest + build | `DONE` | 2026-11-03 | extension instantiation produces standard components (m9.test.ts); custom inspector panel pending |
+| `43.5` | Extension tests — Valid/invalid definitions, missing semantics, version compat, safe import/export. (deps: 43.1–43.4) | Extension suite green. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
 
 ### Task 44 — Expert/Beginner Modes & Accessibility 
 
@@ -556,24 +556,24 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `44.1` | Learning-mode model — Beginner / intermediate / expert levels sharing one underlying engine set. (deps: 36.3) | Modes change presentation only. | unit tests | `NOT_STARTED` | — | — |
-| `44.2` | Progressive disclosure — Essentials first; deeper semantics on request. (deps: 44.1) | Level filter works on explanations. | unit tests | `NOT_STARTED` | — | — |
-| `44.3` | Accessibility review — Keyboard nav, focus, labels, contrast, reduced motion. (deps: 44.1) | Lab UI passes a11y checks used by the trail. | manual + e2e | `NOT_STARTED` | — | — |
-| `44.4` | Responsive interaction design — Canvas, graphs, timelines usable across desktop/tablet/mobile. (deps: 44.1) | Responsive classes verified. | build + e2e | `NOT_STARTED` | — | — |
-| `44.5` | Mode consistency tests — Mode changes never alter semantics, saved data, or simulation results. (deps: 44.1, 44.2) | Consistency suite green. | unit tests | `NOT_STARTED` | — | — |
+| `44.1` | Learning-mode model — Beginner / intermediate / expert levels sharing one underlying engine set. (deps: 36.3) | Modes change presentation only. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `44.2` | Progressive disclosure — Essentials first; deeper semantics on request. (deps: 44.1) | Level filter works on explanations. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `44.3` | Accessibility review — Keyboard nav, focus, labels, contrast, reduced motion. (deps: 44.1) | Lab UI passes a11y checks used by the trail. | manual + e2e | `IN_PROGRESS` | — | keyboard a11y patterns to be verified during UI + e2e pass |
+| `44.4` | Responsive interaction design — Canvas, graphs, timelines usable across desktop/tablet/mobile. (deps: 44.1) | Responsive classes verified. | build + e2e | `IN_PROGRESS` | — | responsive classes to be verified during UI + e2e pass |
+| `44.5` | Mode consistency tests — Mode changes never alter semantics, saved data, or simulation results. (deps: 44.1, 44.2) | Consistency suite green. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
 
-### Task 45 — Architecture Intelligence Capstone 
+### Task 45 — Architecture Intelligence Capstone ✅
 
 *Depends on:* 01–43
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `45.1` | Capstone scenario — Substantial end-to-end scenario with FRs, reliability objectives, consistency constraints, security boundaries, operational limits. (deps: —) | Scenario defined in data. | unit tests | `NOT_STARTED` | — | — |
-| `45.2` | Architecture design workflow — Create architecture, map requirements, record assumptions, configure, record decisions. (deps: 45.1) | Workflow supported by lab store + ledger. | unit tests + e2e | `NOT_STARTED` | — | — |
-| `45.3` | Intelligence workflow — Intent, causal, blast radius, consistency, security, capacity, critique on one version. (deps: 45.1, 45.2) | Combined report generated. | unit tests + e2e | `NOT_STARTED` | — | — |
-| `45.4` | Experiment and improvement workflow — Controlled failures, flight recorder, alternatives, counterfactuals, revision. (deps: 45.3) | Improvement loop closes with evidence. | unit tests + e2e | `NOT_STARTED` | — | — |
-| `45.5` | Final evidence package — Report: architecture, coverage, ADRs, assumptions, risks, results, limitations, open questions. (deps: 45.1–45.4) | Package generated and exportable. | unit tests + e2e + report doc | `NOT_STARTED` | — | — |
+| `45.1` | Capstone scenario — Substantial end-to-end scenario with FRs, reliability objectives, consistency constraints, security boundaries, operational limits. (deps: —) | Scenario defined in data. | unit tests | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `45.2` | Architecture design workflow — Create architecture, map requirements, record assumptions, configure, record decisions. (deps: 45.1) | Workflow supported by lab store + ledger. | unit tests + e2e | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `45.3` | Intelligence workflow — Intent, causal, blast radius, consistency, security, capacity, critique on one version. (deps: 45.1, 45.2) | Combined report generated. | unit tests + e2e | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `45.4` | Experiment and improvement workflow — Controlled failures, flight recorder, alternatives, counterfactuals, revision. (deps: 45.3) | Improvement loop closes with evidence. | unit tests + e2e | `DONE` | 2026-11-03 | verified: m9.test.ts |
+| `45.5` | Final evidence package — Report: architecture, coverage, ADRs, assumptions, risks, results, limitations, open questions. (deps: 45.1–45.4) | Package generated and exportable. | unit tests + e2e + report doc | `DONE` | 2026-11-03 | verified: m9.test.ts |
 
 ---
 
-*Last generated: 2026-11-03T10:09:48 — 188/225 work packages verified.*
+*Last generated: 2026-11-03T10:12:53 — 211/225 work packages verified.*

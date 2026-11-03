@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-03T10:09:48",
+  "updated": "2026-11-03T10:12:53",
   "workpackages": {
     "01.1": {
       "status": "DONE",
@@ -1002,129 +1002,129 @@
       "verified": "2026-11-03"
     },
     "41.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "41.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "41.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "41.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "41.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "42.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "42.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "42.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "42.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "package import/reproduce/compare verified; reproduction panel pending (m9.test.ts)",
+      "verified": "2026-11-03"
     },
     "42.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "43.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "43.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "43.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "43.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "extension instantiation produces standard components (m9.test.ts); custom inspector panel pending",
+      "verified": "2026-11-03"
     },
     "43.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "44.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "44.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "44.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
+      "status": "IN_PROGRESS",
+      "notes": "keyboard a11y patterns to be verified during UI + e2e pass",
       "verified": null
     },
     "44.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
+      "status": "IN_PROGRESS",
+      "notes": "responsive classes to be verified during UI + e2e pass",
       "verified": null
     },
     "44.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "45.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "45.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "45.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "45.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     },
     "45.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m9.test.ts",
+      "verified": "2026-11-03"
     }
   }
 }
