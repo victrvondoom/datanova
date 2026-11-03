@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-03T09:55:22",
+  "updated": "2026-11-03T09:58:21",
   "workpackages": {
     "01.1": {
       "status": "DONE",
@@ -127,14 +127,14 @@
       "verified": null
     },
     "06.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "06.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "06.3": {
       "status": "NOT_STARTED",
@@ -142,74 +142,74 @@
       "verified": null
     },
     "06.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "06.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "07.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "07.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "07.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "07.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "07.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "08.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "08.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "08.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "08.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "08.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "09.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "09.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "09.3": {
       "status": "NOT_STARTED",
@@ -217,24 +217,24 @@
       "verified": null
     },
     "09.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "09.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "10.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "10.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "10.3": {
       "status": "NOT_STARTED",
@@ -242,14 +242,14 @@
       "verified": null
     },
     "10.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "10.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m2.test.ts",
+      "verified": "2026-11-03"
     },
     "11.1": {
       "status": "NOT_STARTED",

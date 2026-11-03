@@ -6,11 +6,11 @@
 
 - Total major tasks: **45**
 - Total work packages: **225**
-- Completed work packages: **19**
+- Completed work packages: **41**
 - In-progress work packages: **1**
 - Blocked work packages: **0**
-- Remaining work packages: **206**
-- Verified completion: **8.44%** (19/225)
+- Remaining work packages: **184**
+- Verified completion: **18.22%** (41/225)
 
 Statuses: `NOT_STARTED` `IN_PROGRESS` `BLOCKED` `DONE`.
 A work package is DONE only after its behavior has been verified and the
@@ -86,35 +86,35 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `06.1` | Genome feature model — Traits: sync dependency depth, state ownership, retry policy, failure isolation, queue topology, cache strategy, recovery mechanisms. (deps: 02.1) | Trait set defined and derived. | unit tests | `NOT_STARTED` | — | — |
-| `06.2` | Genome extraction — Traits derived from the canonical model, not manual entry. (deps: 06.1) | Extraction correct on fixtures. | unit tests | `NOT_STARTED` | — | — |
+| `06.1` | Genome feature model — Traits: sync dependency depth, state ownership, retry policy, failure isolation, queue topology, cache strategy, recovery mechanisms. (deps: 02.1) | Trait set defined and derived. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `06.2` | Genome extraction — Traits derived from the canonical model, not manual entry. (deps: 06.1) | Extraction correct on fixtures. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
 | `06.3` | Genome visualization — Visual fingerprint summarizing an architecture without replacing the diagram. (deps: 06.2) | Panel renders fingerprint. | vitest + build | `NOT_STARTED` | — | — |
-| `06.4` | Genome comparison — Compare two architectures; surface non-obvious structural/behavioral differences. (deps: 06.2) | Comparison reports trait deltas. | unit tests | `NOT_STARTED` | — | — |
-| `06.5` | Genome stability tests — Semantically equivalent architectures → equivalent fingerprints; meaningful changes reflected. (deps: 06.2) | Reorder/isolated-change fixtures stable; mutations reflected. | unit tests | `NOT_STARTED` | — | — |
+| `06.4` | Genome comparison — Compare two architectures; surface non-obvious structural/behavioral differences. (deps: 06.2) | Comparison reports trait deltas. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `06.5` | Genome stability tests — Semantically equivalent architectures → equivalent fingerprints; meaningful changes reflected. (deps: 06.2) | Reorder/isolated-change fixtures stable; mutations reflected. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
 
-### Task 07 — Architecture Mutation Engine 
+### Task 07 — Architecture Mutation Engine ✅
 
 *Depends on:* 02, 06
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `07.1` | Mutation operator library — Mutations: add queue, add cache, split service, sync→async, add idempotency, change retry strategy. (deps: 06.2) | Operators produce valid mutated models. | unit tests | `NOT_STARTED` | — | — |
-| `07.2` | Mutation preconditions — Applicability, required assumptions, invalid states rejected. (deps: 07.1) | Invalid applications rejected with reasons. | unit tests | `NOT_STARTED` | — | — |
-| `07.3` | Mutation explanation — Explain original problem, structural change, expected benefit, new trade-offs. (deps: 07.1) | Every operator returns a full explanation. | unit tests | `NOT_STARTED` | — | — |
-| `07.4` | Mutation workspace — Generate an alternative without modifying the original. (deps: 07.1) | Original model unchanged after mutation (no aliasing). | unit tests + panel | `NOT_STARTED` | — | — |
-| `07.5` | Mutation regression tests — Mutations preserve unrelated requirements, produce valid models, keep existing protections. (deps: 07.1–07.3) | Regression suite green. | unit tests | `NOT_STARTED` | — | — |
+| `07.1` | Mutation operator library — Mutations: add queue, add cache, split service, sync→async, add idempotency, change retry strategy. (deps: 06.2) | Operators produce valid mutated models. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `07.2` | Mutation preconditions — Applicability, required assumptions, invalid states rejected. (deps: 07.1) | Invalid applications rejected with reasons. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `07.3` | Mutation explanation — Explain original problem, structural change, expected benefit, new trade-offs. (deps: 07.1) | Every operator returns a full explanation. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `07.4` | Mutation workspace — Generate an alternative without modifying the original. (deps: 07.1) | Original model unchanged after mutation (no aliasing). | unit tests + panel | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `07.5` | Mutation regression tests — Mutations preserve unrelated requirements, produce valid models, keep existing protections. (deps: 07.1–07.3) | Regression suite green. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
 
-### Task 08 — Counterfactual Experiment Engine 
+### Task 08 — Counterfactual Experiment Engine ✅
 
 *Depends on:* 07
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `08.1` | Experiment definition — Baseline + modified architecture + scenario + compared behaviors. (deps: 07.1) | Experiments defined and validated. | unit tests | `NOT_STARTED` | — | — |
-| `08.2` | Controlled variable isolation — Track changed properties; flag unrelated changes mixed into an experiment. (deps: 08.1) | Undeclared changes flagged as uncontrolled. | unit tests | `NOT_STARTED` | — | — |
-| `08.3` | Outcome comparison — Compare modeled latency, queue behavior, failure propagation, consistency, resources where supported. (deps: 08.1) | Metric deltas computed from model evaluation. | unit tests | `NOT_STARTED` | — | — |
-| `08.4` | Counterfactual explanation — Attribute differences to changed properties; state what remains uncertain. (deps: 08.3) | Explanation names changed trait and uncertainty. | unit tests | `NOT_STARTED` | — | — |
-| `08.5` | Reproducible experiment records — Save inputs, versions, model version, assumptions, outputs, experiment id. (deps: 08.1–08.4) | Same inputs → same outputs on re-run. | unit tests | `NOT_STARTED` | — | — |
+| `08.1` | Experiment definition — Baseline + modified architecture + scenario + compared behaviors. (deps: 07.1) | Experiments defined and validated. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `08.2` | Controlled variable isolation — Track changed properties; flag unrelated changes mixed into an experiment. (deps: 08.1) | Undeclared changes flagged as uncontrolled. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `08.3` | Outcome comparison — Compare modeled latency, queue behavior, failure propagation, consistency, resources where supported. (deps: 08.1) | Metric deltas computed from model evaluation. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `08.4` | Counterfactual explanation — Attribute differences to changed properties; state what remains uncertain. (deps: 08.3) | Explanation names changed trait and uncertainty. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `08.5` | Reproducible experiment records — Save inputs, versions, model version, assumptions, outputs, experiment id. (deps: 08.1–08.4) | Same inputs → same outputs on re-run. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
 
 ### Task 09 — Causal Failure Propagation Engine 
 
@@ -122,11 +122,11 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `09.1` | Causal rule schema — Rules with trigger, precondition, affected variable, direction, magnitude/qualitative effect, confidence. (deps: 03.3) | Rules typed and registered. | unit tests | `NOT_STARTED` | — | — |
-| `09.2` | Propagation algorithm — Deterministic propagation: dependency ordering, cycle handling, no infinite loops. (deps: 09.1) | Cyclic fixtures terminate with stable state. | unit tests | `NOT_STARTED` | — | — |
+| `09.1` | Causal rule schema — Rules with trigger, precondition, affected variable, direction, magnitude/qualitative effect, confidence. (deps: 03.3) | Rules typed and registered. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `09.2` | Propagation algorithm — Deterministic propagation: dependency ordering, cycle handling, no infinite loops. (deps: 09.1) | Cyclic fixtures terminate with stable state. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
 | `09.3` | Causal path visualization — Highlight sequence from initiating failure to downstream effects. (deps: 09.2) | Panel renders propagation paths. | vitest + build | `NOT_STARTED` | — | — |
-| `09.4` | Causal explanation — Per effect: why, which rule fired, supporting evidence. (deps: 09.1, 09.2) | Every effect carries rule id + evidence. | unit tests | `NOT_STARTED` | — | — |
-| `09.5` | Causal engine verification — Known chains, disconnected failures, protected dependencies, cyclic graphs. (deps: 09.1–09.4) | Causal suite green. | unit tests | `NOT_STARTED` | — | — |
+| `09.4` | Causal explanation — Per effect: why, which rule fired, supporting evidence. (deps: 09.1, 09.2) | Every effect carries rule id + evidence. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `09.5` | Causal engine verification — Known chains, disconnected failures, protected dependencies, cyclic graphs. (deps: 09.1–09.4) | Causal suite green. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
 
 ### Task 10 — Blast-Radius & Criticality Analyzer 
 
@@ -134,11 +134,11 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `10.1` | Criticality model — Criticality from operation importance, dependency centrality, data ownership, recovery needs. (deps: 03.2) | Criticality computed from explicit factors. | unit tests | `NOT_STARTED` | — | — |
-| `10.2` | Reachability analysis — Which components, operations, requirements, user-visible features affected by a failure. (deps: 10.1) | Reachability matches fixtures. | unit tests | `NOT_STARTED` | — | — |
+| `10.1` | Criticality model — Criticality from operation importance, dependency centrality, data ownership, recovery needs. (deps: 03.2) | Criticality computed from explicit factors. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `10.2` | Reachability analysis — Which components, operations, requirements, user-visible features affected by a failure. (deps: 10.1) | Reachability matches fixtures. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
 | `10.3` | Blast-radius visualization — Affected nodes/paths with direct vs indirect impact explanations. (deps: 10.2) | Panel renders radius with explanations. | vitest + build | `NOT_STARTED` | — | — |
-| `10.4` | Failure-isolation analysis — Identify boundaries limiting propagation; compare with architectures lacking them. (deps: 10.2) | Isolated vs non-isolated comparison works. | unit tests | `NOT_STARTED` | — | — |
-| `10.5` | Blast-radius test suite — Isolated, shared, critical, cyclic dependency cases. (deps: 10.1–10.4) | Blast-radius suite green. | unit tests | `NOT_STARTED` | — | — |
+| `10.4` | Failure-isolation analysis — Identify boundaries limiting propagation; compare with architectures lacking them. (deps: 10.2) | Isolated vs non-isolated comparison works. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
+| `10.5` | Blast-radius test suite — Isolated, shared, critical, cyclic dependency cases. (deps: 10.1–10.4) | Blast-radius suite green. | unit tests | `DONE` | 2026-11-03 | verified: m2.test.ts |
 
 ## Milestone 3
 
@@ -576,4 +576,4 @@ verification recorded below (evidence column / notes).
 
 ---
 
-*Last generated: 2026-11-03T09:55:22 — 19/225 work packages verified.*
+*Last generated: 2026-11-03T09:58:21 — 41/225 work packages verified.*
