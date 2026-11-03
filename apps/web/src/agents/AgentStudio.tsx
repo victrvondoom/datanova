@@ -92,17 +92,27 @@ export const AgentStudioView: React.FC = () => {
     });
   }, [store]);
 
-  // execution loop: step the active run while it is running
+  // execution loop: step the active run while it is running. The step runs
+  // OUTSIDE the state updater (pure setState — StrictMode-safe): the latest
+  // run comes from a ref, and the engine receives a fresh shallow copy.
+  const runRef = useRef<RunState | null>(null);
+  useEffect(() => { runRef.current = run; }, [run]);
   useEffect(() => {
     if (!run || run.status !== "running") return;
     const timer = window.setInterval(() => {
-      setRuns((prev) => {
-        const current = prev.find((r) => r.id === activeRunId);
-        if (!current || current.status !== "running") return prev;
-        const stepped = stepRun({ ...current, tasks: [...current.tasks], artifacts: [...current.artifacts], evidence: [...current.evidence], findings: [...current.findings], handoffs: [...current.handoffs], approvals: [...current.approvals], externalActions: [...current.externalActions], events: [...current.events] }, datasetFor(current.workflowId));
-        store.save(stepped);
-        return prev.map((r) => (r.id === stepped.id ? stepped : r));
-      });
+      const current = runRef.current;
+      if (!current || current.status !== "running") return;
+      const next = stepRun(
+        { ...current, tasks: [...current.tasks], artifacts: [...current.artifacts],
+          evidence: [...current.evidence], findings: [...current.findings],
+          handoffs: [...current.handoffs], approvals: [...current.approvals],
+          externalActions: [...current.externalActions], events: [...current.events],
+          edgeStates: { ...current.edgeStates }, supervisedApproved: [...current.supervisedApproved] },
+        datasetFor(current.workflowId),
+      );
+      runRef.current = next;
+      store.save(next);
+      setRuns((prev) => prev.map((r) => (r.id === next.id ? next : r)));
     }, 650);
     return () => window.clearInterval(timer);
   }, [run?.status, activeRunId, store]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -130,7 +140,8 @@ export const AgentStudioView: React.FC = () => {
     if (!run) return;
     const pending = run.approvals.find((a) => a.status === "requested");
     if (!pending) return;
-    const r = resolveApproval({ ...run, approvals: run.approvals.map((a) => ({ ...a })), tasks: [...run.tasks], artifacts: [...run.artifacts], events: [...run.events] }, pending.id, decision, decision === "approved" ? "authorized by operator" : "rejected by operator");
+    const r = resolveApproval({ ...run, approvals: run.approvals.map((a) => ({ ...a })), tasks: [...run.tasks], artifacts: [...run.artifacts], events: [...run.events], edgeStates: { ...run.edgeStates }, supervisedApproved: [...run.supervisedApproved] }, pending.id, decision, decision === "approved" ? "authorized by operator" : "rejected by operator");
+    runRef.current = r;
     persist(r);
     setAnnouncer(`Human decision recorded: ${decision}. Execution ${decision === "approved" ? "resumed" : "recorded rejection"}.`);
   };
