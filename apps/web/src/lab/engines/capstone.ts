@@ -21,7 +21,6 @@ import { analyzeLineage } from "./lineage";
 import { enforcementGaps } from "./authz";
 import { injectTenantFailures } from "./tenant";
 import { reviewAdversarially } from "./adversarial";
-import { observabilityGaps } from "./observability";
 import { saturate } from "./resource";
 import { analyzeLatency } from "./latency";
 import { critiqueArchitecture } from "./critic";

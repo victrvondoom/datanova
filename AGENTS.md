@@ -73,3 +73,32 @@ in the existing dashboard. Conventions for any change to it:
    `npm run test && npm run build && npx oxlint src/trail` in `apps/web`,
    plus `npx playwright test e2e/trail.spec.ts` against
    `vite preview --port 4173` for user-flow changes.
+
+## Architecture Intelligence Lab (campaign 03 learning product)
+
+The lab (`apps/web/src/lab/`) extends the trail's conventions — any change to it
+follows the same rules:
+
+1. ALL architecture intelligence consumes the canonical model in
+   `src/lab/model.ts` (see `docs/canonical-architecture-model.md`). Never add a
+   second architecture representation in an engine, panel, or test fixture.
+2. Engine logic is PURE and DETERMINISTIC: behavior lives in
+   `src/lab/engines/*.ts` (DOM-free, dependency-free, unit-tested); panels in
+   `src/lab/panels/` only render engine output and dispatch actions. An engine
+   without a test is not done.
+3. Every analysis result is a `Finding` with evidence references
+   (`component:…`, `requirement:…`, `connection:…`, `rule:…`) — no claim
+   without provenance, no aggregate "architecture score".
+4. Simulation honesty is mandatory: results carry their assumptions and are
+   labeled as modeled/illustrative; never present them as production
+   benchmarks or cloud pricing. Unsupported analyses must return
+   unknown/NOT-APPLICABLE, never a silent pass.
+5. Seed architectures are data in `src/lab/samples.ts`; the flawed checkout
+   fixture is intentionally imperfect — do not "fix" it without updating the
+   benchmark ground truth in `engines/benchmark.ts` (both must change together).
+6. Work-package statuses live in `docs/campaign-03-status.json` and are
+   rendered by `python scripts/gen_campaign03_checklist.py`; never hand-edit
+   the checklist. A work package is DONE only after verification is recorded.
+7. Verification before claiming done on lab changes:
+   `npm run test && npm run build && npx oxlint src/lab` in `apps/web`, plus
+   `npx playwright test e2e/lab.spec.ts` against `vite preview --port 4173`.

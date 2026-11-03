@@ -7,7 +7,7 @@ import { describe, it, expect } from "vitest";
 import { docflowModel } from "../samples";
 import { runBenchmark, renderBenchmarkReport, BENCHMARK_CORPUS } from "../engines/benchmark";
 import {
-  exportPackage, parsePackage, reproducePackage, packageTemplateExperiment, PackageError,
+  parsePackage, reproducePackage, packageTemplateExperiment, PackageError,
 } from "../engines/package";
 import {
   emptyRegistry, registerExtension, instantiateExtension, analysisSupport,
@@ -236,7 +236,7 @@ describe("T45 architecture intelligence capstone", () => {
     const cap = runCapstone({
       generatedAt: "2026-01-01T00:00:00Z",
       benchmarkLimitations: ["critic-only corpus"],
-      revisions: [recordRevision([], "after-first-analysis", "scaled workers", "MC-5 doubled peak traffic")],
+      revisions: recordRevision([], "after-first-analysis", "scaled workers", "MC-5 doubled peak traffic"),
     });
     expect(cap.evidence.title).toContain("DocFlow");
     expect(cap.missionEvaluation.revisionsTracked).toBe(true);
@@ -245,7 +245,7 @@ describe("T45 architecture intelligence capstone", () => {
     const cap2 = runCapstone({
       generatedAt: "2026-01-01T00:00:00Z",
       benchmarkLimitations: ["critic-only corpus"],
-      revisions: [recordRevision([], "after-first-analysis", "scaled workers", "MC-5 doubled peak traffic")],
+      revisions: recordRevision([], "after-first-analysis", "scaled workers", "MC-5 doubled peak traffic"),
     });
     expect(cap2.evidence).toEqual(cap.evidence);
   });

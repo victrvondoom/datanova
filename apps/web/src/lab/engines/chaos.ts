@@ -163,7 +163,7 @@ export function runChaos(m: ArchitectureModel, exp: ChaosExperiment): ChaosOutco
   reviewNotes.push("Scope: this ran entirely against the local educational model; no infrastructure was touched.");
 
   const findings: Finding[] = [finding(
-    "chaos", `chaos:${exp.id}`, verdict === "contradicted" ? "critical" : verdict === "invalid" ? "critical" : "info",
+    "chaos", `chaos:${exp.id}`, verdict === "contradicted" ? "critical" : "info",
     `Experiment ${exp.id}: hypothesis ${verdict}`,
     reviewNotes.join(" "),
     [

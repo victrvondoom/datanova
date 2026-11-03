@@ -94,14 +94,17 @@ export function dispatch(state: IdempotencyState, req: IdempotencyRequest): { st
     };
   }
   // failed: let the retry execute again (failure did not commit a side effect)
-  const records = { ...state.records, [req.key]: { ...rec, state: "processing" } };
+  const records: Record<string, IdempotencyRecord> = {
+    ...state.records,
+    [req.key]: { ...rec, state: "processing" as KeyState },
+  };
   return {
     state: { records },
     outcome: { state: "processing", sideEffects: 1, response: "executed", reason: "previous attempt failed without committing: the operation re-executes" },
   };
 }
 
-export function complete(state: IdempotencyState, key: string, result: string, at: number): IdempotencyState {
+export function complete(state: IdempotencyState, key: string, result: string): IdempotencyState {
   const rec = state.records[key];
   if (!rec) return state;
   return { records: { ...state.records, [key]: { ...rec, state: "completed", storedResult: result, expiresAt: rec.expiresAt } } };
@@ -134,7 +137,7 @@ export function simulateConcurrentDuplicate(): { events: string[]; sideEffectCou
   events.push(`t=100 first request: ${first.outcome.response} (${first.outcome.reason})`);
   const second = dispatch(s, req);
   events.push(`t=100 duplicate request (first still processing): ${second.outcome.response} (${second.outcome.reason})`);
-  s = complete(s, "pay-123", "charged-once", 150);
+  s = complete(s, "pay-123", "charged-once");
   events.push("t=150 first request completed: result stored");
   const third = dispatch(s, req);
   events.push(`t=160 retry after completion: ${third.outcome.response} (${third.outcome.reason})`);

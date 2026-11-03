@@ -9,7 +9,6 @@
 
 import type { ArchitectureModel } from "../model";
 import { causalLinks } from "./graph";
-import { analyzeLatency } from "./latency";
 import { blastRadius } from "./blastradius";
 
 export type DetailLevel = "concise" | "intermediate" | "advanced";

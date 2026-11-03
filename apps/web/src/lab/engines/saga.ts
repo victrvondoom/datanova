@@ -44,8 +44,9 @@ export function validateSaga(m: ArchitectureModel, saga: SagaDefinition): SagaIs
     if (!m.components.some((c) => c.id === s.actionComponentId)) {
       issues.push({ kind: "unknown-component", detail: `step "${s.name}" references unknown component ${s.actionComponentId}` });
     }
-    if (s.compensation && !m.components.some((c) => c.id === s.compensation.actionComponentId)) {
-      issues.push({ kind: "unknown-component", detail: `compensation for "${s.name}" references unknown component ${s.compensation.actionComponentId}` });
+    const comp = s.compensation;
+    if (comp && !m.components.some((c) => c.id === comp.actionComponentId)) {
+      issues.push({ kind: "unknown-component", detail: `compensation for "${s.name}" references unknown component ${comp.actionComponentId}` });
     }
     // unreachable: a step whose action component has no inbound connection from
     // the previous step's component is not necessarily broken, but a step that
@@ -89,7 +90,7 @@ export function failurePaths(saga: SagaDefinition): FailurePath[] {
     const missing = toCompensate.some((s) => !s.compensation);
     paths.push({
       failAtStep: step.name,
-      compensations: toCompensate.reverse().map((s) => s.compensation?.name ?? `${s.name} (NO COMPENSATION)`),
+      compensations: [...toCompensate].reverse().map((s) => s.compensation ? s.compensation.name : `${s.name} (NO COMPENSATION)`),
       outcome: missing ? "manual-recovery" : "compensated",
       note: missing
         ? "at least one completed step has no compensation: manual recovery required"

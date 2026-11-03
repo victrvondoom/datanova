@@ -148,7 +148,7 @@ describe("T19 idempotency lifecycle debugger", () => {
     s = first.state;
     const dup = dispatch(s, req("k1", "p1"));
     expect(dup.outcome).toMatchObject({ response: "in-flight", sideEffects: 0 });
-    s = complete(s, "k1", "order-42", 150);
+    s = complete(s, "k1", "order-42");
     const retry = dispatch(s, req("k1", "p1", 160));
     expect(retry.outcome).toMatchObject({ response: "replayed", sideEffects: 0 });
     expect(retry.outcome.reason).toContain("order-42");
@@ -182,7 +182,7 @@ describe("T19 idempotency lifecycle debugger", () => {
   it("keys expire and reuse after expiry executes a fresh operation", () => {
     let s = emptyIdempotencyState();
     s = dispatch(s, req("k4", "p", 0)).state;
-    s = complete(s, "k4", "done", 10);
+    s = complete(s, "k4", "done");
     s = expireAll(s, 60_001);
     expect(s.records["k4"].state).toBe("expired");
     const reuse = dispatch(s, req("k4", "p", 61_000));

@@ -10,6 +10,7 @@ import { DriftLab } from "./views/DriftLab";
 import { ExplainabilityView } from "./views/ExplainabilityView";
 import { ResearchCenter } from "./views/ResearchCenter";
 import { TrailApp } from "./trail/TrailApp";
+import { LabApp } from "./lab/LabApp";
 import { checkHealth } from "./api";
 
 export const App: React.FC = () => {
@@ -17,7 +18,9 @@ export const App: React.FC = () => {
   // Deep-link support: a fresh load (or navigation) to a #/trail/... URL
   // opens the TRACEN learning trail view directly.
   const [currentView, setCurrentView] = useState<ViewType>(() =>
-    window.location.hash.startsWith("#/trail") ? "trail" : "mission"
+    window.location.hash.startsWith("#/trail") ? "trail"
+      : window.location.hash.startsWith("#/lab") ? "lab"
+        : "mission"
   );
   const [online, setOnline] = useState<boolean>(false);
   const [showDeckModal, setShowDeckModal] = useState<boolean>(false);
@@ -36,6 +39,9 @@ export const App: React.FC = () => {
     const onHashChange = () => {
       if (window.location.hash.startsWith("#/trail")) {
         setCurrentView("trail");
+      }
+      if (window.location.hash.startsWith("#/lab")) {
+        setCurrentView("lab");
       }
     };
     window.addEventListener("hashchange", onHashChange);
@@ -88,6 +94,7 @@ export const App: React.FC = () => {
             {currentView === "explain" && <ExplainabilityView />}
             {currentView === "research" && <ResearchCenter />}
             {currentView === "trail" && <TrailApp />}
+          {currentView === "lab" && <LabApp />}
           </main>
         </div>
       </div>

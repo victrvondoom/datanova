@@ -10,6 +10,7 @@ import {
   FileCheck2,
   BookOpenCheck,
   GraduationCap,
+  FlaskConical,
 } from "lucide-react";
 
 export type ViewType =
@@ -21,7 +22,8 @@ export type ViewType =
   | "drift"
   | "explain"
   | "research"
-  | "trail";
+  | "trail"
+  | "lab";
 
 interface SidebarProps {
   currentView: ViewType;
@@ -115,6 +117,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
     { id: "explain" as ViewType, label: "Explainability Explorer", icon: FileCheck2, badge: "TreeSHAP" },
     { id: "research" as ViewType, label: "Evidence & Research", icon: BookOpenCheck, badge: "Artifacts" },
     { id: "trail" as ViewType, label: "Vibe Coding Trail", icon: GraduationCap, badge: `${trailCompleted}/20 done` },
+    { id: "lab" as ViewType, label: "Architecture Lab", icon: FlaskConical, badge: "Campaign 03" },
   ];
 
   return (

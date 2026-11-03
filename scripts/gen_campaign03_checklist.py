@@ -811,7 +811,8 @@ def default_status() -> dict:
 
 def load_status() -> dict:
     if STATUS_FILE.exists():
-        return json.loads(STATUS_FILE.read_text(encoding="utf-8"))
+        loaded: dict = json.loads(STATUS_FILE.read_text(encoding="utf-8"))
+        return loaded
     status = default_status()
     STATUS_FILE.parent.mkdir(parents=True, exist_ok=True)
     STATUS_FILE.write_text(json.dumps(status, indent=2) + "\n", encoding="utf-8")
@@ -854,7 +855,7 @@ def render(status: dict) -> str:
         "",
         "## Status summary (computed, never hand-written)",
         "",
-        f"- Total major tasks: **45**",
+        "- Total major tasks: **45**",
         f"- Total work packages: **{total_wp}**",
         f"- Completed work packages: **{done}**",
         f"- In-progress work packages: **{in_prog}**",

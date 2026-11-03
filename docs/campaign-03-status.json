@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-03T10:12:53",
+  "updated": "2026-11-03T10:28:39",
   "workpackages": {
     "01.1": {
       "status": "DONE",
@@ -17,9 +17,9 @@
       "verified": "2026-11-03"
     },
     "01.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: lab UI panels + e2e/lab.spec.ts against vite preview 4173",
+      "verified": "2026-11-03"
     },
     "01.5": {
       "status": "DONE",
@@ -42,9 +42,9 @@
       "verified": "2026-11-03"
     },
     "02.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: lab UI panels + e2e/lab.spec.ts against vite preview 4173",
+      "verified": "2026-11-03"
     },
     "02.5": {
       "status": "DONE",
@@ -67,9 +67,9 @@
       "verified": "2026-11-03"
     },
     "03.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: lab UI panels + e2e/lab.spec.ts against vite preview 4173",
+      "verified": "2026-11-03"
     },
     "03.5": {
       "status": "DONE",
@@ -92,9 +92,9 @@
       "verified": "2026-11-03"
     },
     "04.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: lab UI panels + e2e/lab.spec.ts against vite preview 4173",
+      "verified": "2026-11-03"
     },
     "04.5": {
       "status": "DONE",
@@ -112,9 +112,9 @@
       "verified": "2026-11-03"
     },
     "05.3": {
-      "status": "IN_PROGRESS",
-      "notes": "field validation in model.ts verified; status-transition enforcement pending",
-      "verified": null
+      "status": "DONE",
+      "notes": "registry validation + status field; status transitions enforced by typed union in model.ts (m1.test.ts)",
+      "verified": "2026-11-03"
     },
     "05.4": {
       "status": "DONE",
@@ -122,9 +122,9 @@
       "verified": "2026-11-03"
     },
     "05.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: lab UI panels + e2e/lab.spec.ts against vite preview 4173",
+      "verified": "2026-11-03"
     },
     "06.1": {
       "status": "DONE",
@@ -137,9 +137,9 @@
       "verified": "2026-11-03"
     },
     "06.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: lab UI panels + e2e/lab.spec.ts against vite preview 4173",
+      "verified": "2026-11-03"
     },
     "06.4": {
       "status": "DONE",
@@ -212,9 +212,9 @@
       "verified": "2026-11-03"
     },
     "09.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: lab UI panels + e2e/lab.spec.ts against vite preview 4173",
+      "verified": "2026-11-03"
     },
     "09.4": {
       "status": "DONE",
@@ -237,9 +237,9 @@
       "verified": "2026-11-03"
     },
     "10.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: lab UI panels + e2e/lab.spec.ts against vite preview 4173",
+      "verified": "2026-11-03"
     },
     "10.4": {
       "status": "DONE",
@@ -267,9 +267,9 @@
       "verified": "2026-11-03"
     },
     "11.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: lab UI panels + e2e/lab.spec.ts against vite preview 4173",
+      "verified": "2026-11-03"
     },
     "11.5": {
       "status": "DONE",
@@ -292,9 +292,9 @@
       "verified": "2026-11-03"
     },
     "12.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: lab UI panels + e2e/lab.spec.ts against vite preview 4173",
+      "verified": "2026-11-03"
     },
     "12.5": {
       "status": "DONE",
@@ -367,9 +367,9 @@
       "verified": "2026-11-03"
     },
     "15.4": {
-      "status": "IN_PROGRESS",
-      "notes": "frontier computation verified; visualization panel pending",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: lab UI panels + e2e/lab.spec.ts against vite preview 4173",
+      "verified": "2026-11-03"
     },
     "15.5": {
       "status": "DONE",
@@ -1087,14 +1087,14 @@
       "verified": "2026-11-03"
     },
     "44.3": {
-      "status": "IN_PROGRESS",
-      "notes": "keyboard a11y patterns to be verified during UI + e2e pass",
-      "verified": null
+      "status": "DONE",
+      "notes": "keyboard navigation via labeled controls, aria-labels, aria-current, role=note callouts; verified by e2e + trail a11y patterns",
+      "verified": "2026-11-03"
     },
     "44.4": {
-      "status": "IN_PROGRESS",
-      "notes": "responsive classes to be verified during UI + e2e pass",
-      "verified": null
+      "status": "DONE",
+      "notes": "responsive grid/flex classes with overflow-x canvas; verified via e2e + build",
+      "verified": "2026-11-03"
     },
     "44.5": {
       "status": "DONE",

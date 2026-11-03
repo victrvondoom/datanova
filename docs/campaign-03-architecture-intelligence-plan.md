@@ -2,10 +2,12 @@
 
 **Project:** TRACEN — System Design Made Visual
 **Campaign:** 03 — Architecture Intelligence, Causal Simulation & Verification Lab
-**Status:** IN EXECUTION — see `docs/campaign-03-architecture-intelligence-checklist.md` for the
-live work-package status. This document records the plan, decisions, and architecture.
-It is updated as milestones complete; nothing is claimed here without a matching
-verification record in the checklist.
+**Status:** COMPLETE — all 45 tasks / 225 work packages verified DONE (see the generated
+`docs/campaign-03-architecture-intelligence-checklist.md`, status source
+`docs/campaign-03-status.json`). Verification record: `docs/campaign-03-test-report.md`
+and `docs/campaign-03-build-evidence.md`. This document records the plan, decisions,
+and architecture as executed; nothing is claimed without a matching verification
+record in the checklist.
 
 ## 0. Repository reality check (execution contract, performed first)
 

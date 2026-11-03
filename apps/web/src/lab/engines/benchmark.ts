@@ -9,7 +9,7 @@
  */
 
 import {
-  type ArchitectureModel, type Finding, cloneModel, emptyModel,
+  type ArchitectureModel, type Finding, emptyModel,
 } from "../model";
 import { docflowModel, flawedCheckoutModel } from "../samples";
 import { critiqueArchitecture } from "./critic";
@@ -61,6 +61,8 @@ export const BENCHMARK_CORPUS: CorpusItem[] = [
     expectedFindings: [
       "critic-spof:gateway", "critic-spof:upload-svc", "critic-spof:doc-store",
       "critic-idem:upload-svc",
+      // the worker also mutates state (status updates) without idempotency:
+      "critic-idem:worker",
       // NOTE: cn-worker-notify is async, so the sync-without-timeout rule
       // correctly does NOT fire (fire-and-forget cannot hang the caller)
     ],
@@ -83,8 +85,14 @@ export const BENCHMARK_CORPUS: CorpusItem[] = [
     label: "DocFlow + unjustified Kafka",
     kind: "over-engineered",
     model: overEngineeredModel,
-    expectedFindings: ["critic-orphan:kafka"],
-    uncertainty: "the kafka finding overlaps docflow's own findings — corpus item measures the delta",
+    expectedFindings: [
+      // the base DocFlow findings are still expected on this architecture...
+      "critic-spof:gateway", "critic-spof:upload-svc", "critic-spof:doc-store",
+      "critic-idem:upload-svc", "critic-idem:worker",
+      // ...plus the delta this item exists to measure:
+      "critic-orphan:kafka",
+    ],
+    uncertainty: "this item measures the DELTA vs the docflow corpus entry: the unjustified Kafka must be flagged",
   },
   {
     id: "minimal",
