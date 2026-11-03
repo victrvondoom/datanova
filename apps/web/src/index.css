@@ -58,3 +58,142 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .wf-flow-edge { animation: none; }
 }
+
+/* ============================================================
+   ULTRA MODE — premium design layer.
+   All utilities degrade gracefully in light theme and honor
+   prefers-reduced-motion.
+   ============================================================ */
+
+/* Animated aurora canvas: fixed behind the app shell (dark only). */
+.ultra-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  display: none;
+}
+.dark .ultra-aurora { display: block; }
+.ultra-aurora::before,
+.ultra-aurora::after {
+  content: "";
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 9999px;
+  filter: blur(90px);
+  opacity: 0.16;
+  will-change: transform;
+}
+.ultra-aurora::before {
+  background: radial-gradient(circle at center, #00b4d8 0%, #8b5cf6 60%, transparent 70%);
+  top: -18vmax;
+  left: -8vmax;
+  animation: aurora-drift 22s ease-in-out infinite alternate;
+}
+.ultra-aurora::after {
+  background: radial-gradient(circle at center, #10b981 0%, #00b4d8 60%, transparent 70%);
+  bottom: -20vmax;
+  right: -10vmax;
+  animation: aurora-drift 26s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes aurora-drift {
+  0% { transform: translate3d(-4%, -2%, 0) scale(1); }
+  50% { transform: translate3d(3%, 3%, 0) scale(1.1); }
+  100% { transform: translate3d(-2%, 4%, 0) scale(1.05); }
+}
+
+/* Glass panel: translucent card with blur, hairline border, inner light. */
+.ultra-card {
+  position: relative;
+  border-radius: 1rem;
+  background: rgba(28, 37, 65, 0.55);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 32px -8px rgba(2, 6, 23, 0.55),
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.35s ease, border-color 0.35s ease;
+}
+:not(.dark) .ultra-card {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 32px -12px rgba(15, 23, 42, 0.14),
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+}
+.ultra-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 180, 216, 0.35);
+  box-shadow: 0 12px 40px -10px rgba(0, 180, 216, 0.22),
+              inset 0 1px 0 0 rgba(255, 255, 255, 0.07);
+}
+
+/* Animated conic ring that crowns a card (decorative top hairline). */
+.ultra-crown::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 180, 216, 0.8), rgba(139, 92, 246, 0.8), transparent);
+  opacity: 0.7;
+}
+
+/* Shimmer sweep for hero text / accents. */
+.ultra-shimmer-text {
+  background: linear-gradient(110deg, #e2e8f0 30%, #90e0ef 50%, #e2e8f0 70%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-sweep 3.2s linear infinite;
+}
+@keyframes shimmer-sweep {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Staggered entrance: pair with animate fade-up + inline animation-delay. */
+.ultra-stagger > * {
+  animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.ultra-stagger > *:nth-child(1) { animation-delay: 0.03s; }
+.ultra-stagger > *:nth-child(2) { animation-delay: 0.09s; }
+.ultra-stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.ultra-stagger > *:nth-child(4) { animation-delay: 0.21s; }
+.ultra-stagger > *:nth-child(5) { animation-delay: 0.27s; }
+.ultra-stagger > *:nth-child(6) { animation-delay: 0.33s; }
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Grid overlay inside hero panels. */
+.ultra-grid-overlay {
+  background-image:
+    linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+}
+
+/* Respect reduced motion for every ultra effect. */
+@media (prefers-reduced-motion: reduce) {
+  .ultra-aurora::before,
+  .ultra-aurora::after,
+  .ultra-shimmer-text,
+  .ultra-stagger > * {
+    animation: none;
+  }
+  .ultra-card,
+  .ultra-card:hover {
+    transition: none;
+    transform: none;
+  }
+}
+

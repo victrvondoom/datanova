@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { checkHealth, fetchBenchmarks } from "../api";
+import { useCountUp } from "../lib/useCountUp";
+import { formatKpiValue, staggerDelayMs } from "../lib/ultra";
 import {
   LayoutDashboard,
   PlayCircle,
@@ -12,6 +14,9 @@ import {
   GraduationCap,
   FlaskConical,
   Boxes,
+  Trophy,
+  Radio,
+  WifiOff,
 } from "lucide-react";
 
 export type ViewType =
@@ -69,6 +74,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
   // Dynamic trail badge: reflects real learning progress in localStorage.
   const [trailCompleted, setTrailCompleted] = useState<number>(() => readTrailCompleted());
 
+  // Animated KPI presentation of the API-provided champion metrics.
+  const animatedPrAuc = useCountUp(champion.prAuc ?? 0, { durationMs: 1200 });
+  const animatedLatency = useCountUp(champion.latencyMs ?? 0, { durationMs: 1200 });
+
   useEffect(() => {
     let cancelled = false;
     const refreshChampion = async () => {
@@ -124,31 +133,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
   ];
 
   return (
-    <aside className="w-64 border-r flex flex-col justify-between p-4 bg-white dark:bg-navy-900 border-slate-200 dark:border-navy-700 transition-colors">
-      <div className="space-y-1.5">
-        <div className="px-3 py-2 text-[11px] font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
+    <aside className="w-64 border-r flex flex-col justify-between p-4 bg-white/85 dark:bg-navy-900/75 backdrop-blur-xl border-slate-200 dark:border-navy-700 transition-colors">
+      <div className="space-y-1.5 ultra-stagger">
+        <div className="px-3 py-2 text-[11px] font-display font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
           Core Laboratories
         </div>
 
-        {navItems.map((item) => {
+        {navItems.map((item, index) => {
           const Icon = item.icon;
           const isActive = currentView === item.id;
           return (
             <button
               key={item.id}
               onClick={() => setCurrentView(item.id)}
-              className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              style={{ animationDelay: `${staggerDelayMs(index + 1)}ms` }}
+              className={`ultra-card w-full flex items-center justify-between px-3.5 py-2.5 text-sm font-medium transition-all ${
                 isActive
-                  ? "bg-accent-teal/10 text-accent-teal border border-accent-teal/30 shadow-sm font-semibold"
-                  : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-navy-800 hover:text-slate-900 dark:hover:text-white"
+                  ? "text-accent-teal border-accent-teal/40 shadow-glow-teal font-semibold"
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-accent-teal/30"
               }`}
             >
+              {isActive && (
+                <span
+                  aria-hidden
+                  className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-gradient-to-b from-accent-teal to-accent-violet"
+                />
+              )}
               <div className="flex items-center space-x-3">
                 <Icon className={`w-4 h-4 ${isActive ? "text-accent-teal" : "text-slate-400"}`} />
                 <span>{item.label}</span>
               </div>
               <span
-                className={`text-[10px] px-2 py-0.5 rounded-md ${
+                className={`text-[10px] font-mono px-2 py-0.5 rounded-md ${
                   isActive
                     ? "bg-accent-teal text-navy-900 font-bold"
                     : "bg-slate-100 dark:bg-navy-800 text-slate-500 dark:text-slate-400"
@@ -162,29 +178,52 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
       </div>
 
       {/* Champion Status Card — live from the API (honest when offline) */}
-      <div className="p-3.5 rounded-xl border bg-slate-50 dark:bg-navy-800/60 border-slate-200 dark:border-navy-700">
-        <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400 mb-1">
-          Active Champion
+      <div className="ultra-card ultra-crown p-3.5 mt-4">
+        <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center space-x-1.5">
+            <Trophy className="w-3.5 h-3.5 text-accent-teal" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+              Active Champion
+            </span>
+          </div>
+          <span
+            className={`flex items-center space-x-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-md border ${
+              champion.online
+                ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                : "text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20"
+            }`}
+          >
+            {champion.online ? (
+              <Radio className="w-3 h-3" />
+            ) : (
+              <WifiOff className="w-3 h-3" />
+            )}
+            <span>{champion.online ? "Live" : "Offline"}</span>
+          </span>
         </div>
-        <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+        <div className="text-xs font-mono font-bold text-slate-900 dark:text-white truncate">
           {champion.modelId ?? "backend offline"}
         </div>
         {champion.artifactStatus && (
-          <div className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+          <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
             artifact: {champion.artifactStatus}
           </div>
         )}
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200 dark:border-navy-700 text-[11px]">
+        <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/70 dark:border-navy-700/70 text-[11px]">
           <span className="text-slate-500">PR-AUC:</span>
-          <span className={`font-bold ${champion.degraded ? "text-amber-500" : "text-emerald-500"}`}>
-            {champion.prAuc !== null ? champion.prAuc.toFixed(4) : "—"}
+          <span className={`font-mono font-bold ${champion.degraded ? "text-amber-500" : "text-emerald-500"}`}>
+            {champion.prAuc !== null ? formatKpiValue(animatedPrAuc, { decimals: 4 }) : "—"}
             {champion.degraded ? " (cached)" : ""}
           </span>
         </div>
         <div className="flex items-center justify-between text-[11px] mt-0.5">
           <span className="text-slate-500">Latency:</span>
-          <span className="font-semibold text-slate-700 dark:text-slate-300">
-            {champion.latencyMs !== null ? `${champion.latencyMs} ms/tx` : "—"}
+          <span className="font-mono font-semibold text-slate-700 dark:text-slate-300">
+            {champion.latencyMs !== null
+              ? `${formatKpiValue(animatedLatency, {
+                  decimals: Number.isInteger(champion.latencyMs) ? 0 : 2,
+                })} ms/tx`
+              : "—"}
           </span>
         </div>
       </div>

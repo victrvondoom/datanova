@@ -1,10 +1,47 @@
 import React, { useState, useEffect } from "react";
 import { ShieldCheck, TrendingUp, Zap, DollarSign, Lock, Layers, ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { checkHealth, fetchBenchmarks } from "../api";
+import { useCountUp } from "../lib/useCountUp";
+import { formatKpiValue } from "../lib/ultra";
 
 interface MissionControlProps {
   onNavigate: (view: string) => void;
 }
+
+interface KpiTileProps {
+  label: string;
+  target: number;
+  format: (value: number) => string;
+  subtext: string;
+  icon: React.ComponentType<{ className?: string }>;
+  badge: string;
+}
+
+const KpiTile: React.FC<KpiTileProps> = ({ label, target, format, subtext, icon: Icon, badge }) => {
+  const animated = useCountUp(target, { durationMs: 1400 });
+  return (
+    <div className="ultra-card ultra-crown p-5 space-y-3 overflow-hidden">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          {label}
+        </span>
+        <div className="p-2 rounded-xl bg-gradient-to-br from-accent-teal to-accent-violet text-white shadow-glow-teal">
+          <Icon className="w-4 h-4" />
+        </div>
+      </div>
+      <div>
+        <div className="text-2xl font-extrabold font-mono text-slate-900 dark:text-white tracking-tight tabular-nums">
+          {format(animated)}
+        </div>
+        <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">{subtext}</div>
+      </div>
+      <div className="pt-2 border-t border-slate-200/70 dark:border-navy-700/60 flex items-center justify-between text-[11px]">
+        <span className="text-slate-400 dark:text-slate-500">Evidence Trail:</span>
+        <span className="font-semibold text-accent-teal dark:text-accent-cyan">{badge}</span>
+      </div>
+    </div>
+  );
+};
 
 export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) => {
   const [health, setHealth] = useState<any>({
@@ -33,28 +70,32 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
   const kpis = [
     {
       label: "Champion PR-AUC",
-      value: championData.pr_auc.toFixed(4),
+      target: championData.pr_auc,
+      format: (value: number) => formatKpiValue(value, { decimals: 4 }),
       subtext: "vs 0.0949 Rule Baseline (+653%)",
       icon: TrendingUp,
       badge: "Validated",
     },
     {
       label: "Recall @ 1.0% FPR",
-      value: `${(championData.recall_at_fpr_1pct * 100).toFixed(2)}%`,
+      target: championData.recall_at_fpr_1pct * 100,
+      format: (value: number) => formatKpiValue(value, { decimals: 2, suffix: "%" }),
       subtext: "High detection with minimal friction",
       icon: ShieldCheck,
       badge: "Strict Cap",
     },
     {
       label: "Net Operational Savings",
-      value: `$${championData.financial_outcomes.estimated_net_savings.toLocaleString("en-US", { maximumFractionDigits: 0 })}`,
+      target: championData.financial_outcomes.estimated_net_savings,
+      format: (value: number) => formatKpiValue(value, { decimals: 0, prefix: "$" }),
       subtext: "86.1% loss reduction under AEGIS policy",
       icon: DollarSign,
       badge: "Cost-Aware",
     },
     {
       label: "Inference Latency",
-      value: `${championData.inference_latency_ms_per_tx.toFixed(2)} ms`,
+      target: championData.inference_latency_ms_per_tx,
+      format: (value: number) => formatKpiValue(value, { decimals: 2, suffix: " ms" }),
       subtext: "Sub-millisecond real-time scoring",
       icon: Zap,
       badge: "SLA Ready",
@@ -64,10 +105,11 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="relative overflow-hidden rounded-2xl border p-6 bg-gradient-to-r from-navy-900 via-navy-800 to-navy-900 border-navy-700 text-white shadow-xl">
+      <div className="relative overflow-hidden rounded-2xl border p-6 bg-gradient-to-r from-navy-900 via-navy-800 to-navy-950 border-navy-700 text-white shadow-card-ultra">
+        <div className="ultra-grid-overlay absolute inset-0" aria-hidden="true" />
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1.5">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center flex-wrap gap-2">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider bg-accent-teal text-navy-900">
                 Official Baseline
               </span>
@@ -77,8 +119,8 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
                 <span>Backend {health.status === "healthy" ? "Online" : health.status}</span>
               </span>
             </div>
-            <h1 className="text-2xl font-bold tracking-tight text-white">
-              AEGIS-Fraud X Mission Control
+            <h1 className="text-2xl font-display font-bold tracking-tight text-white">
+              AEGIS-Fraud X <span className="ultra-shimmer-text">Mission Control</span>
             </h1>
             <p className="text-sm text-slate-300 max-w-2xl">
               Operating on strict chronological zero-lookahead partitions. Integrating dual-stream tabular velocity,
@@ -88,14 +130,14 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
           <div className="flex items-center gap-3">
             <button
               onClick={() => onNavigate("stream")}
-              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl font-semibold text-sm bg-accent-teal text-navy-900 hover:bg-accent-cyan transition-all shadow-md"
+              className="flex items-center space-x-2 px-4 py-2.5 rounded-xl font-semibold text-sm bg-accent-teal text-navy-900 hover:bg-accent-cyan hover:scale-[1.03] transition-all shadow-glow-teal"
             >
               <span>Launch Live Digital Twin</span>
               <ArrowUpRight className="w-4 h-4" />
             </button>
             <button
               onClick={() => onNavigate("decision")}
-              className="px-4 py-2.5 rounded-xl font-medium text-sm border border-navy-600 bg-navy-800/80 hover:bg-navy-700 text-white transition-all"
+              className="px-4 py-2.5 rounded-xl font-medium text-sm border border-navy-600 bg-navy-800/80 hover:bg-navy-700 hover:border-accent-violet/40 text-white transition-all"
             >
               Cost Engine
             </button>
@@ -104,45 +146,26 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
       </div>
 
       {/* KPI Tiles */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {kpis.map((kpi, idx) => {
-          const Icon = kpi.icon;
-          return (
-            <div
-              key={idx}
-              className="p-5 rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm space-y-3"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {kpi.label}
-                </span>
-                <div className="p-2 rounded-xl bg-accent-teal/10 text-accent-teal">
-                  <Icon className="w-4 h-4" />
-                </div>
-              </div>
-              <div>
-                <div className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                  {kpi.value}
-                </div>
-                <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  {kpi.subtext}
-                </div>
-              </div>
-              <div className="pt-2 border-t border-slate-100 dark:border-navy-700/60 flex items-center justify-between text-[11px]">
-                <span className="text-slate-400">Evidence Trail:</span>
-                <span className="font-semibold text-accent-teal">{kpi.badge}</span>
-              </div>
-            </div>
-          );
-        })}
+      <div className="ultra-stagger grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {kpis.map((kpi, idx) => (
+          <KpiTile
+            key={idx}
+            label={kpi.label}
+            target={kpi.target}
+            format={kpi.format}
+            subtext={kpi.subtext}
+            icon={kpi.icon}
+            badge={kpi.badge}
+          />
+        ))}
       </div>
 
       {/* System Integrity & Operational Architecture */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Core Pillars */}
-        <div className="lg:col-span-2 p-6 rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm space-y-4">
+        <div className="lg:col-span-2 ultra-card ultra-crown overflow-hidden p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-slate-900 dark:text-white">
+            <h2 className="text-base font-display font-bold text-slate-900 dark:text-white">
               AEGIS-Fraud X Architecture Pillars
             </h2>
             <span className="text-xs text-emerald-500 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-md">
@@ -151,9 +174,9 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-xl border border-slate-100 dark:border-navy-700 bg-slate-50 dark:bg-navy-900/40 space-y-2">
-              <div className="flex items-center space-x-2 text-accent-teal font-semibold text-sm">
-                <Layers className="w-4 h-4" />
+            <div className="p-4 rounded-xl border border-slate-200/80 dark:border-navy-700 bg-slate-50/80 dark:bg-navy-900/40 space-y-2 hover:border-accent-teal/40 dark:hover:border-accent-teal/30 transition-colors">
+              <div className="flex items-center space-x-2 text-accent-teal dark:text-accent-cyan font-semibold text-sm">
+                <Layers className="w-4 h-4" aria-hidden="true" />
                 <span>1. Strict Zero Lookahead</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300">
@@ -162,9 +185,9 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
               </p>
             </div>
 
-            <div className="p-4 rounded-xl border border-slate-100 dark:border-navy-700 bg-slate-50 dark:bg-navy-900/40 space-y-2">
+            <div className="p-4 rounded-xl border border-slate-200/80 dark:border-navy-700 bg-slate-50/80 dark:bg-navy-900/40 space-y-2 hover:border-emerald-500/40 dark:hover:border-emerald-500/30 transition-colors">
               <div className="flex items-center space-x-2 text-emerald-500 font-semibold text-sm">
-                <ShieldCheck className="w-4 h-4" />
+                <ShieldCheck className="w-4 h-4" aria-hidden="true" />
                 <span>2. Temporal Graph Heuristics</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300">
@@ -173,9 +196,9 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
               </p>
             </div>
 
-            <div className="p-4 rounded-xl border border-slate-100 dark:border-navy-700 bg-slate-50 dark:bg-navy-900/40 space-y-2">
+            <div className="p-4 rounded-xl border border-slate-200/80 dark:border-navy-700 bg-slate-50/80 dark:bg-navy-900/40 space-y-2 hover:border-accent-violet/40 dark:hover:border-accent-violet/30 transition-colors">
               <div className="flex items-center space-x-2 text-accent-cyan font-semibold text-sm">
-                <DollarSign className="w-4 h-4" />
+                <DollarSign className="w-4 h-4" aria-hidden="true" />
                 <span>3. Cost-Aware Optimizer</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300">
@@ -184,9 +207,9 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
               </p>
             </div>
 
-            <div className="p-4 rounded-xl border border-slate-100 dark:border-navy-700 bg-slate-50 dark:bg-navy-900/40 space-y-2">
+            <div className="p-4 rounded-xl border border-slate-200/80 dark:border-navy-700 bg-slate-50/80 dark:bg-navy-900/40 space-y-2 hover:border-amber-500/40 dark:hover:border-amber-500/30 transition-colors">
               <div className="flex items-center space-x-2 text-amber-500 font-semibold text-sm">
-                <Lock className="w-4 h-4" />
+                <Lock className="w-4 h-4" aria-hidden="true" />
                 <span>4. Cryptographic Receipts</span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-300">
@@ -198,10 +221,10 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
         </div>
 
         {/* Right Col: Live Integrity Checklist */}
-        <div className="p-6 rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm space-y-4">
-          <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center justify-between">
+        <div className="ultra-card ultra-crown overflow-hidden p-6 space-y-4">
+          <h2 className="text-base font-display font-bold text-slate-900 dark:text-white flex items-center justify-between">
             <span>Operational Verification</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+            <CheckCircle2 className="w-4 h-4 text-emerald-500" aria-hidden="true" />
           </h2>
           <div className="space-y-3">
             {[
@@ -211,7 +234,7 @@ export const MissionControl: React.FC<MissionControlProps> = ({ onNavigate }) =>
               { label: "False Alarm Rate (FPR)", status: "0.87%", detail: "Below maximum 1.50% ceiling" },
               { label: "Dynamic Invariant Test Suite", status: "28/28 Passed", detail: "pytest suite executed & verified (100%)" },
             ].map((row, i) => (
-              <div key={i} className="flex items-center justify-between text-xs pb-2 border-b border-slate-100 dark:border-navy-700/60">
+              <div key={i} className="flex items-center justify-between text-xs pb-2 border-b border-slate-200/70 dark:border-navy-700/60">
                 <div>
                   <div className="font-semibold text-slate-800 dark:text-slate-200">{row.label}</div>
                   <div className="text-[11px] text-slate-500 dark:text-slate-400">{row.detail}</div>

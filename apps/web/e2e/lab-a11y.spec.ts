@@ -114,6 +114,9 @@ test("scenario runner results are announced with pass/fail labels, not color alo
 
 test("accessibility tree: the overview exposes headings and named regions", async ({ page }) => {
   await page.goto("#/lab/overview");
+  // The lab view is code-split: wait for the lazy module to mount before
+  // snapshotting the a11y tree (ariaSnapshot itself does not auto-wait).
+  await expect(page.getByRole("heading", { name: "Architecture canvas" })).toBeVisible();
   // the lab renders its own <main> inside the dashboard shell
   const snapshot = await page.getByRole("main").last().ariaSnapshot();
   expect(snapshot).toContain("heading \"Architecture canvas\"");

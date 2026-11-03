@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { Navbar } from "./components/Navbar";
 import { Sidebar, ViewType } from "./components/Sidebar";
 import { MissionControl } from "./views/MissionControl";
@@ -9,10 +9,21 @@ import { BenchmarkLab } from "./views/BenchmarkLab";
 import { DriftLab } from "./views/DriftLab";
 import { ExplainabilityView } from "./views/ExplainabilityView";
 import { ResearchCenter } from "./views/ResearchCenter";
-import { TrailApp } from "./trail/TrailApp";
-import { LabApp } from "./lab/LabApp";
-import { AtlasApp } from "./atlas/AtlasApp";
 import { checkHealth } from "./api";
+// Heavy standalone products are code-split: three.js (atlas), the lab and the
+// trail only load when their view is opened or deep-linked.
+const TrailApp = React.lazy(() => import("./trail/TrailApp").then((m) => ({ default: m.TrailApp })));
+const LabApp = React.lazy(() => import("./lab/LabApp").then((m) => ({ default: m.LabApp })));
+const AtlasApp = React.lazy(() => import("./atlas/AtlasApp").then((m) => ({ default: m.AtlasApp })));
+
+const ViewSuspense: React.FC = () => (
+  <div className="flex items-center justify-center min-h-[60vh]">
+    <div className="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400">
+      <div className="w-8 h-8 rounded-full border-2 border-accent-teal/30 border-t-accent-teal animate-spin" />
+      <span className="text-xs font-semibold uppercase tracking-widest">Loading module…</span>
+    </div>
+  </div>
+);
 
 export const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState<boolean>(true);
@@ -55,7 +66,13 @@ export const App: React.FC = () => {
 
   return (
     <div className={`min-h-screen ${darkMode ? "dark bg-navy-900 text-slate-100" : "bg-slate-50 text-slate-800"}`}>
-      <div className="flex flex-col min-h-screen">
+      {/* Ultra-mode aurora canvas: fixed, behind all content (dark theme only).
+          Scoped to the ops dashboard — the trail/lab/atlas products have their
+          own visual design (and pixel baselines) and stay untouched. */}
+      {!["trail", "lab", "atlas"].includes(currentView) && (
+        <div className="ultra-aurora" aria-hidden="true" />
+      )}
+      <div className="relative z-10 flex flex-col min-h-screen">
         {/* Navigation Bar */}
         <Navbar
           darkMode={darkMode}
@@ -98,9 +115,9 @@ export const App: React.FC = () => {
             {currentView === "drift" && <DriftLab />}
             {currentView === "explain" && <ExplainabilityView />}
             {currentView === "research" && <ResearchCenter />}
-            {currentView === "trail" && <TrailApp />}
-          {currentView === "lab" && <LabApp />}
-          {currentView === "atlas" && <div className="flex-1 overflow-hidden !p-0 !m-0 !max-w-none"><AtlasApp /></div>}
+            {currentView === "trail" && <Suspense fallback={<ViewSuspense />}><TrailApp /></Suspense>}
+          {currentView === "lab" && <Suspense fallback={<ViewSuspense />}><LabApp /></Suspense>}
+          {currentView === "atlas" && <div className="flex-1 overflow-hidden !p-0 !m-0 !max-w-none"><Suspense fallback={<ViewSuspense />}><AtlasApp /></Suspense></div>}
           </main>
         </div>
       </div>
