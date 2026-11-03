@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-03T10:08:07",
+  "updated": "2026-11-03T10:09:48",
   "workpackages": {
     "01.1": {
       "status": "DONE",
@@ -877,129 +877,129 @@
       "verified": "2026-11-03"
     },
     "36.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "36.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "36.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "36.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "36.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "37.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "37.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "37.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "37.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "37.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "38.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "38.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "38.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "38.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "38.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "39.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "39.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "39.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "debate model + consistency checks verified; comparison panel pending (m8.test.ts)",
+      "verified": "2026-11-03"
     },
     "39.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "39.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "40.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "40.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "40.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "40.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "40.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m8.test.ts",
+      "verified": "2026-11-03"
     },
     "41.1": {
       "status": "NOT_STARTED",

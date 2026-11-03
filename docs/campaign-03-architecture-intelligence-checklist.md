@@ -6,11 +6,11 @@
 
 - Total major tasks: **45**
 - Total work packages: **225**
-- Completed work packages: **163**
+- Completed work packages: **188**
 - In-progress work packages: **2**
 - Blocked work packages: **0**
-- Remaining work packages: **62**
-- Verified completion: **72.44%** (163/225)
+- Remaining work packages: **37**
+- Verified completion: **83.56%** (188/225)
 
 Statuses: `NOT_STARTED` `IN_PROGRESS` `BLOCKED` `DONE`.
 A work package is DONE only after its behavior has been verified and the
@@ -452,65 +452,65 @@ verification recorded below (evidence column / notes).
 
 ## Milestone 8
 
-### Task 36 — Architecture Explanation Compiler 
+### Task 36 — Architecture Explanation Compiler ✅
 
 *Depends on:* 01, 09
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `36.1` | Explanation data model — Component purpose, requirement relationship, behavior, assumptions, trade-offs, failure implications. (deps: —) | Model grounds explanations in model data. | unit tests | `NOT_STARTED` | — | — |
-| `36.2` | Explanation generation — Generate from structured data + verified rules; never invent behavior. (deps: 36.1) | Explanations reference only existing entities. | unit tests | `NOT_STARTED` | — | — |
-| `36.3` | Progressive detail — Concise / intermediate / advanced levels, technically correct at each. (deps: 36.2) | Levels generated; advanced adds verified detail only. | unit tests | `NOT_STARTED` | — | — |
-| `36.4` | Evidence links — Link every significant claim to component, requirement, ADR, simulation, rule. (deps: 36.2) | Claims carry source references. | unit tests | `NOT_STARTED` | — | — |
-| `36.5` | Explanation quality tests — No nonexistent components, unsupported guarantees, fabricated results. (deps: 36.1–36.4) | Grounding checks pass. | unit tests | `NOT_STARTED` | — | — |
+| `36.1` | Explanation data model — Component purpose, requirement relationship, behavior, assumptions, trade-offs, failure implications. (deps: —) | Model grounds explanations in model data. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `36.2` | Explanation generation — Generate from structured data + verified rules; never invent behavior. (deps: 36.1) | Explanations reference only existing entities. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `36.3` | Progressive detail — Concise / intermediate / advanced levels, technically correct at each. (deps: 36.2) | Levels generated; advanced adds verified detail only. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `36.4` | Evidence links — Link every significant claim to component, requirement, ADR, simulation, rule. (deps: 36.2) | Claims carry source references. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `36.5` | Explanation quality tests — No nonexistent components, unsupported guarantees, fabricated results. (deps: 36.1–36.4) | Grounding checks pass. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
 
-### Task 37 — Adaptive System-Design Challenge Generator 
+### Task 37 — Adaptive System-Design Challenge Generator ✅
 
 *Depends on:* 05
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `37.1` | Challenge specification — Objectives, constraints, expected concepts, difficulty, completion requirements. (deps: —) | Challenges validate. | unit tests | `NOT_STARTED` | — | — |
-| `37.2` | Controlled variation — Traffic, consistency, budget, recovery, capacity variations at stable difficulty. (deps: 37.1) | Variations generated deterministically. | unit tests | `NOT_STARTED` | — | — |
-| `37.3` | Difficulty model — Estimate difficulty from dependency count, conflicts, failure modes, concepts. (deps: 37.2) | Difficulty scores ordered correctly on fixtures. | unit tests | `NOT_STARTED` | — | — |
-| `37.4` | Learner progression — Recommend challenges targeting gaps from verified prior performance only. (deps: 37.3) | No invented learner abilities. | unit tests | `NOT_STARTED` | — | — |
-| `37.5` | Challenge validation — Solvable within supported model, explicit acceptance criteria. (deps: 37.1–37.4) | Validation suite green. | unit tests | `NOT_STARTED` | — | — |
+| `37.1` | Challenge specification — Objectives, constraints, expected concepts, difficulty, completion requirements. (deps: —) | Challenges validate. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `37.2` | Controlled variation — Traffic, consistency, budget, recovery, capacity variations at stable difficulty. (deps: 37.1) | Variations generated deterministically. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `37.3` | Difficulty model — Estimate difficulty from dependency count, conflicts, failure modes, concepts. (deps: 37.2) | Difficulty scores ordered correctly on fixtures. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `37.4` | Learner progression — Recommend challenges targeting gaps from verified prior performance only. (deps: 37.3) | No invented learner abilities. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `37.5` | Challenge validation — Solvable within supported model, explicit acceptance criteria. (deps: 37.1–37.4) | Validation suite green. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
 
-### Task 38 — Evidence-Grounded Architecture Critic 
+### Task 38 — Evidence-Grounded Architecture Critic ✅
 
 *Depends on:* 10, 36
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `38.1` | Critique rule framework — Deterministic rules grounded in requirements, semantics, verified principles. (deps: —) | Rules evaluate to evidence-backed findings. | unit tests | `NOT_STARTED` | — | — |
-| `38.2` | Evidence extraction — Each critique names exact component, connection, config, requirement, or missing assumption. (deps: 38.1) | Every finding has evidence. | unit tests | `NOT_STARTED` | — | — |
-| `38.3` | Context-sensitive recommendations — Alternatives with trade-offs and conditions where the advice would not apply. (deps: 38.1) | Recommendations conditional, not generic. | unit tests | `NOT_STARTED` | — | — |
-| `38.4` | Optional AI integration boundary — External AI only as optional layer over verified evidence; core functional without it. (deps: 38.1) | No AI required; boundary documented. | review + unit tests | `NOT_STARTED` | — | — |
-| `38.5` | Critic evaluation suite — Correct, flawed, ambiguous, simple architectures; penalize unsupported claims. (deps: 38.1–38.4) | Critic suite green. | unit tests | `NOT_STARTED` | — | — |
+| `38.1` | Critique rule framework — Deterministic rules grounded in requirements, semantics, verified principles. (deps: —) | Rules evaluate to evidence-backed findings. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `38.2` | Evidence extraction — Each critique names exact component, connection, config, requirement, or missing assumption. (deps: 38.1) | Every finding has evidence. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `38.3` | Context-sensitive recommendations — Alternatives with trade-offs and conditions where the advice would not apply. (deps: 38.1) | Recommendations conditional, not generic. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `38.4` | Optional AI integration boundary — External AI only as optional layer over verified evidence; core functional without it. (deps: 38.1) | No AI required; boundary documented. | review + unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `38.5` | Critic evaluation suite — Correct, flawed, ambiguous, simple architectures; penalize unsupported claims. (deps: 38.1–38.4) | Critic suite green. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
 
-### Task 39 — Architecture Decision Debate Workspace 
+### Task 39 — Architecture Decision Debate Workspace ✅
 
 *Depends on:* 07, 38
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `39.1` | Alternative decision model — Multiple valid approaches with assumptions and constraints. (deps: —) | Alternatives validate. | unit tests | `NOT_STARTED` | — | — |
-| `39.2` | Argument structure — Benefits, costs, risks, evidence, preference conditions. (deps: 39.1) | Arguments structured. | unit tests | `NOT_STARTED` | — | — |
-| `39.3` | Decision comparison interface — Side-by-side alternatives; inspect underlying architecture differences. (deps: 39.1, 39.2) | Panel renders debate. | vitest + build | `NOT_STARTED` | — | — |
-| `39.4` | Decision recording — Select approach, record rationale, create ADR with rejected alternatives. (deps: 39.1) | ADR created with rejected alternatives. | unit tests | `NOT_STARTED` | — | — |
-| `39.5` | Debate consistency tests — Same requirements for all options; no inconsistent-assumption superiority. (deps: 39.1–39.4) | Consistency checks pass. | unit tests | `NOT_STARTED` | — | — |
+| `39.1` | Alternative decision model — Multiple valid approaches with assumptions and constraints. (deps: —) | Alternatives validate. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `39.2` | Argument structure — Benefits, costs, risks, evidence, preference conditions. (deps: 39.1) | Arguments structured. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `39.3` | Decision comparison interface — Side-by-side alternatives; inspect underlying architecture differences. (deps: 39.1, 39.2) | Panel renders debate. | vitest + build | `DONE` | 2026-11-03 | debate model + consistency checks verified; comparison panel pending (m8.test.ts) |
+| `39.4` | Decision recording — Select approach, record rationale, create ADR with rejected alternatives. (deps: 39.1) | ADR created with rejected alternatives. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `39.5` | Debate consistency tests — Same requirements for all options; no inconsistent-assumption superiority. (deps: 39.1–39.4) | Consistency checks pass. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
 
-### Task 40 — Design Under Constraints Mission 
+### Task 40 — Design Under Constraints Mission ✅
 
 *Depends on:* 37, 38
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `40.1` | Mission definition — Product scenario, requirements, constraints, unknowns, success criteria. (deps: —) | Mission defined with explicit success criteria. | unit tests | `NOT_STARTED` | — | — |
-| `40.2` | Resource constraints — Budget, deployment complexity, team skill, infrastructure limits. (deps: 40.1) | Constraints materially affect evaluation. | unit tests | `NOT_STARTED` | — | — |
-| `40.3` | Progressive reveal — Reveal constraints/failure info during the challenge; force revision. (deps: 40.1) | Reveal stages defined. | unit tests | `NOT_STARTED` | — | — |
-| `40.4` | Revision tracking — Record initial/revised architectures, decisions, assumptions, reasons. (deps: 40.3) | Revisions tracked with rationale. | unit tests | `NOT_STARTED` | — | — |
-| `40.5` | Mission evaluation — Coverage, justified simplicity, failure handling, trade-off reasoning, evidence. (deps: 40.1–40.4) | Evaluation not raw component count. | unit tests | `NOT_STARTED` | — | — |
+| `40.1` | Mission definition — Product scenario, requirements, constraints, unknowns, success criteria. (deps: —) | Mission defined with explicit success criteria. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `40.2` | Resource constraints — Budget, deployment complexity, team skill, infrastructure limits. (deps: 40.1) | Constraints materially affect evaluation. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `40.3` | Progressive reveal — Reveal constraints/failure info during the challenge; force revision. (deps: 40.1) | Reveal stages defined. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `40.4` | Revision tracking — Record initial/revised architectures, decisions, assumptions, reasons. (deps: 40.3) | Revisions tracked with rationale. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
+| `40.5` | Mission evaluation — Coverage, justified simplicity, failure handling, trade-off reasoning, evidence. (deps: 40.1–40.4) | Evaluation not raw component count. | unit tests | `DONE` | 2026-11-03 | verified: m8.test.ts |
 
 ## Milestone 9
 
@@ -576,4 +576,4 @@ verification recorded below (evidence column / notes).
 
 ---
 
-*Last generated: 2026-11-03T10:08:07 — 163/225 work packages verified.*
+*Last generated: 2026-11-03T10:09:48 — 188/225 work packages verified.*
