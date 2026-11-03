@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 
 export const ATLAS_SECTIONS = [
   "mission", "studio", "experiments", "validation", "exchange",
-  "benchmarks", "sources", "decisions", "settings", "system",
+  "benchmarks", "sources", "decisions", "settings", "system", "agents",
 ] as const;
 
 export type AtlasSection = (typeof ATLAS_SECTIONS)[number];
@@ -23,6 +23,7 @@ export const SECTION_LABELS: Record<AtlasSection, string> = {
   decisions: "Decisions",
   settings: "Settings",
   system: "Design System",
+  agents: "Workflow Studio",
 };
 
 export function parseAtlasHash(hash: string): AtlasSection {

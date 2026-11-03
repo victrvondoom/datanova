@@ -45,3 +45,16 @@ body {
 .radar-glow {
   animation: radar-pulse 2s infinite ease-in-out;
 }
+
+/* Workflow Studio: flow animation — runs ONLY along edges whose source node
+   is currently executing (real persisted events, not decoration). */
+@keyframes wf-flow-dash {
+  to { stroke-dashoffset: -20; }
+}
+.wf-flow-edge {
+  stroke-dasharray: 8 6;
+  animation: wf-flow-dash 0.8s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .wf-flow-edge { animation: none; }
+}

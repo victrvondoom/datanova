@@ -7,7 +7,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   LayoutDashboard, Boxes, FlaskConical, ShieldCheck, Send, Gauge,
-  BookOpen, GitBranch, Settings, Palette, Search, ChevronRight, Plus,
+  BookOpen, GitBranch, Settings, Palette, Search, ChevronRight, Plus, Bot,
 } from "lucide-react";
 import {
   ATLAS_SECTIONS, SECTION_LABELS, useAtlasSection, type AtlasSection,
@@ -33,6 +33,7 @@ import { SourcesView } from "./views/Sources";
 import { DecisionsView } from "./views/Decisions";
 import { SettingsView } from "./views/Settings";
 import { DesignSystemView } from "./views/DesignSystem";
+import { AgentStudioView } from "../agents/AgentStudio";
 import { CommandPalette } from "./CommandPalette";
 
 const SECTION_ICONS: Record<AtlasSection, React.ReactNode> = {
@@ -46,6 +47,7 @@ const SECTION_ICONS: Record<AtlasSection, React.ReactNode> = {
   decisions: <GitBranch size={16} aria-hidden />,
   settings: <Settings size={16} aria-hidden />,
   system: <Palette size={16} aria-hidden />,
+  agents: <Bot size={16} aria-hidden />,
 };
 
 /** Review records live with the Atlas workspace (per-browser, no fabrication). */
@@ -213,6 +215,7 @@ export const AtlasApp: React.FC = () => {
             />
           )}
           {section === "system" && <DesignSystemView />}
+          {section === "agents" && <AgentStudioView />}
         </main>
       </div>
 
