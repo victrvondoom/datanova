@@ -5,6 +5,7 @@
 
 import React, { useMemo, useState } from "react";
 import type { ArchitectureModel } from "../model";
+import { topologySummary, topologySummaryText } from "../engines/nonvisual";
 import { analyzeIntent, coverageMap } from "../engines/intent";
 import { explainComponent } from "../engines/explain";
 import { analyzeConstraints } from "../engines/constraints";
@@ -109,6 +110,24 @@ export const OverviewPanel: React.FC<{ model: ArchitectureModel; mode: LearningM
           Modeled architecture. Simulations and scores derived from it are educational models with declared assumptions —
           never production measurements or load tests.
         </Callout>
+      </Panel>
+
+      {/*
+        Campaign 05, Task 03 — nonvisual representation: the same topology the
+        canvas draws, as readable text (screen-reader users get the same
+        information the diagram shows; nothing is color-only).
+      */}
+      <Panel title="Nonvisual architecture summary" subtitle="The same topology as text — what a screen reader can read">
+        <details>
+          <summary className="text-xs text-slate-300 cursor-pointer">
+            {topologySummary(model).overview} — expand for the full description
+          </summary>
+          <ul className="mt-2 space-y-1 text-xs text-slate-300">
+            {topologySummaryText(topologySummary(model)).map((line, i) => (
+              <li key={i}>{line}</li>
+            ))}
+          </ul>
+        </details>
       </Panel>
 
       <Panel title="Intent coverage" subtitle="Why does this architecture exist? Trace every decision back to a requirement."

@@ -1,0 +1,70 @@
+﻿Pane :: web - Google Chrome for Testing
+Button :: Minimize
+Button :: Maximize
+Button :: Close
+Button :: Back
+Button :: Forward
+Button :: Reload
+Button :: View site information
+Edit :: Address and search bar
+Button :: Bookmark this tab
+Button :: Chromium
+Document :: web
+Text :: AEGIS-Fraud 
+Text :: X
+Text :: DN-FN-01
+Text :: Adaptive Graph-Enhanced Intelligence for Cost-Aware Financial Fraud Prevention
+Text :: EVALUATION: 
+Text :: SYNTHETIC 10K (SEED 42)
+Text :: |
+Text :: ZERO LOOKAHEAD ENFORCED
+Text :: Local Engine Mode
+Button :: Finalist PPTX
+Button :: Switch to light theme
+Text :: BACKEND OFFLINE
+Text :: Views are showing offline fallback data (marked “degraded”), not live measurements. Scores, receipts, drift metrics, and savings figures in this mode are simulations. Receipt verification is unavailable offline and will not claim authenticity.
+Button :: Retry connection
+Text :: CORE LABORATORIES
+Button :: Mission Control Live KPIs
+Button :: Live Digital Twin Replay
+Button :: Fraud Network Graph Mule Rings
+Button :: Decision Intelligence Cost Engine
+Button :: ML Benchmarks 6 Models
+Button :: Drift & Stress Lab PSI Alert
+Button :: Explainability Explorer TreeSHAP
+Button :: Evidence & Research Artifacts
+Button :: Vibe Coding Trail 0/20 done
+Button :: Architecture Lab Campaign 03
+Text :: ACTIVE CHAMPION
+Text :: AEGIS-LightGBM-Graph-v1.2
+Text :: PR-AUC:
+Text :: 0.7147
+Text ::  (cached)
+Text :: Latency:
+Text :: 0.001 ms/tx
+Text :: Architecture Intelligence Lab
+Text :: Architectures that explain their intent, expose their risks, simulate their failure paths, compare alternatives, and support their claims with reproducible evidence.
+Text :: Architecture
+ComboBox :: Architecture
+Text :: Mode
+ComboBox :: Mode
+Button :: Reset the lab to the default architecture
+Group :: Lab sections
+Tab :: Lab sections
+TabItem :: 1. Intent
+TabItem :: Architecture & Intent
+TabItem :: Causality & Blast Radius
+TabItem :: Capacity & Latency
+TabItem :: Data & Workflows
+TabItem :: Security & Trust
+TabItem :: Experiments & Recorder
+TabItem :: Critic & Missions
+TabItem :: Evidence Exchange
+TabItem :: Capstone & Benchmark
+Group :: 1. Intent — what are you trying to build?
+Text :: 1. INTENT — WHAT ARE YOU TRYING TO BUILD?
+Text :: Structured intent compiles deterministically into a reviewable starter architecture. Ambiguity stays visible.
+Text :: Goal
+Edit :: Architecture goal
+Text :: Peak workload (rps)
+Spinner :: Peak requests per second

@@ -5,6 +5,7 @@
 
 import React, { useMemo, useState } from "react";
 import type { ArchitectureModel } from "../model";
+import { explainFinding, groundingSummary } from "../engines/grounding";
 import { critiqueArchitecture } from "../engines/critic";
 import { buildScorecard } from "../engines/scorecard";
 import { generateChallenge, estimateDifficulty, validateChallenge, recommendChallenge } from "../engines/challenges";
@@ -47,6 +48,52 @@ export const ReviewPanel: React.FC<{
         right={<span className="text-[10px] text-slate-400">rules fired: {critic.rulesFired.join(", ") || "none"}</span>}>
         <FindingsList findings={presented.headline} emptyText="No critical or warning findings from the critic." />
         {cfg.showRawEngineOutput && <div className="mt-2"><FindingsList findings={presented.detail} /></div>}
+      </Panel>
+
+      {/*
+        Campaign 05, Task 10 — grounded explanations: every critic finding
+        shows which claims and real sources support it, what the lab adds
+        beyond those sources, and when the recommendation does NOT apply.
+      */}
+      <Panel title="Grounded explanations" subtitle="Which claims and real sources support each finding — and what is only our model">
+        {(() => {
+          const findings = critiqueArchitecture(model).findings;
+          const summary = groundingSummary(findings);
+          return (
+            <>
+              <p className="text-xs text-slate-400 mb-2">
+                {summary.grounded} externally grounded · {summary.internalModel} internal-model · {summary.insufficient} insufficient evidence
+              </p>
+              <ul className="space-y-2">
+                {findings.map((f) => {
+                  const ex = explainFinding(f);
+                  return (
+                    <li key={f.id} className="border border-slate-700/60 rounded-md p-2 text-xs">
+                      <span className="font-semibold text-slate-200">{f.title}</span>{" "}
+                      <span className={
+                        ex.confidence === "grounded" ? "text-emerald-300"
+                        : ex.confidence === "internal-model" ? "text-amber-300" : "text-rose-300"
+                      }>[{ex.confidence}]</span>
+                      {ex.sources.length > 0 && (
+                        <ul className="mt-1 text-[11px] text-slate-400 list-disc ml-4">
+                                          {ex.sources.map((src) => (
+                            <li key={src.id}>{src.title} — {src.sectionRef}</li>
+                          ))}
+                        </ul>
+                      )}
+                      {ex.conditions.length > 0 && (
+                        <p className="mt-1 text-[11px] text-slate-400">Does not apply when: {ex.conditions[0]}</p>
+                      )}
+                      {ex.deltas.map((d, i) => (
+                        <p key={i} className="mt-1 text-[11px] text-slate-500">Beyond the sources: {d}</p>
+                      ))}
+                    </li>
+                  );
+                })}
+              </ul>
+            </>
+          );
+        })()}
       </Panel>
 
       <Panel title="Resilience scorecard" subtitle="Seven dimensions, uncertainty labels, inspectable rationale — no aggregate score by design">

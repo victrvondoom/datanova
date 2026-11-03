@@ -9,7 +9,7 @@ import type { ArchitectureModel } from "../model";
 import { serializeModel, validateModel } from "../model";
 import { compileIntent, type IntentSpecInput } from "../engines/intent-compiler";
 import { extractGenome } from "../engines/genome";
-import { Panel, Btn, Callout, Metric, StateBadge, OkBadge } from "../ui";
+import { Panel, Btn, Callout, Metric, StateBadge, OkBadge, Announcer } from "../ui";
 
 const EXAMPLE: IntentSpecInput = {
   goal: "Let users upload documents and receive processed PDFs within a second",
@@ -26,6 +26,7 @@ const EXAMPLE: IntentSpecInput = {
 export const IntentPanel: React.FC<{ onAdopt: (m: ArchitectureModel) => void }> = ({ onAdopt }) => {
   const [spec, setSpec] = useState<IntentSpecInput>(EXAMPLE);
   const [reviewed, setReviewed] = useState(false);
+  const [announcement, setAnnouncement] = useState("");
   const compiled = useMemo(() => compileIntent(spec), [spec]);
   const validation = useMemo(() => validateModel(compiled.model), [compiled]);
   const genome = useMemo(() => extractGenome(compiled.model), [compiled]);
@@ -35,6 +36,7 @@ export const IntentPanel: React.FC<{ onAdopt: (m: ArchitectureModel) => void }> 
 
   return (
     <div>
+      <Announcer message={announcement} />
       <Panel title="1. Intent — what are you trying to build?"
         subtitle="Structured intent compiles deterministically into a reviewable starter architecture. Ambiguity stays visible.">
         <div className="grid md:grid-cols-2 gap-3">
@@ -96,7 +98,17 @@ export const IntentPanel: React.FC<{ onAdopt: (m: ArchitectureModel) => void }> 
             className="w-full rounded-md bg-slate-800 border border-slate-600 p-2 text-xs text-slate-100" />
         </label>
         <div className="flex gap-2 mt-3">
-          <Btn onClick={() => setReviewed(true)}>Compile and review intent</Btn>
+          <Btn
+            aria-label="Compile and review intent"
+            onClick={() => {
+              const compiled = compileIntent(spec);
+              setReviewed(true);
+              setAnnouncement(
+                `Intent compiled: ${compiled.problems.length} problem(s), ` +
+                `${compiled.model.requirements.filter((r) => r.acceptance.includes("UNRESOLVED")).length} unresolved field(s).`,
+              );
+            }}
+          >Compile and review intent</Btn>
           <Btn onClick={() => { setSpec(EXAMPLE); setReviewed(false); }}>Reset to example</Btn>
         </div>
       </Panel>

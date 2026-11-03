@@ -78,6 +78,16 @@ export const EvidenceKindChip: React.FC<{ kind: EvidenceKind }> = ({ kind }) => 
   </span>
 );
 
+/**
+ * Campaign 05, Task 04 — polite live-region announcer.
+ * Renders the latest announcement for screen readers without stealing focus.
+ * Panels pass a string that CHANGES only when a new status occurs, so
+ * unchanged content is never re-announced; empty string announces nothing.
+ */
+export const Announcer: React.FC<{ message: string }> = ({ message }) => (
+  <p role="status" aria-live="polite" className="sr-only">{message}</p>
+);
+
 export const FindingsList: React.FC<{ findings: Finding[]; emptyText?: string }> = ({ findings, emptyText = "No findings." }) => (
   <ul className="space-y-2">
     {findings.length === 0 && <li className="text-xs text-slate-400">{emptyText}</li>}
@@ -103,10 +113,12 @@ export const Metric: React.FC<{ label: string; value: string | number; hint?: st
   </div>
 );
 
-export const Callout: React.FC<{ kind: "honest" | "warn"; children: React.ReactNode }> = ({ kind, children }) => (
-  <div className={`rounded-lg border p-2.5 text-xs leading-relaxed ${kind === "honest"
-    ? "border-sky-500/40 bg-sky-500/10 text-sky-200"
-    : "border-amber-500/40 bg-amber-500/10 text-amber-200"}`}
+export const Callout: React.FC<{ kind: "honest" | "warn" | "ok" | "bad"; children: React.ReactNode }> = ({ kind, children }) => (
+  <div className={`rounded-lg border p-2.5 text-xs leading-relaxed ${
+    kind === "honest" ? "border-sky-500/40 bg-sky-500/10 text-sky-200"
+    : kind === "warn" ? "border-amber-500/40 bg-amber-500/10 text-amber-200"
+    : kind === "ok" ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-200"
+    : "border-rose-500/40 bg-rose-500/10 text-rose-200"}`}
     role="note">
     {children}
   </div>

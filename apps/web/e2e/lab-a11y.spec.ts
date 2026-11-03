@@ -25,9 +25,11 @@ test.beforeEach(async ({ page }) => {
 
 test("primary journey is fully keyboard-operable with visible focus", async ({ page }) => {
   await page.goto("#/lab");
-  // tab into the tab bar and navigate with the keyboard only
+  // tab into the tab bar and navigate with the keyboard only.
+  // Campaign 05: the tab bar is a real ARIA tablist — tabs now expose
+  // role="tab" (the keyboard journey is unchanged; the semantics improved).
   await page.keyboard.press("Tab");
-  const tab = page.getByRole("button", { name: "Causality & Blast Radius" });
+  const tab = page.getByRole("tab", { name: "Causality & Blast Radius" });
   await tab.focus();
   await expect(tab).toBeFocused();
   await page.keyboard.press("Enter");

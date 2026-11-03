@@ -17,6 +17,7 @@ import { SecurityPanel } from "./panels/Security";
 import { ExperimentsPanel } from "./panels/Experiments";
 import { ReviewPanel } from "./panels/Review";
 import { CapstonePanel } from "./panels/Capstone";
+import { ExchangePanel } from "./panels/Exchange";
 import { Btn, Callout } from "./ui";
 
 export const LabApp: React.FC = () => {
@@ -75,15 +76,34 @@ export const LabApp: React.FC = () => {
         </div>
       </header>
 
+      {/*
+        Campaign 05, Task 05 — the tab bar is a real ARIA tablist: roving focus
+        with ArrowLeft/ArrowRight, aria-selected per tab, keyboard-operable
+        without a mouse (same hash navigation underneath).
+      */}
       <nav aria-label="Lab sections" className="flex flex-wrap gap-2 mb-5">
-        {LAB_TABS.map((t) => (
-          <button key={t} onClick={() => navigate(t)} aria-current={tab === t ? "page" : undefined}
-            className={`rounded-md px-3 py-1.5 text-xs font-semibold border transition-colors ${tab === t
-              ? "border-sky-400 bg-sky-500/20 text-sky-200"
-              : "border-slate-600 bg-slate-800/60 text-slate-300 hover:bg-slate-700/60"}`}>
-            {TAB_LABELS[t]}
-          </button>
-        ))}
+        <div role="tablist" aria-label="Lab sections" className="flex flex-wrap gap-2"
+          onKeyDown={(e) => {
+            if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+            e.preventDefault();
+            const idx = LAB_TABS.indexOf(tab);
+            const next = LAB_TABS[(idx + (e.key === "ArrowRight" ? 1 : LAB_TABS.length - 1)) % LAB_TABS.length];
+            navigate(next);
+            window.requestAnimationFrame(() => {
+              const el = window.document.querySelector<HTMLButtonElement>(`[role="tab"][data-tab="${next}"]`);
+              el?.focus();
+            });
+          }}>
+          {LAB_TABS.map((t) => (
+            <button key={t} role="tab" data-tab={t} onClick={() => navigate(t)}
+              aria-selected={tab === t} tabIndex={tab === t ? 0 : -1}
+              className={`rounded-md px-3 py-1.5 text-xs font-semibold border transition-colors ${tab === t
+                ? "border-sky-400 bg-sky-500/20 text-sky-200"
+                : "border-slate-600 bg-slate-800/60 text-slate-300 hover:bg-slate-700/60"}`}>
+              {TAB_LABELS[t]}
+            </button>
+          ))}
+        </div>
       </nav>
 
       {adrLog.length > 0 && (
@@ -116,6 +136,10 @@ export const LabApp: React.FC = () => {
         {tab === "review" && (
           <ReviewPanel model={model} mode={state.mode}
             onAddAdr={(text) => setAdrLog((log) => [...log, text])} />
+        )}
+        {tab === "exchange" && (
+          <ExchangePanel model={model}
+            onAdoptJson={(modelJson) => setState((s) => ({ ...s, archId: "custom", modelJson }))} />
         )}
         {tab === "capstone" && <CapstonePanel model={model} />}
       </main>

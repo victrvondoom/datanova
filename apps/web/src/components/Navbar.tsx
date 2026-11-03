@@ -63,6 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, online, o
           onClick={() => setDarkMode(!darkMode)}
           className="p-2 rounded-lg border text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-800 border-slate-200 dark:border-navy-700 transition-colors"
           title="Toggle Theme"
+          aria-label={darkMode ? "Switch to light theme" : "Switch to dark theme"}
         >
           {darkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
         </button>

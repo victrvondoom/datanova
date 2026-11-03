@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 export const LAB_TABS = [
   "intent", "overview", "causality", "reasoning", "data", "security",
-  "experiments", "review", "capstone",
+  "experiments", "review", "exchange", "capstone",
 ] as const;
 
 export type LabTab = (typeof LAB_TABS)[number];
@@ -20,6 +20,7 @@ export const TAB_LABELS: Record<LabTab, string> = {
   security: "Security & Trust",
   experiments: "Experiments & Recorder",
   review: "Critic & Missions",
+  exchange: "Evidence Exchange",
   capstone: "Capstone & Benchmark",
 };
 

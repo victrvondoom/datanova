@@ -8,6 +8,7 @@ import type { ArchitectureModel } from "../model";
 import { runCapstone } from "../engines/capstone";
 import { runBenchmark } from "../engines/benchmark";
 import { runBenchmarkV2, renderBenchmarkV2Report } from "../engines/benchmark2";
+import { validityDashboard, externalValidationReport } from "../engines/benchvalid";
 import {
   captureFinding, buildEvidencePack, serializeEvidencePack, checkEvidenceIntegrity, kindSummary,
 } from "../engines/evidence";
@@ -125,6 +126,38 @@ export const CapstonePanel: React.FC<{ model: ArchitectureModel }> = ({ model })
         <Callout kind="honest">
           {benchmarkV2.limitations[0]}
         </Callout>
+      </Panel>
+
+      {/*
+        Campaign 05, Tasks 16/20 — benchmark validity dashboard: what the
+        benchmark score is WORTH (synthetic vs grounded vs human-reviewed vs
+        independently validated), computed from actual metadata — never
+        disguising unreviewed cases as validated.
+      */}
+      <Panel title="Benchmark validity dashboard" subtitle="How trustworthy the benchmark's evidence is — missing validation is shown as missing">
+        <ul className="space-y-1 mb-3">
+          {validityDashboard([]).map((d) => (
+            <li key={d.key} className="border border-slate-700/60 rounded-md p-2 text-xs">
+              <span className="font-semibold text-slate-200">{d.label}</span>{" "}
+              <span className={
+                d.status === "validated" ? "text-emerald-300"
+                : d.status === "failed-validation" ? "text-rose-300"
+                : d.status === "partially-validated" ? "text-sky-300" : "text-amber-300"
+              }>[{d.status}]</span>
+              <span className="text-slate-400"> — {d.value}</span>
+              <p className="text-[11px] text-slate-500 mt-0.5">{d.reason}</p>
+            </li>
+          ))}
+        </ul>
+        {(() => {
+          const r = externalValidationReport(benchmarkV2, []);
+          return (
+            <Callout kind="honest">
+              <strong>Validation status:</strong> {r.human.status} {r.independent.status}
+              {" "}Grounded subset: {r.grounded.cases} cases citing {r.grounded.sources} sources.
+            </Callout>
+          );
+        })()}
       </Panel>
 
       {exported && (
