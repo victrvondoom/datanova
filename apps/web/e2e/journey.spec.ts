@@ -10,7 +10,9 @@ test("score -> receipt -> verify journey with live backend", async ({ page }) =>
   await page.goto("/");
 
   // The global degraded banner must NOT be visible when the backend is live
-  await expect(page.getByText("Backend offline")).toHaveCount(0);
+  // (exact: the mission-control panel also renders a lowercase
+  // "backend offline" status, which must not match here)
+  await expect(page.getByText("Backend offline", { exact: true })).toHaveCount(0);
 
   // Navigate to the Explainability Explorer
   await page.getByText("Explainability Explorer").first().click();
@@ -40,7 +42,9 @@ test("backend offline shows the degraded banner and never claims authenticity", 
   // This test assumes the API is NOT running (see run script: e2e:offline).
   await page.goto("/");
 
-  await expect(page.getByText("Backend offline")).toBeVisible({ timeout: 30_000 });
+  // exact match: only the global banner span (the mission-control status
+  // chip renders lowercase "backend offline" and must not be ambiguous here)
+  await expect(page.getByText("Backend offline", { exact: true })).toBeVisible({ timeout: 30_000 });
 
   await page.getByText("Explainability Explorer").first().click();
   await page.getByRole("button", { name: "Run TreeSHAP" }).click();

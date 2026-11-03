@@ -48,6 +48,11 @@ test.describe("visual baselines (regenerate with --update-snapshots)", () => {
   });
 
   test("topic 01 token bucket matches baseline", async ({ page }) => {
+    // The bucket refills on a setInterval, so the fill bar drifts in real
+    // time -> nondeterministic screenshots. Freeze the page clock: the burst
+    // is a synchronous state update, so the bucket level after the click is
+    // exactly capacity-10 and never changes before the screenshot.
+    await page.clock.install();
     await page.goto("/");
     await page.evaluate(() => window.localStorage.clear());
     await page.goto("/#/trail/topic/01");

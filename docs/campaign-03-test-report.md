@@ -11,7 +11,7 @@
 | `npx oxlint src/lab src/App.tsx src/components` (apps/web) | **0 warnings, 0 errors** |
 | `npm run build` (apps/web, = `tsc -b && vite build`) | **built successfully** (~301 kB gzip; pre-existing chunk-size warning) |
 | `npx playwright test e2e/lab.spec.ts` (vs `vite preview --port 4173`) | **6/6 passed** |
-| `npx playwright test e2e/trail.spec.ts e2e/trail-a11y.spec.ts` | trail flows pass; visual baseline passes in isolation (see Known gaps) |
+| `npx playwright test` (workers pinned to 1) | **15/15 pass under the documented two-phase procedure**: phase A (API stopped): lab 6 + trail 4 + a11y 3 + offline journey = **14/14**; phase B (API on :8002 per `scripts/run_e2e.md`): online score->receipt->verify journey = **1/1** |
 | `python -m pytest tests/ -W ignore` | **141 passed** (includes the mandatory release gates: 12 release tests green) |
 | `python -m mypy packages apps scripts --ignore-missing-imports` | **Success: no issues in 59 source files** |
 | `python -m ruff check .` | **All checks passed** |
@@ -71,13 +71,19 @@ across reload + deep links + reset.
 
 ## Known gaps (honest)
 
-1. `e2e/journey.spec.ts` (2 tests) fails in this environment because the Python
-   fraud API is not running ("Backend offline") and one locator resolves two
-   elements. **Verified pre-existing**: fails identically without the campaign
-   changes (stash-tested).
-2. `e2e/trail-a11y.spec.ts` visual baseline ("topic 01 token bucket") is
-   timing-flaky when the full suite runs concurrently (animated sim fill);
-   passes consistently in isolation and passed at the pre-campaign tree too.
+1. The two `journey.spec.ts` tests are mutually exclusive by design (one needs
+   the live API, the other needs it stopped) and are run as two phases per
+   `scripts/run_e2e.md` — both phases pass (14/14 offline, 1/1 online). The
+   offline test's locator was made strict (`exact: true`) because the
+   mission-control status chip also renders a lowercase "backend offline".
+2. The `trail-a11y` visual baselines are now deterministic: the token-bucket
+   refill `setInterval` is frozen with Playwright's clock API (the burst is a
+   synchronous state update, so the bucket level is exactly capacity-10 at
+   screenshot time — the regenerated screenshot was pixel-identical to the
+   committed baseline), and the suite runs with `workers: 1` because concurrent
+   browser instances caused rasterization variance in the pixel diff.
+   Baselines depend on the documented backend state (the global
+   "Backend offline" banner is part of the page).
 3. The lab has no dedicated screen-reader E2E (the trail has one); the lab UI
    follows the same labeled-control + badge(label+icon+color) conventions and
    all interactive controls are labeled, but SR-only navigation was not

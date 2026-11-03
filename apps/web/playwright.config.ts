@@ -7,6 +7,12 @@ export default defineConfig({
   testDir: "./e2e",
   timeout: 60_000,
   retries: 0,
+  // Serial execution: the visual-baseline screenshots (trail-a11y) need
+  // consistent CPU for deterministic rasterization; concurrent workers caused
+  // rendering variance that flaked the pixel diff. The full suite still runs
+  // in ~15s. The two journey tests remain a two-phase procedure (API up/down,
+  // see scripts/run_e2e.md).
+  workers: 1,
   use: {
     baseURL: "http://localhost:4173",
     headless: true,
