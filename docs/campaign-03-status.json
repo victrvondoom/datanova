@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-03T09:58:21",
+  "updated": "2026-11-03T10:00:07",
   "workpackages": {
     "01.1": {
       "status": "DONE",
@@ -252,19 +252,19 @@
       "verified": "2026-11-03"
     },
     "11.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "11.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "11.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "11.4": {
       "status": "NOT_STARTED",
@@ -272,24 +272,24 @@
       "verified": null
     },
     "11.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "12.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "12.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "12.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "12.4": {
       "status": "NOT_STARTED",
@@ -297,84 +297,84 @@
       "verified": null
     },
     "12.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "13.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "13.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "13.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "13.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "13.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "14.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "14.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "14.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "14.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "14.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "15.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "15.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "15.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "15.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
+      "status": "IN_PROGRESS",
+      "notes": "frontier computation verified; visualization panel pending",
       "verified": null
     },
     "15.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m3.test.ts",
+      "verified": "2026-11-03"
     },
     "16.1": {
       "status": "NOT_STARTED",

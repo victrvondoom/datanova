@@ -6,11 +6,11 @@
 
 - Total major tasks: **45**
 - Total work packages: **225**
-- Completed work packages: **41**
-- In-progress work packages: **1**
+- Completed work packages: **63**
+- In-progress work packages: **2**
 - Blocked work packages: **0**
-- Remaining work packages: **184**
-- Verified completion: **18.22%** (41/225)
+- Remaining work packages: **162**
+- Verified completion: **28.0%** (63/225)
 
 Statuses: `NOT_STARTED` `IN_PROGRESS` `BLOCKED` `DONE`.
 A work package is DONE only after its behavior has been verified and the
@@ -148,11 +148,11 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `11.1` | Traffic profile model — Steady, bursty, periodic, user-defined arrival patterns with explicit parameters and units. (deps: —) | Profiles simulate with seeded determinism. | unit tests | `NOT_STARTED` | — | — |
-| `11.2` | Work-duration model — Fixed and variable processing durations with documented distributions/assumptions. (deps: 11.1) | Duration distributions behave as documented. | unit tests | `NOT_STARTED` | — | — |
-| `11.3` | Queue dynamics — Arrivals, processing rate, queue depth, waiting time, backlog growth for supported worker configs. (deps: 11.1, 11.2) | Stable/overload/burst dynamics correct. | unit tests | `NOT_STARTED` | — | — |
+| `11.1` | Traffic profile model — Steady, bursty, periodic, user-defined arrival patterns with explicit parameters and units. (deps: —) | Profiles simulate with seeded determinism. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `11.2` | Work-duration model — Fixed and variable processing durations with documented distributions/assumptions. (deps: 11.1) | Duration distributions behave as documented. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `11.3` | Queue dynamics — Arrivals, processing rate, queue depth, waiting time, backlog growth for supported worker configs. (deps: 11.1, 11.2) | Stable/overload/burst dynamics correct. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
 | `11.4` | Traffic visualization — Coordinated timeline: traffic, queue depth, utilization, overload. (deps: 11.3) | Panel renders simulation timeline. | vitest + build | `NOT_STARTED` | — | — |
-| `11.5` | Model validation — Mathematical + simulation tests: stable load, overload, burst recovery, capacity change. (deps: 11.3) | Model suite green. | unit tests | `NOT_STARTED` | — | — |
+| `11.5` | Model validation — Mathematical + simulation tests: stable load, overload, burst recovery, capacity change. (deps: 11.3) | Model suite green. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
 
 ### Task 12 — End-to-End Latency Budget Composer 
 
@@ -160,35 +160,35 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `12.1` | Latency budget schema — Total deadlines + per-component allocations with units and assumptions. (deps: —) | Budgets validate; units explicit. | unit tests | `NOT_STARTED` | — | — |
-| `12.2` | Request-path aggregation — Sequential, parallel, asynchronous path latency computation. (deps: 12.1) | Aggregation math verified. | unit tests | `NOT_STARTED` | — | — |
-| `12.3` | Budget violation analysis — Identify which component consumes the largest budget portion. (deps: 12.2) | Violation finder correct. | unit tests | `NOT_STARTED` | — | — |
+| `12.1` | Latency budget schema — Total deadlines + per-component allocations with units and assumptions. (deps: —) | Budgets validate; units explicit. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `12.2` | Request-path aggregation — Sequential, parallel, asynchronous path latency computation. (deps: 12.1) | Aggregation math verified. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `12.3` | Budget violation analysis — Identify which component consumes the largest budget portion. (deps: 12.2) | Violation finder correct. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
 | `12.4` | Deadline-aware visualization — Allocation, remaining budget, deadline-miss point. (deps: 12.3) | Panel renders budget bars. | vitest + build | `NOT_STARTED` | — | — |
-| `12.5` | Latency test suite — Aggregation, parallel paths, retry effects, timeout limits, missing assumptions. (deps: 12.1–12.4) | Latency suite green. | unit tests | `NOT_STARTED` | — | — |
+| `12.5` | Latency test suite — Aggregation, parallel paths, retry effects, timeout limits, missing assumptions. (deps: 12.1–12.4) | Latency suite green. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
 
-### Task 13 — Reliability Budget & SLO Explorer 
+### Task 13 — Reliability Budget & SLO Explorer ✅
 
 *Depends on:* 02
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `13.1` | SLO model — Explicit availability/latency/completion targets with windows and denominators. (deps: —) | SLOs validate. | unit tests | `NOT_STARTED` | — | — |
-| `13.2` | Error-budget calculation — Transparent allowed-failure math over a period. (deps: 13.1) | Budget math exact on fixtures. | unit tests | `NOT_STARTED` | — | — |
-| `13.3` | Architecture mapping — Link SLOs to components, dependencies, operations. (deps: 13.1) | Mapping resolvable. | unit tests | `NOT_STARTED` | — | — |
-| `13.4` | Failure-budget simulation — Inject modeled failures; observe budget consumption. (deps: 13.2, 13.3) | Consumption computed from injected downtime. | unit tests | `NOT_STARTED` | — | — |
-| `13.5` | SLO validation — Calculations, window boundaries, missing measurements, insufficient evidence. (deps: 13.1–13.4) | SLO suite green. | unit tests | `NOT_STARTED` | — | — |
+| `13.1` | SLO model — Explicit availability/latency/completion targets with windows and denominators. (deps: —) | SLOs validate. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `13.2` | Error-budget calculation — Transparent allowed-failure math over a period. (deps: 13.1) | Budget math exact on fixtures. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `13.3` | Architecture mapping — Link SLOs to components, dependencies, operations. (deps: 13.1) | Mapping resolvable. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `13.4` | Failure-budget simulation — Inject modeled failures; observe budget consumption. (deps: 13.2, 13.3) | Consumption computed from injected downtime. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `13.5` | SLO validation — Calculations, window boundaries, missing measurements, insufficient evidence. (deps: 13.1–13.4) | SLO suite green. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
 
-### Task 14 — Resource Saturation & Bottleneck Explorer 
+### Task 14 — Resource Saturation & Bottleneck Explorer ✅
 
 *Depends on:* 11
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `14.1` | Resource model — CPU, memory, connection pools, worker slots, DB concurrency, queue capacity. (deps: —) | Resources part of component config with validation. | unit tests | `NOT_STARTED` | — | — |
-| `14.2` | Saturation relationships — How utilization affects waiting, rejection, throughput, failure under the model. (deps: 14.1) | Saturation transitions modeled. | unit tests | `NOT_STARTED` | — | — |
-| `14.3` | Bottleneck detection — Identify constrained resource; explain why unrelated scaling won't help. (deps: 14.2) | Detector identifies bottleneck with explanation. | unit tests | `NOT_STARTED` | — | — |
-| `14.4` | Scaling experiment — Scale one resource at a time; observe bottleneck movement. (deps: 14.3) | Scaling experiments move the bottleneck. | unit tests | `NOT_STARTED` | — | — |
-| `14.5` | Resource model tests — Constraints, saturation transitions, capacity changes, invalid configs. (deps: 14.1–14.4) | Resource suite green. | unit tests | `NOT_STARTED` | — | — |
+| `14.1` | Resource model — CPU, memory, connection pools, worker slots, DB concurrency, queue capacity. (deps: —) | Resources part of component config with validation. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `14.2` | Saturation relationships — How utilization affects waiting, rejection, throughput, failure under the model. (deps: 14.1) | Saturation transitions modeled. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `14.3` | Bottleneck detection — Identify constrained resource; explain why unrelated scaling won't help. (deps: 14.2) | Detector identifies bottleneck with explanation. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `14.4` | Scaling experiment — Scale one resource at a time; observe bottleneck movement. (deps: 14.3) | Scaling experiments move the bottleneck. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `14.5` | Resource model tests — Constraints, saturation transitions, capacity changes, invalid configs. (deps: 14.1–14.4) | Resource suite green. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
 
 ### Task 15 — Cost-Risk-Complexity Frontier 
 
@@ -196,11 +196,11 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `15.1` | Cost assumption model — Configurable compute/storage/network/managed-service cost inputs, clearly modeled. (deps: —) | Cost derived from declared assumptions only. | unit tests | `NOT_STARTED` | — | — |
-| `15.2` | Risk model — Risks with severity, likelihood assumptions, mitigation coverage; uncertain values not dressed as facts. (deps: —) | Risk register validates. | unit tests | `NOT_STARTED` | — | — |
-| `15.3` | Complexity model — Operational components, deployment boundaries, stateful systems, failure modes. (deps: 15.1) | Complexity scores computed from model. | unit tests | `NOT_STARTED` | — | — |
-| `15.4` | Trade-off frontier — Visualize cost/risk/performance/complexity combinations across architectures. (deps: 15.1–15.3) | Frontier comparison renders. | vitest + build | `NOT_STARTED` | — | — |
-| `15.5` | Sensitivity analysis — Change assumptions; observe comparison changes; outputs labeled as modeled. (deps: 15.4) | Sensitivity deltas computed; not presented as pricing. | unit tests | `NOT_STARTED` | — | — |
+| `15.1` | Cost assumption model — Configurable compute/storage/network/managed-service cost inputs, clearly modeled. (deps: —) | Cost derived from declared assumptions only. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `15.2` | Risk model — Risks with severity, likelihood assumptions, mitigation coverage; uncertain values not dressed as facts. (deps: —) | Risk register validates. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `15.3` | Complexity model — Operational components, deployment boundaries, stateful systems, failure modes. (deps: 15.1) | Complexity scores computed from model. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
+| `15.4` | Trade-off frontier — Visualize cost/risk/performance/complexity combinations across architectures. (deps: 15.1–15.3) | Frontier comparison renders. | vitest + build | `IN_PROGRESS` | — | frontier computation verified; visualization panel pending |
+| `15.5` | Sensitivity analysis — Change assumptions; observe comparison changes; outputs labeled as modeled. (deps: 15.4) | Sensitivity deltas computed; not presented as pricing. | unit tests | `DONE` | 2026-11-03 | verified: m3.test.ts |
 
 ## Milestone 4
 
@@ -576,4 +576,4 @@ verification recorded below (evidence column / notes).
 
 ---
 
-*Last generated: 2026-11-03T09:58:21 — 41/225 work packages verified.*
+*Last generated: 2026-11-03T10:00:07 — 63/225 work packages verified.*
