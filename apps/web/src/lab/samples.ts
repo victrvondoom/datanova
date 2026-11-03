@@ -123,31 +123,31 @@ export function docflowModel(): ArchitectureModel {
       controls: ["authn", "authz", "ratelimit"], operationIds: ["op-upload"],
       requirementIds: ["NFR-4", "NFR-5"] },
     { id: "cn-up-store", from: "upload-svc", to: "doc-store", kind: "sync", criticality: 4,
-      failureBehavior: "blocks", dataDirection: "files", latencyMs: 60,
+      failureBehavior: "blocks", dataDirection: "files", latencyMs: 60, access: "write",
       controls: ["encryption"], operationIds: ["op-upload"], requirementIds: ["NFR-4"] },
     { id: "cn-up-queue", from: "upload-svc", to: "work-queue", kind: "async", criticality: 3,
       failureBehavior: "degrades", dataDirection: "work items", latencyMs: 5,
       operationIds: ["op-upload"], requirementIds: ["NFR-1"] },
     { id: "cn-up-db", from: "upload-svc", to: "meta-db", kind: "sync", criticality: 5,
-      failureBehavior: "blocks", dataDirection: "status writes", latencyMs: 20,
+      failureBehavior: "blocks", dataDirection: "status writes", latencyMs: 20, access: "write",
       controls: ["encryption"], operationIds: ["op-upload"], requirementIds: ["NFR-3"] },
     { id: "cn-queue-worker", from: "work-queue", to: "worker", kind: "async", criticality: 3,
       failureBehavior: "isolated", dataDirection: "work items", latencyMs: 5,
       operationIds: ["op-process"], requirementIds: ["NFR-2"] },
     { id: "cn-worker-store", from: "worker", to: "doc-store", kind: "sync", criticality: 4,
-      failureBehavior: "blocks", dataDirection: "rendered PDFs", latencyMs: 80,
+      failureBehavior: "blocks", dataDirection: "rendered PDFs", latencyMs: 80, access: "write",
       controls: ["encryption"], operationIds: ["op-process"], requirementIds: ["FR-1"] },
     { id: "cn-worker-db", from: "worker", to: "meta-db", kind: "sync", criticality: 4,
-      failureBehavior: "blocks", dataDirection: "status updates", latencyMs: 20,
+      failureBehavior: "blocks", dataDirection: "status updates", latencyMs: 20, access: "write",
       operationIds: ["op-process"], requirementIds: ["FR-2"] },
     { id: "cn-gw-status", from: "gateway", to: "status-cache", kind: "sync", criticality: 3,
-      failureBehavior: "degrades", dataDirection: "status queries", latencyMs: 8,
+      failureBehavior: "degrades", dataDirection: "status queries", latencyMs: 8, access: "read",
       operationIds: ["op-status"], requirementIds: ["NFR-1"] },
     { id: "cn-cache-db", from: "status-cache", to: "meta-db", kind: "sync", criticality: 3,
-      failureBehavior: "degrades", dataDirection: "status queries (cache miss)", latencyMs: 15,
+      failureBehavior: "degrades", dataDirection: "status queries (cache miss)", latencyMs: 15, access: "read",
       operationIds: ["op-status"], requirementIds: [] },
     { id: "cn-db-analytics", from: "meta-db", to: "analytics", kind: "event", criticality: 1,
-      failureBehavior: "isolated", dataDirection: "usage events", latencyMs: 5,
+      failureBehavior: "isolated", dataDirection: "usage events", latencyMs: 5, access: "read",
       operationIds: ["op-report"], requirementIds: ["CON-3"] },
     { id: "cn-worker-notify", from: "worker", to: "notify", kind: "async", criticality: 2,
       failureBehavior: "isolated", dataDirection: "notification jobs", latencyMs: 50,
@@ -222,6 +222,13 @@ export function docflowModel(): ArchitectureModel {
   ];
 
   m.latencyBudget = { deadlineMs: 800, allocations: { web: 20, gateway: 40, "upload-svc": 120, "doc-store": 60, "meta-db": 20 } };
+
+  m.consistencyContracts = [
+    { id: "cc-status", operationId: "op-status", entityId: "de-meta", requirementId: "NFR-3",
+      readAfterWrite: "immediate" },
+    { id: "cc-analytics", operationId: "op-report", entityId: "de-meta", requirementId: "CON-3",
+      readAfterWrite: "eventual", maxStalenessSec: 86400 },
+  ];
 
   return m;
 }

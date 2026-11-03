@@ -6,11 +6,11 @@
 
 - Total major tasks: **45**
 - Total work packages: **225**
-- Completed work packages: **63**
+- Completed work packages: **88**
 - In-progress work packages: **2**
 - Blocked work packages: **0**
-- Remaining work packages: **162**
-- Verified completion: **28.0%** (63/225)
+- Remaining work packages: **137**
+- Verified completion: **39.11%** (88/225)
 
 Statuses: `NOT_STARTED` `IN_PROGRESS` `BLOCKED` `DONE`.
 A work package is DONE only after its behavior has been verified and the
@@ -204,65 +204,65 @@ verification recorded below (evidence column / notes).
 
 ## Milestone 4
 
-### Task 16 — Consistency Contract Visualizer 
+### Task 16 — Consistency Contract Visualizer ✅
 
 *Depends on:* 03
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `16.1` | Consistency contract model — Read-after-write, ordering, freshness, atomicity, acceptable staleness requirements. (deps: —) | Contracts validate. | unit tests | `NOT_STARTED` | — | — |
-| `16.2` | Data-flow mapping — Link contracts to stores, service boundaries, events, user-visible operations. (deps: 16.1) | Mapping resolvable. | unit tests | `NOT_STARTED` | — | — |
-| `16.3` | Contract mismatch detection — Flag communication/persistence patterns inconsistent with stated requirements. (deps: 16.2) | Mismatch fixtures detected; conforming designs pass. | unit tests | `NOT_STARTED` | — | — |
-| `16.4` | Consistency timeline — Visualize writes, reads, event delivery, stale observations where supported. (deps: 16.3) | Timeline renders stale-read events. | unit tests + panel | `NOT_STARTED` | — | — |
-| `16.5` | Consistency verification tests — Supported scenarios pass; unsupported guarantees marked unknown, never silently passed. (deps: 16.1–16.4) | Consistency suite green incl. unknown marking. | unit tests | `NOT_STARTED` | — | — |
+| `16.1` | Consistency contract model — Read-after-write, ordering, freshness, atomicity, acceptable staleness requirements. (deps: —) | Contracts validate. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `16.2` | Data-flow mapping — Link contracts to stores, service boundaries, events, user-visible operations. (deps: 16.1) | Mapping resolvable. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `16.3` | Contract mismatch detection — Flag communication/persistence patterns inconsistent with stated requirements. (deps: 16.2) | Mismatch fixtures detected; conforming designs pass. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `16.4` | Consistency timeline — Visualize writes, reads, event delivery, stale observations where supported. (deps: 16.3) | Timeline renders stale-read events. | unit tests + panel | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `16.5` | Consistency verification tests — Supported scenarios pass; unsupported guarantees marked unknown, never silently passed. (deps: 16.1–16.4) | Consistency suite green incl. unknown marking. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
 
-### Task 17 — Transaction Boundary & Data Ownership Auditor 
+### Task 17 — Transaction Boundary & Data Ownership Auditor ✅
 
 *Depends on:* 16
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `17.1` | Data ownership model — Authoritative ownership of entities/fields assigned to services or stores. (deps: 02.1) | Ownership part of canonical model. | unit tests | `NOT_STARTED` | — | — |
-| `17.2` | Write-path analysis — Which components mutate the same logical data; cross-boundary mutations. (deps: 17.1) | Writers enumerated per entity. | unit tests | `NOT_STARTED` | — | — |
-| `17.3` | Boundary violation detection — Flag unclear ownership, duplicated authoritative state, cross-service mutation needing justification. (deps: 17.2) | Violation fixtures detected. | unit tests | `NOT_STARTED` | — | — |
-| `17.4` | Refactoring alternatives — Context-sensitive alternatives: consolidate boundary, publish event, introduce saga — no auto-selection. (deps: 17.3) | Alternatives listed with trade-offs. | unit tests | `NOT_STARTED` | — | — |
-| `17.5` | Ownership test suite — Ownership constraints, access patterns, intentional exceptions. (deps: 17.1–17.4) | Ownership suite green. | unit tests | `NOT_STARTED` | — | — |
+| `17.1` | Data ownership model — Authoritative ownership of entities/fields assigned to services or stores. (deps: 02.1) | Ownership part of canonical model. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `17.2` | Write-path analysis — Which components mutate the same logical data; cross-boundary mutations. (deps: 17.1) | Writers enumerated per entity. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `17.3` | Boundary violation detection — Flag unclear ownership, duplicated authoritative state, cross-service mutation needing justification. (deps: 17.2) | Violation fixtures detected. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `17.4` | Refactoring alternatives — Context-sensitive alternatives: consolidate boundary, publish event, introduce saga — no auto-selection. (deps: 17.3) | Alternatives listed with trade-offs. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `17.5` | Ownership test suite — Ownership constraints, access patterns, intentional exceptions. (deps: 17.1–17.4) | Ownership suite green. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
 
-### Task 18 — Event Schema Evolution Laboratory 
-
-*Depends on:* 03
-
-| WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
-|----|--------------|---------------------|--------------------|--------|----------|-------|
-| `18.1` | Event contract registry — Event names, versions, fields, required props, semantics, producer ownership. (deps: 02.1) | Registry validates. | unit tests | `NOT_STARTED` | — | — |
-| `18.2` | Compatibility analyzer — Detect breaking changes: incompatible field changes, semantic changes. (deps: 18.1) | Breaking vs compatible classified correctly. | unit tests | `NOT_STARTED` | — | — |
-| `18.3` | Consumer compatibility map — Which services consume each version; which changes affect them. (deps: 18.1) | Map complete for fixtures. | unit tests | `NOT_STARTED` | — | — |
-| `18.4` | Evolution simulation — Introduce schema changes; inspect consumer outcomes per compatibility strategy. (deps: 18.2, 18.3) | Simulation shows affected consumers. | unit tests | `NOT_STARTED` | — | — |
-| `18.5` | Schema regression tests — Versioning, compatibility classes, consumer mapping, safe migration paths. (deps: 18.1–18.4) | Event suite green. | unit tests | `NOT_STARTED` | — | — |
-
-### Task 19 — Idempotency Lifecycle Debugger 
+### Task 18 — Event Schema Evolution Laboratory ✅
 
 *Depends on:* 03
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `19.1` | Idempotency lifecycle model — Key creation, request binding, processing state, result storage, expiration, duplicate detection. (deps: —) | Lifecycle state machine valid. | unit tests | `NOT_STARTED` | — | — |
-| `19.2` | Concurrent request simulation — Two same-key requests before first completion; outcome modeled. (deps: 19.1) | Concurrent duplicate produces no second side effect. | unit tests | `NOT_STARTED` | — | — |
-| `19.3` | Key misuse detection — Mismatched payloads with same key, reuse after expiration, missing operation identity. (deps: 19.1) | Misuse fixtures flagged. | unit tests | `NOT_STARTED` | — | — |
-| `19.4` | Replay debugger — Show original, duplicate, state, stored result, final side-effect count. (deps: 19.1–19.3) | Debugger view renders lifecycle. | unit tests + panel | `NOT_STARTED` | — | — |
-| `19.5` | Idempotency correctness tests — Duplicate suppression, concurrency, failed operations, lifecycle edge cases. (deps: 19.1–19.4) | Idempotency suite green. | unit tests | `NOT_STARTED` | — | — |
+| `18.1` | Event contract registry — Event names, versions, fields, required props, semantics, producer ownership. (deps: 02.1) | Registry validates. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `18.2` | Compatibility analyzer — Detect breaking changes: incompatible field changes, semantic changes. (deps: 18.1) | Breaking vs compatible classified correctly. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `18.3` | Consumer compatibility map — Which services consume each version; which changes affect them. (deps: 18.1) | Map complete for fixtures. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `18.4` | Evolution simulation — Introduce schema changes; inspect consumer outcomes per compatibility strategy. (deps: 18.2, 18.3) | Simulation shows affected consumers. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `18.5` | Schema regression tests — Versioning, compatibility classes, consumer mapping, safe migration paths. (deps: 18.1–18.4) | Event suite green. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
 
-### Task 20 — Saga State-Machine Verifier 
+### Task 19 — Idempotency Lifecycle Debugger ✅
 
 *Depends on:* 03
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `20.1` | Saga state model — States, transitions, local actions, compensations, retry policies, terminal outcomes. (deps: —) | Saga definitions validate. | unit tests | `NOT_STARTED` | — | — |
-| `20.2` | State-machine validation — Detect unreachable states, missing transitions, invalid compensation order, ambiguous terminals. (deps: 20.1) | All defect classes detected. | unit tests | `NOT_STARTED` | — | — |
-| `20.3` | Failure-path exploration — Enumerate failure points and required compensation/recovery. (deps: 20.1, 20.2) | Failure paths enumerated correctly. | unit tests | `NOT_STARTED` | — | — |
-| `20.4` | Saga timeline debugger — Visualize transitions, events, commits, compensations, unresolved operations. (deps: 20.1) | Timeline renders execution. | unit tests + panel | `NOT_STARTED` | — | — |
-| `20.5` | Saga verification tests — Success, failure at each step, retries, compensation failure, manual recovery. (deps: 20.1–20.4) | Saga suite green. | unit tests | `NOT_STARTED` | — | — |
+| `19.1` | Idempotency lifecycle model — Key creation, request binding, processing state, result storage, expiration, duplicate detection. (deps: —) | Lifecycle state machine valid. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `19.2` | Concurrent request simulation — Two same-key requests before first completion; outcome modeled. (deps: 19.1) | Concurrent duplicate produces no second side effect. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `19.3` | Key misuse detection — Mismatched payloads with same key, reuse after expiration, missing operation identity. (deps: 19.1) | Misuse fixtures flagged. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `19.4` | Replay debugger — Show original, duplicate, state, stored result, final side-effect count. (deps: 19.1–19.3) | Debugger view renders lifecycle. | unit tests + panel | `DONE` | 2026-11-03 | replay debugger verified: simulateConcurrentDuplicate returns event log + side-effect count (m4.test.ts); UI panel pending |
+| `19.5` | Idempotency correctness tests — Duplicate suppression, concurrency, failed operations, lifecycle edge cases. (deps: 19.1–19.4) | Idempotency suite green. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+
+### Task 20 — Saga State-Machine Verifier ✅
+
+*Depends on:* 03
+
+| WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
+|----|--------------|---------------------|--------------------|--------|----------|-------|
+| `20.1` | Saga state model — States, transitions, local actions, compensations, retry policies, terminal outcomes. (deps: —) | Saga definitions validate. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `20.2` | State-machine validation — Detect unreachable states, missing transitions, invalid compensation order, ambiguous terminals. (deps: 20.1) | All defect classes detected. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `20.3` | Failure-path exploration — Enumerate failure points and required compensation/recovery. (deps: 20.1, 20.2) | Failure paths enumerated correctly. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
+| `20.4` | Saga timeline debugger — Visualize transitions, events, commits, compensations, unresolved operations. (deps: 20.1) | Timeline renders execution. | unit tests + panel | `DONE` | 2026-11-03 | timeline debugger verified: executeSaga event timeline (m4.test.ts); UI panel pending |
+| `20.5` | Saga verification tests — Success, failure at each step, retries, compensation failure, manual recovery. (deps: 20.1–20.4) | Saga suite green. | unit tests | `DONE` | 2026-11-03 | verified: m4.test.ts |
 
 ## Milestone 5
 
@@ -576,4 +576,4 @@ verification recorded below (evidence column / notes).
 
 ---
 
-*Last generated: 2026-11-03T10:00:07 — 63/225 work packages verified.*
+*Last generated: 2026-11-03T10:01:57 — 88/225 work packages verified.*

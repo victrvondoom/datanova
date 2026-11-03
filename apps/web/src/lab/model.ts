@@ -86,6 +86,8 @@ export interface Connection {
   operationIds: string[];
   requirementIds: string[];
   ports?: Port[];
+  /** whether this connection carries read and/or write access to the target's data */
+  access?: "read" | "write" | "readwrite";
 }
 
 export type RequirementKind = "functional" | "nfr" | "constraint" | "risk" | "objective";
@@ -212,6 +214,19 @@ export interface LatencyBudget {
   allocations: Record<string, number>;
 }
 
+/** Task 16 — consistency contract attached to an operation + data entity. */
+export interface ConsistencyContract {
+  id: string;
+  operationId: string;
+  entityId: string;
+  requirementId: string;
+  readAfterWrite: "immediate" | "eventual";
+  /** acceptable staleness for eventual reads (seconds) */
+  maxStalenessSec?: number;
+  /** whether the operation's writes must be atomic across components */
+  atomicity?: "single-store" | "cross-service";
+}
+
 export interface ArchitectureModel {
   schemaVersion: number;
   id: string;
@@ -229,6 +244,7 @@ export interface ArchitectureModel {
   zones: TrustZone[];
   slos: SloTarget[];
   latencyBudget?: LatencyBudget;
+  consistencyContracts?: ConsistencyContract[];
 }
 
 // ---------------------------------------------------------------------------
@@ -329,6 +345,9 @@ export function validateModel(m: ArchitectureModel): ValidationError[] {
       }
     }
     if (cn.criticality < 1 || cn.criticality > 5) push(`${p}.criticality`, "criticality must be 1..5");
+    if (cn.access && !["read", "write", "readwrite"].includes(cn.access)) {
+      push(`${p}.access`, `unknown access mode ${cn.access}`);
+    }
     if (!["blocks", "degrades", "isolated"].includes(cn.failureBehavior)) {
       push(`${p}.failureBehavior`, `unknown failure behavior ${cn.failureBehavior}`);
     }
@@ -404,6 +423,14 @@ export function validateModel(m: ArchitectureModel): ValidationError[] {
       }
     });
   }
+  (m.consistencyContracts ?? []).forEach((cc) => {
+    if (!operationIds.has(cc.operationId)) push(`consistencyContract:${cc.id}.operationId`, `unknown operation ${cc.operationId}`);
+    if (!m.dataEntities.some((d) => d.id === cc.entityId)) push(`consistencyContract:${cc.id}.entityId`, `unknown data entity ${cc.entityId}`);
+    if (!requirementIds.has(cc.requirementId)) push(`consistencyContract:${cc.id}.requirementId`, `unknown requirement ${cc.requirementId}`);
+    if (!["immediate", "eventual"].includes(cc.readAfterWrite)) {
+      push(`consistencyContract:${cc.id}.readAfterWrite`, `unknown mode ${cc.readAfterWrite}`);
+    }
+  });
   // zones referenced but never defined
   m.components.forEach((c) => {
     if (c.zoneId && !zoneIds.has(c.zoneId)) push(`component:${c.id}.zoneId`, `undefined zone ${c.zoneId}`);

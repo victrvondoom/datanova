@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-03T10:00:07",
+  "updated": "2026-11-03T10:01:57",
   "workpackages": {
     "01.1": {
       "status": "DONE",
@@ -377,129 +377,129 @@
       "verified": "2026-11-03"
     },
     "16.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "16.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "16.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "16.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "16.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "17.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "17.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "17.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "17.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "17.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "18.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "18.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "18.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "18.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "18.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "19.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "19.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "19.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "19.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "replay debugger verified: simulateConcurrentDuplicate returns event log + side-effect count (m4.test.ts); UI panel pending",
+      "verified": "2026-11-03"
     },
     "19.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "20.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "20.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "20.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "20.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "timeline debugger verified: executeSaga event timeline (m4.test.ts); UI panel pending",
+      "verified": "2026-11-03"
     },
     "20.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m4.test.ts",
+      "verified": "2026-11-03"
     },
     "21.1": {
       "status": "NOT_STARTED",
