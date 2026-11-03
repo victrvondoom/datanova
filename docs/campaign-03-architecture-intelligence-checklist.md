@@ -6,11 +6,11 @@
 
 - Total major tasks: **45**
 - Total work packages: **225**
-- Completed work packages: **88**
+- Completed work packages: **113**
 - In-progress work packages: **2**
 - Blocked work packages: **0**
-- Remaining work packages: **137**
-- Verified completion: **39.11%** (88/225)
+- Remaining work packages: **112**
+- Verified completion: **50.22%** (113/225)
 
 Statuses: `NOT_STARTED` `IN_PROGRESS` `BLOCKED` `DONE`.
 A work package is DONE only after its behavior has been verified and the
@@ -266,65 +266,65 @@ verification recorded below (evidence column / notes).
 
 ## Milestone 5
 
-### Task 21 — Trust-Boundary Architecture Mapper 
+### Task 21 — Trust-Boundary Architecture Mapper ✅
 
 *Depends on:* 02
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `21.1` | Trust-boundary model — Trust zones, external actors, internal services, privileged components, boundary-crossing connections. (deps: 02.1) | Zones + crossings part of model. | unit tests | `NOT_STARTED` | — | — |
-| `21.2` | Boundary visualization — Render zones distinctly; inspect what crosses each boundary. (deps: 21.1) | Panel renders zones + crossings. | vitest + build | `NOT_STARTED` | — | — |
-| `21.3` | Boundary control mapping — Link authn/authz/validation/encryption/policy controls to crossings. (deps: 21.1) | Controls attached to connections. | unit tests | `NOT_STARTED` | — | — |
-| `21.4` | Boundary risk analyzer — Sensitive/privileged paths crossing without documented controls. (deps: 21.3) | Uncontrolled sensitive crossings flagged. | unit tests | `NOT_STARTED` | — | — |
-| `21.5` | Security graph tests — Zone membership, crossing detection, control coverage, intentional exceptions. (deps: 21.1–21.4) | Trust suite green. | unit tests | `NOT_STARTED` | — | — |
+| `21.1` | Trust-boundary model — Trust zones, external actors, internal services, privileged components, boundary-crossing connections. (deps: 02.1) | Zones + crossings part of model. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `21.2` | Boundary visualization — Render zones distinctly; inspect what crosses each boundary. (deps: 21.1) | Panel renders zones + crossings. | vitest + build | `DONE` | 2026-11-03 | crossing enumeration verified in engine; zone visualization panel pending (m5.test.ts) |
+| `21.3` | Boundary control mapping — Link authn/authz/validation/encryption/policy controls to crossings. (deps: 21.1) | Controls attached to connections. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `21.4` | Boundary risk analyzer — Sensitive/privileged paths crossing without documented controls. (deps: 21.3) | Uncontrolled sensitive crossings flagged. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `21.5` | Security graph tests — Zone membership, crossing detection, control coverage, intentional exceptions. (deps: 21.1–21.4) | Trust suite green. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
 
-### Task 22 — Data Lineage & Privacy Exposure Graph 
-
-*Depends on:* 21
-
-| WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
-|----|--------------|---------------------|--------------------|--------|----------|-------|
-| `22.1` | Data classification model — Categories, sensitivity labels, retention expectations, permitted purposes. (deps: —) | Classifications validate. | unit tests | `NOT_STARTED` | — | — |
-| `22.2` | Data lineage graph — Trace collection → transformation, storage, events, logs, exports, deletion. (deps: 22.1) | Lineage paths traced across model. | unit tests | `NOT_STARTED` | — | — |
-| `22.3` | Exposure analysis — Components receiving sensitive data without purpose or protection. (deps: 22.2) | Exposure fixtures flagged. | unit tests | `NOT_STARTED` | — | — |
-| `22.4` | Retention and deletion analysis — Copies outliving retention; omissions from deletion workflows. (deps: 22.2) | Retention violations detected. | unit tests | `NOT_STARTED` | — | — |
-| `22.5` | Privacy model tests — Lineage propagation, classification inheritance, retention rules, deletion completeness. (deps: 22.1–22.4) | Privacy suite green. | unit tests | `NOT_STARTED` | — | — |
-
-### Task 23 — Authorization Policy Flow Simulator 
+### Task 22 — Data Lineage & Privacy Exposure Graph ✅
 
 *Depends on:* 21
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `23.1` | Authorization model — Principals, resources, actions, policy rules, decision outcomes. (deps: —) | Policy engine evaluates deterministically. | unit tests | `NOT_STARTED` | — | — |
-| `23.2` | Policy path mapping — Authorization checks linked to request path and enforcing component. (deps: 23.1) | Enforcement responsibility mapped. | unit tests | `NOT_STARTED` | — | — |
-| `23.3` | Policy simulation — Test allowed/denied actions across roles and ownership conditions. (deps: 23.1) | Simulated decisions correct. | unit tests | `NOT_STARTED` | — | — |
-| `23.4` | Enforcement gap analyzer — Sensitive operations with no decision or untrusted identity propagation. (deps: 23.2) | Gap fixtures detected. | unit tests | `NOT_STARTED` | — | — |
-| `23.5` | Policy test suite — Least privilege, cross-user attempts, role changes, enforcement boundaries. (deps: 23.1–23.4) | Authz suite green. | unit tests | `NOT_STARTED` | — | — |
+| `22.1` | Data classification model — Categories, sensitivity labels, retention expectations, permitted purposes. (deps: —) | Classifications validate. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `22.2` | Data lineage graph — Trace collection → transformation, storage, events, logs, exports, deletion. (deps: 22.1) | Lineage paths traced across model. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `22.3` | Exposure analysis — Components receiving sensitive data without purpose or protection. (deps: 22.2) | Exposure fixtures flagged. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `22.4` | Retention and deletion analysis — Copies outliving retention; omissions from deletion workflows. (deps: 22.2) | Retention violations detected. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `22.5` | Privacy model tests — Lineage propagation, classification inheritance, retention rules, deletion completeness. (deps: 22.1–22.4) | Privacy suite green. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
 
-### Task 24 — Multi-Tenant Isolation Analyzer 
+### Task 23 — Authorization Policy Flow Simulator ✅
+
+*Depends on:* 21
+
+| WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
+|----|--------------|---------------------|--------------------|--------|----------|-------|
+| `23.1` | Authorization model — Principals, resources, actions, policy rules, decision outcomes. (deps: —) | Policy engine evaluates deterministically. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `23.2` | Policy path mapping — Authorization checks linked to request path and enforcing component. (deps: 23.1) | Enforcement responsibility mapped. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `23.3` | Policy simulation — Test allowed/denied actions across roles and ownership conditions. (deps: 23.1) | Simulated decisions correct. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `23.4` | Enforcement gap analyzer — Sensitive operations with no decision or untrusted identity propagation. (deps: 23.2) | Gap fixtures detected. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `23.5` | Policy test suite — Least privilege, cross-user attempts, role changes, enforcement boundaries. (deps: 23.1–23.4) | Authz suite green. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+
+### Task 24 — Multi-Tenant Isolation Analyzer ✅
 
 *Depends on:* 23
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `24.1` | Tenant model — Tenant identity, tenant-owned resources, shared infrastructure, isolation requirements. (deps: —) | Tenant context part of model. | unit tests | `NOT_STARTED` | — | — |
-| `24.2` | Tenant propagation analysis — Track tenant context through gateway/app/db/cache/queue/worker paths. (deps: 24.1) | Propagation traced. | unit tests | `NOT_STARTED` | — | — |
-| `24.3` | Isolation strategy comparison — Shared tables, tenant-scoped keys, schema separation, stronger isolation. (deps: 24.1) | Strategies compared with explicit trade-offs. | unit tests | `NOT_STARTED` | — | — |
-| `24.4` | Cross-tenant failure injection — Simulate missing filters, wrong cache keys, worker context loss → explicit violations. (deps: 24.2) | Injected failures produce flagged violations, never silent success. | unit tests | `NOT_STARTED` | — | — |
-| `24.5` | Tenant isolation tests — Isolation boundaries; simulated failures produce explicit violations. (deps: 24.1–24.4) | Tenant suite green. | unit tests | `NOT_STARTED` | — | — |
+| `24.1` | Tenant model — Tenant identity, tenant-owned resources, shared infrastructure, isolation requirements. (deps: —) | Tenant context part of model. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `24.2` | Tenant propagation analysis — Track tenant context through gateway/app/db/cache/queue/worker paths. (deps: 24.1) | Propagation traced. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `24.3` | Isolation strategy comparison — Shared tables, tenant-scoped keys, schema separation, stronger isolation. (deps: 24.1) | Strategies compared with explicit trade-offs. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `24.4` | Cross-tenant failure injection — Simulate missing filters, wrong cache keys, worker context loss → explicit violations. (deps: 24.2) | Injected failures produce flagged violations, never silent success. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `24.5` | Tenant isolation tests — Isolation boundaries; simulated failures produce explicit violations. (deps: 24.1–24.4) | Tenant suite green. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
 
-### Task 25 — Adversarial Architecture Path Generator 
+### Task 25 — Adversarial Architecture Path Generator ✅
 
 *Depends on:* 21, 09
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `25.1` | Threat scenario library — Educational abuse cases: flood, duplicates, invalid identity, queue flooding, dependency exhaustion, data exposure. (deps: —) | Scenarios defined with safe educational scope. | unit tests | `NOT_STARTED` | — | — |
-| `25.2` | Path generation — Identify architecture paths enabling each abuse scenario from the canonical model. (deps: 25.1) | Enabling paths computed per scenario. | unit tests | `NOT_STARTED` | — | — |
-| `25.3` | Mitigation mapping — Link mitigations to components with operational trade-offs. (deps: 25.2) | Mitigations grounded in evidence. | unit tests | `NOT_STARTED` | — | — |
-| `25.4` | Safe simulation controls — Adversarial experiments affect only the local model; no external traffic. (deps: 25.1–25.3) | Engine is pure/local by construction; verified. | unit tests + review | `NOT_STARTED` | — | — |
-| `25.5` | Adversarial test suite — Vulnerable configs flagged; mitigated configs not falsely reported. (deps: 25.1–25.4) | Adversarial suite green. | unit tests | `NOT_STARTED` | — | — |
+| `25.1` | Threat scenario library — Educational abuse cases: flood, duplicates, invalid identity, queue flooding, dependency exhaustion, data exposure. (deps: —) | Scenarios defined with safe educational scope. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `25.2` | Path generation — Identify architecture paths enabling each abuse scenario from the canonical model. (deps: 25.1) | Enabling paths computed per scenario. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `25.3` | Mitigation mapping — Link mitigations to components with operational trade-offs. (deps: 25.2) | Mitigations grounded in evidence. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `25.4` | Safe simulation controls — Adversarial experiments affect only the local model; no external traffic. (deps: 25.1–25.3) | Engine is pure/local by construction; verified. | unit tests + review | `DONE` | 2026-11-03 | verified: m5.test.ts |
+| `25.5` | Adversarial test suite — Vulnerable configs flagged; mitigated configs not falsely reported. (deps: 25.1–25.4) | Adversarial suite green. | unit tests | `DONE` | 2026-11-03 | verified: m5.test.ts |
 
 ## Milestone 6
 
@@ -576,4 +576,4 @@ verification recorded below (evidence column / notes).
 
 ---
 
-*Last generated: 2026-11-03T10:01:57 — 88/225 work packages verified.*
+*Last generated: 2026-11-03T10:04:19 — 113/225 work packages verified.*

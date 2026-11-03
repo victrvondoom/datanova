@@ -88,6 +88,8 @@ export interface Connection {
   ports?: Port[];
   /** whether this connection carries read and/or write access to the target's data */
   access?: "read" | "write" | "readwrite";
+  /** documented exception for a boundary-control finding (intentional, reviewed) */
+  securityNote?: string;
 }
 
 export type RequirementKind = "functional" | "nfr" | "constraint" | "risk" | "objective";
@@ -158,6 +160,18 @@ export interface DataEntity {
   retentionDays?: number;
   /** components holding a copy of this entity (cache/queue/log/export) */
   copies?: { componentId: string; purpose: string }[];
+  /** true when this entity belongs to a tenant in a multi-tenant system */
+  tenantScoped?: boolean;
+}
+
+/** Task 23 — authorization policy rule (default deny). */
+export interface PolicyRule {
+  id: string;
+  principal: string;
+  /** component or data-entity id */
+  resource: string;
+  action: string;
+  effect: "allow" | "deny";
 }
 
 export interface EventField {
@@ -245,6 +259,7 @@ export interface ArchitectureModel {
   slos: SloTarget[];
   latencyBudget?: LatencyBudget;
   consistencyContracts?: ConsistencyContract[];
+  policies?: PolicyRule[];
 }
 
 // ---------------------------------------------------------------------------
@@ -423,6 +438,12 @@ export function validateModel(m: ArchitectureModel): ValidationError[] {
       }
     });
   }
+  (m.policies ?? []).forEach((p) => {
+    if (!m.components.some((c) => c.id === p.resource) && !m.dataEntities.some((d) => d.id === p.resource)) {
+      push(`policy:${p.id}.resource`, `unknown resource ${p.resource}`);
+    }
+    if (p.effect !== "allow" && p.effect !== "deny") push(`policy:${p.id}.effect`, `unknown effect ${p.effect}`);
+  });
   (m.consistencyContracts ?? []).forEach((cc) => {
     if (!operationIds.has(cc.operationId)) push(`consistencyContract:${cc.id}.operationId`, `unknown operation ${cc.operationId}`);
     if (!m.dataEntities.some((d) => d.id === cc.entityId)) push(`consistencyContract:${cc.id}.entityId`, `unknown data entity ${cc.entityId}`);

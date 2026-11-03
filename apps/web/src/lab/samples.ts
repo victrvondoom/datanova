@@ -98,7 +98,7 @@ export function docflowModel(): ArchitectureModel {
       telemetry: { metrics: ["processed", "processing_time"], logs: true, traces: true, tracePropagation: false } },
     { id: "meta-db", kind: "database", name: "Metadata database", zoneId: "zone-data",
       purpose: "Authoritative document status and ownership records",
-      config: { connPool: 50, replicas: 2, atRestEncryption: true },
+      config: { connPool: 50, replicas: 2, atRestEncryption: true, tenantKey: "tenant_id" },
       requirementIds: ["FR-2", "NFR-3", "CON-2"],
       telemetry: { metrics: ["queries", "latency_p95"], logs: true, traces: false, tracePropagation: false } },
     { id: "status-cache", kind: "cache", name: "Status cache", zoneId: "zone-data",
@@ -189,12 +189,12 @@ export function docflowModel(): ArchitectureModel {
 
   m.dataEntities = [
     { id: "de-doc", name: "Original document", ownerComponentId: "doc-store",
-      classification: "sensitive", retentionDays: 90,
+      classification: "sensitive", retentionDays: 90, tenantScoped: true,
       copies: [{ componentId: "work-queue", purpose: "processing reference" }] },
     { id: "de-pdf", name: "Rendered PDF", ownerComponentId: "doc-store",
-      classification: "sensitive", retentionDays: 90, copies: [] },
+      classification: "sensitive", retentionDays: 90, tenantScoped: true, copies: [] },
     { id: "de-meta", name: "Document metadata & status", ownerComponentId: "meta-db",
-      classification: "internal", retentionDays: 365,
+      classification: "internal", retentionDays: 365, tenantScoped: true,
       copies: [{ componentId: "status-cache", purpose: "hot status reads" }] },
   ];
 
@@ -222,6 +222,13 @@ export function docflowModel(): ArchitectureModel {
   ];
 
   m.latencyBudget = { deadlineMs: 800, allocations: { web: 20, gateway: 40, "upload-svc": 120, "doc-store": 60, "meta-db": 20 } };
+
+  m.policies = [
+    { id: "pol-1", principal: "tenant-user", resource: "de-meta", action: "read", effect: "allow" },
+    { id: "pol-2", principal: "tenant-user", resource: "de-doc", action: "read", effect: "allow" },
+    { id: "pol-3", principal: "tenant-user", resource: "de-doc", action: "delete", effect: "allow" },
+    { id: "pol-4", principal: "anonymous", resource: "de-meta", action: "read", effect: "deny" },
+  ];
 
   m.consistencyContracts = [
     { id: "cc-status", operationId: "op-status", entityId: "de-meta", requirementId: "NFR-3",
@@ -278,11 +285,12 @@ export function flawedCheckoutModel(): ArchitectureModel {
       requirementIds: ["R-1"] },
     { id: "k-2", from: "c-api", to: "c-pay", kind: "sync", criticality: 5,
       failureBehavior: "blocks", latencyMs: 900, operationIds: ["op-checkout"],
+      access: "write",
       // intentionally NO controls on an internet-zone payment crossing
       requirementIds: ["R-1"] },
     { id: "k-3", from: "c-api", to: "c-db", kind: "sync", criticality: 5,
       failureBehavior: "blocks", latencyMs: 20, operationIds: ["op-checkout"],
-      requirementIds: ["R-3"] },
+      access: "write", requirementIds: ["R-3"] },
   ];
   m.operations = [
     { id: "op-checkout", name: "Checkout", criticality: 5, requirementIds: ["R-1", "R-2", "R-3"] },
