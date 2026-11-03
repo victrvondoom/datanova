@@ -1,20 +1,20 @@
 {
-  "updated": "2026-11-03T09:53:10",
+  "updated": "2026-11-03T09:55:22",
   "workpackages": {
     "01.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "01.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "01.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "01.4": {
       "status": "NOT_STARTED",
@@ -22,24 +22,24 @@
       "verified": null
     },
     "01.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "02.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "02.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "02.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "02.4": {
       "status": "NOT_STARTED",
@@ -47,24 +47,24 @@
       "verified": null
     },
     "02.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "03.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "03.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "03.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "03.4": {
       "status": "NOT_STARTED",
@@ -72,24 +72,24 @@
       "verified": null
     },
     "03.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "04.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "04.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "04.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "04.4": {
       "status": "NOT_STARTED",
@@ -97,29 +97,29 @@
       "verified": null
     },
     "04.5": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "05.1": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "05.2": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "05.3": {
-      "status": "NOT_STARTED",
-      "notes": "",
+      "status": "IN_PROGRESS",
+      "notes": "field validation in model.ts verified; status-transition enforcement pending",
       "verified": null
     },
     "05.4": {
-      "status": "NOT_STARTED",
-      "notes": "",
-      "verified": null
+      "status": "DONE",
+      "notes": "verified: m1.test.ts",
+      "verified": "2026-11-03"
     },
     "05.5": {
       "status": "NOT_STARTED",

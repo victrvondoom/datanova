@@ -6,11 +6,11 @@
 
 - Total major tasks: **45**
 - Total work packages: **225**
-- Completed work packages: **0**
-- In-progress work packages: **0**
+- Completed work packages: **19**
+- In-progress work packages: **1**
 - Blocked work packages: **0**
-- Remaining work packages: **225**
-- Verified completion: **0.0%** (0/225)
+- Remaining work packages: **206**
+- Verified completion: **8.44%** (19/225)
 
 Statuses: `NOT_STARTED` `IN_PROGRESS` `BLOCKED` `DONE`.
 A work package is DONE only after its behavior has been verified and the
@@ -24,11 +24,11 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `01.1` | Intent schema — Structured model for functional/NFR requirements, constraints, assumptions, risks, objectives with stable IDs and reviewable acceptance conditions. (deps: —) | Requirements validate; each has id + acceptance condition. | unit tests in src/lab/__tests__/m1.test.ts | `NOT_STARTED` | — | — |
-| `01.2` | Intent-to-component mapping — Requirements link to components, connections, configs, ADRs; partial coverage allowed, unresolved requirements supported. (deps: 01.1) | Mappings resolve or are explicitly flagged unresolved. | unit tests | `NOT_STARTED` | — | — |
-| `01.3` | Intent coverage analyzer — Identifies unsupported requirements, purposeless components, decisions with missing motivation. (deps: 01.2) | All three gap classes detected on seeded fixtures. | unit tests | `NOT_STARTED` | — | — |
+| `01.1` | Intent schema — Structured model for functional/NFR requirements, constraints, assumptions, risks, objectives with stable IDs and reviewable acceptance conditions. (deps: —) | Requirements validate; each has id + acceptance condition. | unit tests in src/lab/__tests__/m1.test.ts | `DONE` | 2026-11-03 | verified: m1.test.ts |
+| `01.2` | Intent-to-component mapping — Requirements link to components, connections, configs, ADRs; partial coverage allowed, unresolved requirements supported. (deps: 01.1) | Mappings resolve or are explicitly flagged unresolved. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
+| `01.3` | Intent coverage analyzer — Identifies unsupported requirements, purposeless components, decisions with missing motivation. (deps: 01.2) | All three gap classes detected on seeded fixtures. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
 | `01.4` | Intent explanation view — Visual view: why each component exists, requirement supported, risks mitigated, trade-offs introduced. (deps: 01.3) | Panel renders coverage findings with evidence links. | vitest + build; panel component | `NOT_STARTED` | — | — |
-| `01.5` | Intent round-trip validation — Save/reopen/edit/export preserves intent model + links; missing, duplicated, conflicting refs handled. (deps: 01.2) | Round-trip + invalid-reference tests pass. | unit tests | `NOT_STARTED` | — | — |
+| `01.5` | Intent round-trip validation — Save/reopen/edit/export preserves intent model + links; missing, duplicated, conflicting refs handled. (deps: 01.2) | Round-trip + invalid-reference tests pass. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
 
 ### Task 02 — Canonical Architecture IR 
 
@@ -36,11 +36,11 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `02.1` | Canonical schema — Typed entities: components, connections, ports, config, requirements, data ownership, trust zones, events, ADRs. (deps: —) | Schema types defined; sample architectures type-check. | unit tests | `NOT_STARTED` | — | — |
-| `02.2` | Semantic validation — Validate component kinds, connection compatibility, required properties, invalid refs, missing endpoints, malformed imports. (deps: 02.1) | Validator rejects malformed fixtures with precise errors. | unit tests | `NOT_STARTED` | — | — |
-| `02.3` | Versioning and migration — Explicit schema version + migration path; saved architectures remain readable as the product evolves. (deps: 02.1) | Older-version fixture migrates; unknown version rejected loudly. | unit tests | `NOT_STARTED` | — | — |
+| `02.1` | Canonical schema — Typed entities: components, connections, ports, config, requirements, data ownership, trust zones, events, ADRs. (deps: —) | Schema types defined; sample architectures type-check. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
+| `02.2` | Semantic validation — Validate component kinds, connection compatibility, required properties, invalid refs, missing endpoints, malformed imports. (deps: 02.1) | Validator rejects malformed fixtures with precise errors. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
+| `02.3` | Versioning and migration — Explicit schema version + migration path; saved architectures remain readable as the product evolves. (deps: 02.1) | Older-version fixture migrates; unknown version rejected loudly. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
 | `02.4` | Adapter architecture — Adapters between the visual canvas and canonical model; UI state never becomes the simulation model. (deps: 02.1) | Canvas reads/writes only via canonical adapters. | unit tests + build | `NOT_STARTED` | — | — |
-| `02.5` | Model integrity suite — Tests: edits, imports, exports, undo/redo, migrations preserve semantics and stable component identity. (deps: 02.2, 02.3) | Integrity suite green. | unit tests | `NOT_STARTED` | — | — |
+| `02.5` | Model integrity suite — Tests: edits, imports, exports, undo/redo, migrations preserve semantics and stable component identity. (deps: 02.2, 02.3) | Integrity suite green. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
 
 ### Task 03 — Semantic Dependency & Causal Graph 
 
@@ -48,11 +48,11 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `03.1` | Dependency semantics — Connections carry dependency type, criticality, request/data direction, failure behavior, sync/async. (deps: 02.1) | Semantics part of canonical schema and validated. | unit tests | `NOT_STARTED` | — | — |
-| `03.2` | Business-operation graph — Components/connections belong to operations (checkout, notification, …). (deps: 03.1) | Operation subgraphs extractable. | unit tests | `NOT_STARTED` | — | — |
-| `03.3` | Causal relationship model — Represent 'db latency ↑ → request duration ↑', 'worker failure → queue depth ↑', 'missing idempotency → duplicate effects'. (deps: 03.1) | Causal links typed and inspectable. | unit tests | `NOT_STARTED` | — | — |
+| `03.1` | Dependency semantics — Connections carry dependency type, criticality, request/data direction, failure behavior, sync/async. (deps: 02.1) | Semantics part of canonical schema and validated. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
+| `03.2` | Business-operation graph — Components/connections belong to operations (checkout, notification, …). (deps: 03.1) | Operation subgraphs extractable. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
+| `03.3` | Causal relationship model — Represent 'db latency ↑ → request duration ↑', 'worker failure → queue depth ↑', 'missing idempotency → duplicate effects'. (deps: 03.1) | Causal links typed and inspectable. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
 | `03.4` | Graph inspection interface — Interactive view switching physical / logical dependency / business-operation / causal views. (deps: 03.2, 03.3) | Panel renders all four views from one model. | vitest + build | `NOT_STARTED` | — | — |
-| `03.5` | Graph correctness tests — Traversal, cycle detection, causal-link integrity, removal behavior. (deps: 03.1–03.3) | Graph suite green incl. cycle + removal cases. | unit tests | `NOT_STARTED` | — | — |
+| `03.5` | Graph correctness tests — Traversal, cycle detection, causal-link integrity, removal behavior. (deps: 03.1–03.3) | Graph suite green incl. cycle + removal cases. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
 
 ### Task 04 — Versioned Architecture Design Ledger 
 
@@ -60,11 +60,11 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `04.1` | Architecture snapshots — Immutable snapshots of meaningful versions incl. canonical model, intent, config, ADR refs. (deps: 02.1) | Snapshots deep-copied; mutation of live model leaves them unchanged. | unit tests | `NOT_STARTED` | — | — |
-| `04.2` | Change classification — Classify changes structural / behavioral / reliability / security / cost / documentation-only. (deps: 04.1) | Classifier produces correct classes on fixtures. | unit tests | `NOT_STARTED` | — | — |
-| `04.3` | Decision lineage — Link architecture changes to the requirement, experiment, failure, or ADR that motivated them. (deps: 04.2) | Diff entries carry motivation references when provided. | unit tests | `NOT_STARTED` | — | — |
+| `04.1` | Architecture snapshots — Immutable snapshots of meaningful versions incl. canonical model, intent, config, ADR refs. (deps: 02.1) | Snapshots deep-copied; mutation of live model leaves them unchanged. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
+| `04.2` | Change classification — Classify changes structural / behavioral / reliability / security / cost / documentation-only. (deps: 04.1) | Classifier produces correct classes on fixtures. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
+| `04.3` | Decision lineage — Link architecture changes to the requirement, experiment, failure, or ADR that motivated them. (deps: 04.2) | Diff entries carry motivation references when provided. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
 | `04.4` | Timeline interface — Visual timeline: inspect earlier versions, compare, understand why a change was made. (deps: 04.1, 04.3) | Panel renders snapshot list + diff classification. | vitest + build | `NOT_STARTED` | — | — |
-| `04.5` | History integrity tests — Snapshot immutability, ordering, restore, change→ADR linkage. (deps: 04.1–04.3) | Ledger suite green. | unit tests | `NOT_STARTED` | — | — |
+| `04.5` | History integrity tests — Snapshot immutability, ordering, restore, change→ADR linkage. (deps: 04.1–04.3) | Ledger suite green. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
 
 ### Task 05 — Constraint & Assumption Discovery Engine 
 
@@ -72,10 +72,10 @@ verification recorded below (evidence column / notes).
 
 | WP | Work package | Acceptance criteria | Evidence expected | Status | Verified | Notes |
 |----|--------------|---------------------|--------------------|--------|----------|-------|
-| `05.1` | Constraint taxonomy — Categories: latency, throughput, availability, consistency, security, privacy, cost, deployment, ops skill, regulatory. (deps: —) | Taxonomy drives requirement categorization. | unit tests | `NOT_STARTED` | — | — |
-| `05.2` | Missing-context detector — Detect absent peak traffic, recovery objectives, data sensitivity, acceptable delay. (deps: 05.1) | Detector lists missing categories with why they matter. | unit tests | `NOT_STARTED` | — | — |
-| `05.3` | Assumption registry — Assumptions recorded with source, confidence, owner, validation status. (deps: 05.1) | Registry validates fields; status transitions enforced. | unit tests | `NOT_STARTED` | — | — |
-| `05.4` | Constraint conflict analyzer — Detect conflicts e.g. strict synchronous completion + long-running background workflow. (deps: 05.1) | Conflict fixtures detected; consistent fixtures pass. | unit tests | `NOT_STARTED` | — | — |
+| `05.1` | Constraint taxonomy — Categories: latency, throughput, availability, consistency, security, privacy, cost, deployment, ops skill, regulatory. (deps: —) | Taxonomy drives requirement categorization. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
+| `05.2` | Missing-context detector — Detect absent peak traffic, recovery objectives, data sensitivity, acceptable delay. (deps: 05.1) | Detector lists missing categories with why they matter. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
+| `05.3` | Assumption registry — Assumptions recorded with source, confidence, owner, validation status. (deps: 05.1) | Registry validates fields; status transitions enforced. | unit tests | `IN_PROGRESS` | — | field validation in model.ts verified; status-transition enforcement pending |
+| `05.4` | Constraint conflict analyzer — Detect conflicts e.g. strict synchronous completion + long-running background workflow. (deps: 05.1) | Conflict fixtures detected; consistent fixtures pass. | unit tests | `DONE` | 2026-11-03 | verified: m1.test.ts |
 | `05.5` | Guided clarification interface — Focused questions explaining how answers change the architecture. (deps: 05.2, 05.4) | Panel presents clarification cards from detector output. | vitest + build | `NOT_STARTED` | — | — |
 
 ## Milestone 2
@@ -576,4 +576,4 @@ verification recorded below (evidence column / notes).
 
 ---
 
-*Last generated: 2026-11-03T09:53:10 — 0/225 work packages verified.*
+*Last generated: 2026-11-03T09:55:22 — 19/225 work packages verified.*
