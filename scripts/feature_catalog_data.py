@@ -51,7 +51,7 @@ DOMAINS = {
 
 # Entry: (domain, key, name, description, problem, outcome, status, priority,
 #         evidence_files, dependency_keys, status_reason)
-F = []
+F: list[tuple[str, str, str, str, str, str, str, str, list[str], list[str], str]] = []
 
 def d(domain, key, name, desc, problem, outcome, status, pri, ev, deps, reason=""):
     F.append((domain, key, name, desc, problem, outcome, status, pri, ev, deps, reason))
