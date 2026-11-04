@@ -1,7 +1,92 @@
 import React, { useState, useEffect } from "react";
-import { FileCheck2, Fingerprint, ShieldCheck, AlertCircle, Copy, Check, Send, Sparkles } from "lucide-react";
+import { FileCheck2, Fingerprint, ShieldCheck, AlertCircle, Copy, Check, Send, Sparkles, ShieldAlert, ShieldQuestion, Search, Activity } from "lucide-react";
 import { scoreTransaction, verifyReceipt } from "../api";
 import { PredictionResult } from "../types";
+import { useCountUp } from "../lib/useCountUp";
+import { formatKpiValue, staggerDelayMs } from "../lib/ultra";
+
+/** Animated SHAP attribution meter: draws its width on mount/re-score. */
+const ShapBar: React.FC<{ shapValue: number; index: number }> = ({ shapValue, index }) => {
+  const [drawn, setDrawn] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Kick the width draw off one frame after mount so the transition runs.
+    const raf = window.requestAnimationFrame(() => setDrawn(true));
+    return () => window.cancelAnimationFrame(raf);
+  }, []);
+
+  const isPositive = shapValue > 0;
+  const widthPct = Math.min(100, Math.max(8, Math.abs(shapValue) * 180));
+
+  return (
+    <div className="ultra-progress-track h-2">
+      <div
+        className="ultra-progress-fill"
+        style={{
+          width: `${drawn ? widthPct : 0}%`,
+          transitionDelay: `${staggerDelayMs(index, 80)}ms`,
+          background: isPositive
+            ? "linear-gradient(90deg, #f43f5e, #fb7185, #f43f5e)"
+            : "linear-gradient(90deg, #10b981, #34d399, #10b981)",
+          backgroundSize: "200% 100%",
+        }}
+      />
+    </div>
+  );
+};
+
+/** Headline risk readout: count-up number with animated underline draw. */
+const ScoreMetric: React.FC<{ probability: number }> = ({ probability }) => {
+  const [drawn, setDrawn] = useState<boolean>(false);
+  const animated = useCountUp(probability * 100, { durationMs: 1400 });
+
+  useEffect(() => {
+    const raf = window.requestAnimationFrame(() => setDrawn(true));
+    return () => window.cancelAnimationFrame(raf);
+  }, []);
+
+  return (
+    <div className="flex items-end justify-between rounded-xl border border-slate-200/80 dark:border-navy-700/60 bg-slate-50/80 dark:bg-navy-900/40 px-4 py-3">
+      <div>
+        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          Calibrated Fraud Probability
+        </div>
+        <span
+          className={`ultra-metric text-2xl font-extrabold text-slate-900 dark:text-white ${
+            drawn ? "ultra-metric-drawn" : ""
+          }`}
+        >
+          {formatKpiValue(animated, { decimals: 1, suffix: "%" })}
+        </span>
+      </div>
+      <Activity className="w-5 h-5 text-accent-teal dark:text-accent-cyan shrink-0" aria-hidden="true" />
+    </div>
+  );
+};
+
+/** Decision status chip: icon + mono label, count-up percentage. */
+const ActionChip: React.FC<{ action: string; probability: number }> = ({ action, probability }) => {
+  const animated = useCountUp(probability * 100, { durationMs: 1200 });
+
+  const meta =
+    action === "BLOCK"
+      ? { icon: ShieldAlert, cls: "text-rose-500" }
+      : action === "REVIEW"
+      ? { icon: Search, cls: "text-amber-500" }
+      : action === "CHALLENGE"
+      ? { icon: ShieldQuestion, cls: "text-accent-teal" }
+      : { icon: ShieldCheck, cls: "text-emerald-500" };
+  const Icon = meta.icon;
+
+  return (
+    <span className={`ultra-chip ${meta.cls}`}>
+      <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+      <span className="font-mono font-bold">
+        ACTION: {action} ({formatKpiValue(animated, { decimals: 1 })}%)
+      </span>
+    </span>
+  );
+};
 
 export const ExplainabilityView: React.FC = () => {
   const [copied, setCopied] = useState<boolean>(false);
@@ -157,29 +242,32 @@ export const ExplainabilityView: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="p-5 rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm">
-        <div className="flex items-center space-x-2">
-          <span className="p-1.5 rounded-lg bg-accent-teal/10 text-accent-teal">
-            <FileCheck2 className="w-4 h-4" />
-          </span>
-          <span className="text-xs font-bold uppercase tracking-wider text-accent-teal">
-            Responsible AI &amp; Audit Trail
-          </span>
+      <div className="relative overflow-hidden rounded-2xl border p-6 bg-gradient-to-r from-navy-900 via-navy-800 to-navy-950 border-navy-700 text-white shadow-card-ultra">
+        <div className="ultra-grid-overlay absolute inset-0" aria-hidden="true" />
+        <div className="relative z-10 space-y-1.5">
+          <div className="flex items-center space-x-2">
+            <span className="p-1.5 rounded-lg bg-accent-teal/20 text-accent-cyan border border-accent-teal/30">
+              <FileCheck2 className="w-4 h-4" />
+            </span>
+            <span className="text-xs font-bold uppercase tracking-wider text-accent-cyan">
+              Responsible AI &amp; Audit Trail
+            </span>
+          </div>
+          <h1 className="text-2xl font-display font-bold tracking-tight text-white">
+            Explainability Explorer <span className="ultra-shimmer-text">&amp; Cryptographic Receipts</span>
+          </h1>
+          <p className="text-xs text-slate-300 max-w-3xl">
+            Complies with GDPR Article 22, ECOA Reg B &amp; EU AI Act high-risk AI governance via exact local TreeSHAP attributions and SHA-256 HMAC cryptographic tokens.
+          </p>
         </div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white mt-1">
-          Explainability Explorer &amp; Cryptographic Receipts
-        </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          Complies with GDPR Article 22, ECOA Reg B &amp; EU AI Act high-risk AI governance via exact local TreeSHAP attributions and SHA-256 HMAC cryptographic tokens.
-        </p>
       </div>
 
       {/* Dynamic Transaction Scoring Form */}
-      <div className="rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm p-5 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-navy-700">
+      <div className="ultra-card ultra-crown p-5 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/70 dark:border-navy-700/60">
           <div>
             <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2">
-              <Sparkles className="w-4 h-4 text-accent-teal" />
+              <Sparkles className="w-4 h-4 text-accent-teal dark:text-accent-cyan" />
               <span>Interactive Transaction Scoring Playground</span>
             </h2>
             <p className="text-xs text-slate-400">Input any transaction payload to trigger live TreeSHAP calculation.</p>
@@ -190,25 +278,25 @@ export const ExplainabilityView: React.FC = () => {
             <span className="text-xs text-slate-400">Presets:</span>
             <button
               onClick={() => handleApplyPreset("mule")}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-all"
             >
               Mule Ring
             </button>
             <button
               onClick={() => handleApplyPreset("smurfing")}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20 transition-all"
             >
               Smurfing
             </button>
             <button
               onClick={() => handleApplyPreset("legit")}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all"
             >
               Legit Coffee
             </button>
             <button
               onClick={() => handleApplyPreset("high_value")}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-blue-500/10 text-accent-teal border border-blue-500/20 hover:bg-blue-500/20"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-blue-500/10 text-accent-teal border border-blue-500/20 hover:bg-blue-500/20 transition-all"
             >
               High Value
             </button>
@@ -222,7 +310,7 @@ export const ExplainabilityView: React.FC = () => {
               type="text"
               value={senderId}
               onChange={(e) => setSenderId(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono"
+              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
             />
           </div>
           <div>
@@ -231,7 +319,7 @@ export const ExplainabilityView: React.FC = () => {
               type="text"
               value={receiverId}
               onChange={(e) => setReceiverId(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono"
+              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
             />
           </div>
           <div>
@@ -241,7 +329,7 @@ export const ExplainabilityView: React.FC = () => {
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono font-bold"
+              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono font-bold transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
             />
           </div>
           <div>
@@ -249,7 +337,7 @@ export const ExplainabilityView: React.FC = () => {
             <select
               value={channel}
               onChange={(e) => setChannel(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700"
+              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
             >
               <option value="mobile">Mobile</option>
               <option value="p2p">P2P</option>
@@ -263,14 +351,14 @@ export const ExplainabilityView: React.FC = () => {
               type="text"
               value={deviceId}
               onChange={(e) => setDeviceId(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono"
+              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
             />
           </div>
           <div className="flex items-end">
             <button
               type="submit"
               disabled={scoring}
-              className="w-full py-1.5 px-3 rounded-lg font-bold bg-accent-teal text-navy-950 hover:bg-accent-cyan flex items-center justify-center space-x-1.5 shadow-sm transition-all"
+              className="w-full py-1.5 px-3 rounded-lg font-bold bg-accent-teal text-navy-950 hover:bg-accent-cyan flex items-center justify-center space-x-1.5 shadow-glow-teal hover:scale-[1.02] transition-all"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{scoring ? "Scoring..." : "Run TreeSHAP"}</span>
@@ -279,10 +367,10 @@ export const ExplainabilityView: React.FC = () => {
         </form>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="ultra-stagger grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Col: TreeSHAP Attribution Visualizer */}
-        <div className="rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm p-5 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-navy-700">
+        <div className="ultra-card ultra-crown p-5 space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200/70 dark:border-navy-700/60">
             <div>
               <h2 className="text-sm font-bold text-slate-900 dark:text-white">
                 TreeSHAP Local Feature Attribution
@@ -292,44 +380,28 @@ export const ExplainabilityView: React.FC = () => {
               </span>
             </div>
             {prediction && (
-              <span
-                className={`px-2.5 py-0.5 rounded-full text-xs font-bold ${
-                  prediction.recommended_action === "BLOCK"
-                    ? "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                    : prediction.recommended_action === "REVIEW"
-                    ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                    : prediction.recommended_action === "CHALLENGE"
-                    ? "bg-blue-500/10 text-accent-teal border border-blue-500/20"
-                    : "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
-                }`}
-              >
-                ACTION: {prediction.recommended_action} ({(prediction.calibrated_probability * 100).toFixed(1)}%)
-              </span>
+              <ActionChip action={prediction.recommended_action} probability={prediction.calibrated_probability} />
             )}
           </div>
+
+          {prediction && <ScoreMetric probability={prediction.calibrated_probability} />}
 
           <div className="space-y-3">
             {prediction && prediction.top_features && prediction.top_features.length > 0 ? (
               prediction.top_features.map((feat, idx) => {
                 const isPositive = feat.shap_value > 0;
-                const widthPct = Math.min(100, Math.max(8, Math.abs(feat.shap_value) * 180));
 
                 return (
                   <div key={idx} className="space-y-1">
                     <div className="flex items-center justify-between text-xs font-mono">
                       <span className="text-slate-700 dark:text-slate-300 font-semibold">
-                        {feat.feature_name} = <strong className="text-accent-teal">{String(feat.feature_value)}</strong>
+                        {feat.feature_name} = <strong className="text-accent-teal dark:text-accent-cyan">{String(feat.feature_value)}</strong>
                       </span>
                       <span className={`font-bold ${isPositive ? "text-rose-500" : "text-emerald-500"}`}>
                         {isPositive ? `+${feat.shap_value.toFixed(3)}` : feat.shap_value.toFixed(3)}
                       </span>
                     </div>
-                    <div className="w-full bg-slate-100 dark:bg-navy-900 h-2 rounded-full overflow-hidden flex">
-                      <div
-                        className={`h-full transition-all duration-300 ${isPositive ? "bg-rose-500" : "bg-emerald-500"}`}
-                        style={{ width: `${widthPct}%` }}
-                      />
-                    </div>
+                    <ShapBar shapValue={feat.shap_value} index={idx} />
                   </div>
                 );
               })
@@ -339,7 +411,7 @@ export const ExplainabilityView: React.FC = () => {
           </div>
 
           {/* Adverse Action Notice Generator */}
-          <div className="p-4 rounded-xl border border-slate-100 dark:border-navy-700 bg-slate-50 dark:bg-navy-900/60 text-xs space-y-1.5">
+          <div className="p-4 rounded-xl border border-slate-200/80 dark:border-navy-700/70 bg-slate-50/80 dark:bg-navy-900/60 text-xs space-y-1.5">
             <div className="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">
               <span>Regulatory Adverse Action Narrative</span>
               <span className="text-[10px] text-slate-400 font-normal">(Automated Plain-English)</span>
@@ -350,96 +422,107 @@ export const ExplainabilityView: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Col: Cryptographic Receipt Inspector & Verification Workbench */}
-        <div className="rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm p-5 space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-navy-700">
-            <div className="flex items-center space-x-2">
-              <Fingerprint className="w-4 h-4 text-accent-teal" />
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
-                Cryptographic HMAC-SHA256 Receipt
-              </h2>
-            </div>
-            <button
-              onClick={handleCopy}
-              className="flex items-center space-x-1 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copied ? "Copied" : "Copy JSON"}</span>
-            </button>
-          </div>
-
-          <div className="p-3.5 rounded-xl bg-slate-900 text-slate-200 font-mono text-[11px] overflow-x-auto max-h-[220px]">
-            <pre>{receiptPayload ? JSON.stringify(receiptPayload, null, 2) : "Generating receipt..."}</pre>
-          </div>
-
-          {/* Live Cryptographic Verification Workbench */}
-          <div className="space-y-3 pt-2">
-            <div className="flex items-center justify-between text-xs">
-              <span className="font-bold text-slate-700 dark:text-slate-300">
-                Live Tamper-Evidence Workbench:
-                {verifyResult && (
-                  <span
-                    className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                      isTampered
-                        ? "bg-rose-500/15 text-rose-500 border border-rose-500/30"
-                        : "bg-emerald-500/15 text-emerald-500 border border-emerald-500/30"
-                    }`}
-                  >
-                    {isTampered ? "last payload: TAMPERED" : "last payload: authentic"}
-                  </span>
-                )}
-              </span>
-              <span className="text-[10px] text-slate-400">Calls /api/receipts/verify</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => handleVerify(false)}
-                disabled={verifying}
-                className="py-2 px-3 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all text-center flex items-center justify-center space-x-1.5"
-              >
-                <ShieldCheck className="w-4 h-4" />
-                <span>Verify Authentic</span>
-              </button>
-              <button
-                onClick={() => handleVerify(true)}
-                disabled={verifying}
-                className="py-2 px-3 rounded-xl text-xs font-bold bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20 transition-all text-center flex items-center justify-center space-x-1.5"
-              >
-                <AlertCircle className="w-4 h-4" />
-                <span>Simulate Tamper Edit</span>
-              </button>
-            </div>
-
-            {verifyResult && (
-              <div
-                className={`p-3 rounded-xl border text-xs space-y-1 ${
-                  verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE"
-                    ? "bg-amber-500/10 border-amber-500/30 text-amber-500"
-                    : verifyResult.is_valid
-                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
-                    : "bg-rose-500/10 border-rose-500/30 text-rose-500"
-                }`}
-              >
-                <div className="flex items-center space-x-1.5 font-bold">
-                  {verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE" ? (
-                    <AlertCircle className="w-4 h-4" />
-                  ) : verifyResult.is_valid ? (
-                    <ShieldCheck className="w-4 h-4" />
-                  ) : (
-                    <AlertCircle className="w-4 h-4" />
-                  )}
-                  <span>VERIFICATION RESULT: {verifyResult.status}</span>
-                </div>
-                <p className="text-[11px] text-slate-600 dark:text-slate-300">
-                  {verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE"
-                    ? "Verification engine is offline. No authenticity claim can be made without the server-side HMAC key — start the API to verify this receipt."
-                    : verifyResult.is_valid
-                    ? "Cryptographic HMAC matches exactly. Token payload is guaranteed authentic and untampered."
-                    : "HMAC mismatch detected! Calibrated probability or operational action was altered after signing."}
-                </p>
+        {/* Right Col: Cryptographic Receipt Inspector & Verification Workbench (focal panel) */}
+        <div className="ultra-gradient-ring rounded-2xl">
+          <div className="ultra-card rounded-2xl p-5 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-200/70 dark:border-navy-700/60">
+              <div className="flex items-center space-x-2">
+                <Fingerprint className="w-4 h-4 text-accent-teal dark:text-accent-cyan" />
+                <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                  Cryptographic HMAC-SHA256 Receipt
+                </h2>
               </div>
-            )}
+              <button
+                onClick={handleCopy}
+                className="flex items-center space-x-1 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copied ? "Copied" : "Copy JSON"}</span>
+              </button>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-slate-900 text-slate-200 font-mono text-[11px] overflow-x-auto max-h-[220px] border border-slate-700/60 shadow-inner">
+              <pre>{receiptPayload ? JSON.stringify(receiptPayload, null, 2) : "Generating receipt..."}</pre>
+            </div>
+
+            {/* Live Cryptographic Verification Workbench */}
+            <div className="space-y-3 pt-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center space-x-2">
+                  <span>Live Tamper-Evidence Workbench:</span>
+                  {verifyResult && (
+                    <span className={`ultra-chip font-bold ${isTampered ? "text-rose-500" : "text-emerald-500"}`}>
+                      {isTampered ? (
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      ) : (
+                        <ShieldCheck className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                      )}
+                      <span className="font-mono">{isTampered ? "last payload: TAMPERED" : "last payload: authentic"}</span>
+                    </span>
+                  )}
+                </span>
+                <span className="text-[10px] text-slate-400 font-mono">Calls /api/receipts/verify</span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => handleVerify(false)}
+                  disabled={verifying}
+                  className="py-2 px-3 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 hover:scale-[1.02] transition-all text-center flex items-center justify-center space-x-1.5 shadow-glow-emerald disabled:opacity-50 disabled:hover:scale-100"
+                >
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Verify Authentic</span>
+                </button>
+                <button
+                  onClick={() => handleVerify(true)}
+                  disabled={verifying}
+                  className="py-2 px-3 rounded-xl text-xs font-bold bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20 hover:scale-[1.02] transition-all text-center flex items-center justify-center space-x-1.5 disabled:opacity-50 disabled:hover:scale-100"
+                >
+                  <AlertCircle className="w-4 h-4" />
+                  <span>Simulate Tamper Edit</span>
+                </button>
+              </div>
+
+              {verifyResult && (
+                <div
+                  className={`p-3 rounded-xl border text-xs space-y-1 ${
+                    verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE"
+                      ? "bg-amber-500/10 border-amber-500/30 text-amber-500"
+                      : verifyResult.is_valid
+                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
+                      : "bg-rose-500/10 border-rose-500/30 text-rose-500"
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <span
+                      className={`ultra-chip font-bold ${
+                        verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE"
+                          ? "text-amber-500"
+                          : verifyResult.is_valid
+                          ? "text-emerald-500"
+                          : "text-rose-500"
+                      }`}
+                    >
+                      {verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE" ? (
+                        <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
+                      ) : verifyResult.is_valid ? (
+                        <ShieldCheck className="w-4 h-4 shrink-0" aria-hidden="true" />
+                      ) : (
+                        <AlertCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
+                      )}
+                      <span className="font-mono">VERIFICATION RESULT: {verifyResult.status}</span>
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300">
+                    {verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE"
+                      ? "Verification engine is offline. No authenticity claim can be made without the server-side HMAC key — start the API to verify this receipt."
+                      : verifyResult.is_valid
+                      ? "Cryptographic HMAC matches exactly. Token payload is guaranteed authentic and untampered."
+                      : "HMAC mismatch detected! Calibrated probability or operational action was altered after signing."}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

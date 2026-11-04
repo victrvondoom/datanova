@@ -1,7 +1,27 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Network, Search, ShieldAlert, RefreshCw, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { Network, Search, ShieldAlert, RefreshCw, ArrowUpRight, ArrowDownLeft, Store, User, Smartphone, Zap } from "lucide-react";
 import { fetchGraphSubgraph } from "../api";
 import { GraphNode, GraphEdge } from "../types";
+import { useCountUp } from "../lib/useCountUp";
+import { formatKpiValue } from "../lib/ultra";
+
+/** Animated integer readout (node/edge/degree counts). Presentation-only. */
+const AnimatedCount: React.FC<{ value: number; durationMs?: number }> = ({ value, durationMs = 900 }) => {
+  const animated = useCountUp(value, { durationMs });
+  return <>{formatKpiValue(animated, { decimals: 0 })}</>;
+};
+
+/** Animated currency readout for transaction flow amounts. */
+const AnimatedMoney: React.FC<{ value: number }> = ({ value }) => {
+  const animated = useCountUp(value, { durationMs: 800 });
+  return <>{formatKpiValue(animated, { decimals: 2, prefix: "$" })}</>;
+};
+
+/** Animated percentage readout (risk score). */
+const AnimatedPercent: React.FC<{ value: number }> = ({ value }) => {
+  const animated = useCountUp(value, { durationMs: 1100 });
+  return <>{formatKpiValue(animated, { decimals: 0, suffix: "%" })}</>;
+};
 
 export const FraudGraphView: React.FC = () => {
   const [nodes, setNodes] = useState<GraphNode[]>([]);
@@ -87,10 +107,11 @@ export const FraudGraphView: React.FC = () => {
   }, [selectedNode, edges]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ultra-stagger">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm">
-        <div>
+      <div className="relative ultra-card ultra-crown overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5">
+        <div className="ultra-grid-overlay absolute inset-0 pointer-events-none" aria-hidden="true" />
+        <div className="relative">
           <div className="flex items-center space-x-2">
             <span className="p-1.5 rounded-lg bg-accent-teal/10 text-accent-teal">
               <Network className="w-4 h-4" />
@@ -100,7 +121,7 @@ export const FraudGraphView: React.FC = () => {
             </span>
           </div>
           <h1 className="text-xl font-bold text-slate-900 dark:text-white mt-1">
-            Fraud Syndicate &amp; Mule Ring Graph Explorer
+            Fraud Syndicate &amp; Mule Ring <span className="ultra-shimmer-text">Graph Explorer</span>
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">
             Uncovering circular laundering structures (A &rarr; B &rarr; C &rarr; A) and multi-account device proliferation.
@@ -108,7 +129,7 @@ export const FraudGraphView: React.FC = () => {
         </div>
 
         {/* Filter Controls & Reload */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="relative flex flex-wrap items-center gap-3">
           <div className="relative">
             <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
             <input
@@ -143,21 +164,21 @@ export const FraudGraphView: React.FC = () => {
       </div>
 
       {/* Main Interactive Canvas & Inspector */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ultra-stagger">
         {/* Left 2 Cols: Network Visualizer SVG */}
-        <div className="lg:col-span-2 rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm p-5 flex flex-col justify-between min-h-[520px]">
+        <div className="ultra-card ultra-gradient-ring lg:col-span-2 p-5 flex flex-col justify-between min-h-[520px]">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-navy-700 text-xs text-slate-400">
-            <span>Dynamic Bipartite Ego-Net ({nodes.length} Nodes &bull; {edges.length} Directed Edges)</span>
-            <div className="flex items-center space-x-4">
-              <span className="flex items-center space-x-1.5">
+            <span>Dynamic Bipartite Ego-Net (<AnimatedCount value={nodes.length} /> Nodes &bull; <AnimatedCount value={edges.length} /> Directed Edges)</span>
+            <div className="flex items-center space-x-2">
+              <span className="ultra-chip text-slate-600 dark:text-slate-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
                 <span>Mule Ring Node</span>
               </span>
-              <span className="flex items-center space-x-1.5">
+              <span className="ultra-chip text-slate-600 dark:text-slate-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-accent-teal"></span>
                 <span>Legitimate User</span>
               </span>
-              <span className="flex items-center space-x-1.5">
+              <span className="ultra-chip text-slate-600 dark:text-slate-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
                 <span>Merchant / Gateway</span>
               </span>
@@ -165,7 +186,7 @@ export const FraudGraphView: React.FC = () => {
           </div>
 
           {/* Render Network Graph in SVG */}
-          <div className="relative w-full h-[400px] my-3 rounded-xl bg-slate-50 dark:bg-navy-950/80 border border-slate-100 dark:border-navy-750 overflow-hidden flex items-center justify-center">
+          <div className="ultra-grid-overlay relative w-full h-[400px] my-3 rounded-xl bg-slate-50 dark:bg-navy-950/80 border border-slate-100 dark:border-navy-750 overflow-hidden flex items-center justify-center">
             <svg viewBox="0 0 720 400" className="w-full h-full select-none">
               <defs>
                 <marker
@@ -272,13 +293,21 @@ export const FraudGraphView: React.FC = () => {
 
           <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100 dark:border-navy-700">
             <span>Tip: Click any node to highlight immediate counterparties and flow volumes.</span>
-            <span className="font-mono text-accent-teal">Sub-20ms Ego-Net Latency Bounded</span>
+            <span className="ultra-chip font-mono text-accent-teal">
+              <Zap className="w-3 h-3 shrink-0" />
+              <span>Sub-20ms Ego-Net Latency Bounded</span>
+            </span>
           </div>
         </div>
 
         {/* Right Col: Node Investigation Card */}
-        {selectedNode && (
-          <div className="rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm p-5 space-y-4">
+        {selectedNode && (() => {
+          const isMuleNode = selectedNode.type === "mule_account" || selectedNode.id.includes("mule");
+          const isMerchNode = selectedNode.type === "merchant" || selectedNode.id.includes("merch") || selectedNode.id.includes("exchange");
+          const isDeviceNode = selectedNode.type === "device";
+          const ChipIcon = isMuleNode ? ShieldAlert : isMerchNode ? Store : isDeviceNode ? Smartphone : User;
+          return (
+          <div className="ultra-card ultra-crown p-5 space-y-4">
             <div className="pb-3 border-b border-slate-100 dark:border-navy-700 flex items-center justify-between">
               <div>
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
@@ -289,15 +318,16 @@ export const FraudGraphView: React.FC = () => {
                 </div>
               </div>
               <span
-                className={`text-xs px-2.5 py-0.5 rounded-full font-bold uppercase ${
-                  selectedNode.type === "mule_account" || selectedNode.id.includes("mule")
-                    ? "bg-rose-500/10 text-rose-500 border border-rose-500/20"
-                    : selectedNode.type === "merchant" || selectedNode.id.includes("merch")
-                    ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                    : "bg-accent-teal/10 text-accent-teal border border-accent-teal/20"
+                className={`ultra-chip uppercase font-bold ${
+                  isMuleNode
+                    ? "text-rose-500 border-rose-500/30 bg-rose-500/10"
+                    : isMerchNode
+                    ? "text-amber-500 border-amber-500/30 bg-amber-500/10"
+                    : "text-accent-teal border-accent-teal/30 bg-accent-teal/10"
                 }`}
               >
-                {selectedNode.type.replace("_", " ")}
+                <ChipIcon className="w-3 h-3 shrink-0" />
+                <span>{selectedNode.type.replace("_", " ")}</span>
               </span>
             </div>
 
@@ -314,18 +344,12 @@ export const FraudGraphView: React.FC = () => {
                       : "text-emerald-500"
                   }`}
                 >
-                  {(selectedNode.risk_score * 100).toFixed(0)}%
+                  <AnimatedPercent value={selectedNode.risk_score * 100} />
                 </span>
               </div>
-              <div className="w-full bg-slate-100 dark:bg-navy-900 h-2 rounded-full overflow-hidden flex">
+              <div className="ultra-progress-track w-full h-2">
                 <div
-                  className={`h-full ${
-                    selectedNode.risk_score >= 0.75
-                      ? "bg-rose-500"
-                      : selectedNode.risk_score >= 0.4
-                      ? "bg-amber-500"
-                      : "bg-emerald-500"
-                  }`}
+                  className="ultra-progress-fill"
                   style={{ width: `${selectedNode.risk_score * 100}%` }}
                 />
               </div>
@@ -337,14 +361,14 @@ export const FraudGraphView: React.FC = () => {
                 <span className="text-slate-400 block text-[10px]">In-Degree (Fan-In):</span>
                 <span className="text-base font-bold text-slate-900 dark:text-white font-mono flex items-center space-x-1">
                   <ArrowDownLeft className="w-3.5 h-3.5 text-accent-teal" />
-                  <span>{selectedNode.in_degree}</span>
+                  <span><AnimatedCount value={selectedNode.in_degree} /></span>
                 </span>
               </div>
               <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700">
                 <span className="text-slate-400 block text-[10px]">Out-Degree (Fan-Out):</span>
                 <span className="text-base font-bold text-slate-900 dark:text-white font-mono flex items-center space-x-1">
                   <ArrowUpRight className="w-3.5 h-3.5 text-rose-500" />
-                  <span>{selectedNode.out_degree}</span>
+                  <span><AnimatedCount value={selectedNode.out_degree} /></span>
                 </span>
               </div>
             </div>
@@ -352,7 +376,7 @@ export const FraudGraphView: React.FC = () => {
             {/* Connected Transaction Flows */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs font-bold text-slate-900 dark:text-white">
-                <span>Direct Flows ({connectedEdges.length})</span>
+                <span>Direct Flows (<AnimatedCount value={connectedEdges.length} />)</span>
                 <span className="text-[10px] text-slate-400 font-normal">24h Ego Window</span>
               </div>
               <div className="space-y-1.5 max-h-[160px] overflow-y-auto">
@@ -360,7 +384,7 @@ export const FraudGraphView: React.FC = () => {
                   connectedEdges.map((e, idx) => (
                     <div
                       key={idx}
-                      className="p-2 rounded-lg bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700 text-xs flex items-center justify-between font-mono"
+                      className="ultra-row p-2 rounded-lg bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700 text-xs flex items-center justify-between font-mono"
                     >
                       <div className="truncate text-slate-700 dark:text-slate-300">
                         {e.source === selectedNode.id ? (
@@ -369,7 +393,7 @@ export const FraudGraphView: React.FC = () => {
                           <span>&larr; {e.source}</span>
                         )}
                       </div>
-                      <span className="font-bold text-accent-teal">${e.amount.toFixed(2)}</span>
+                      <span className="font-bold text-accent-teal"><AnimatedMoney value={e.amount} /></span>
                     </div>
                   ))
                 ) : (
@@ -391,7 +415,8 @@ export const FraudGraphView: React.FC = () => {
               </div>
             )}
           </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

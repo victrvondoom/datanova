@@ -16,6 +16,7 @@ ROOT_DIRECT = [
 ]
 DEV_DIRECT = [
     "pytest", "pytest-asyncio", "pytest-cov", "ruff", "mypy", "httpx",
+    "cryptography",  # ed25519 signing tests (pyproject dev extras)
 ]
 
 def norm(name: str) -> str:

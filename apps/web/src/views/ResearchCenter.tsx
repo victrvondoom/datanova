@@ -1,5 +1,59 @@
 import React from "react";
-import { BookOpenCheck, FileText, CheckCircle2 } from "lucide-react";
+import { BookOpenCheck, FileText, CheckCircle2, Database, Award } from "lucide-react";
+import { useCountUp } from "../lib/useCountUp";
+import { formatKpiValue } from "../lib/ultra";
+
+/** Animated count chip for the hero (icon + mono count-up label). */
+const CountChip: React.FC<{
+  icon: React.ComponentType<{ className?: string }>;
+  value: number;
+  label: string;
+}> = ({ icon: Icon, value, label }) => {
+  const animated = useCountUp(value, { durationMs: 1200 });
+  return (
+    <span className="ultra-chip text-accent-cyan">
+      <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+      <span className="font-mono font-bold">
+        {formatKpiValue(animated, { decimals: 0 })} {label}
+      </span>
+    </span>
+  );
+};
+
+/** Dataset provenance card with count-up scale & prevalence readouts. */
+const DatasetCard: React.FC<{
+  name: string;
+  sizeCount: number;
+  sizeUnit: string;
+  fraudRate: number;
+  rateDecimals: number;
+  status: string;
+  designation: string;
+}> = ({ name, sizeCount, sizeUnit, fraudRate, rateDecimals, status, designation }) => {
+  const size = useCountUp(sizeCount, { durationMs: 1400 });
+  const rate = useCountUp(fraudRate, { durationMs: 1400 });
+
+  return (
+    <div className="ultra-card ultra-crown p-4 space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-bold text-xs text-slate-900 dark:text-white">{name}</span>
+        <span className="ultra-chip text-emerald-500">
+          <CheckCircle2 className="w-3 h-3 shrink-0" aria-hidden="true" />
+          <span className="font-bold">{status}</span>
+        </span>
+      </div>
+      <div className="text-[11px] text-slate-500 space-y-0.5">
+        <div>
+          Scale: <strong className="text-slate-700 dark:text-slate-300">{formatKpiValue(size, { decimals: 0 })} {sizeUnit}</strong>
+        </div>
+        <div>
+          Prevalence: <strong className="text-slate-700 dark:text-slate-300">{formatKpiValue(rate, { decimals: rateDecimals })}%</strong>
+        </div>
+        <div className="text-[10px] font-mono text-accent-teal dark:text-accent-cyan pt-1">{designation}</div>
+      </div>
+    </div>
+  );
+};
 
 export const ResearchCenter: React.FC = () => {
   const artifacts = [
@@ -38,24 +92,30 @@ export const ResearchCenter: React.FC = () => {
   const datasets = [
     {
       name: "Seeded Synthetic Benchmark",
-      size: "10,000 transactions",
-      fraudRate: "1.99%",
+      sizeCount: 10000,
+      sizeUnit: "transactions",
+      fraudRate: 1.99,
+      rateDecimals: 2,
       status: "Actively Benchmarked",
       designation: "SYNTHETIC (Deterministic seed=42)",
       checksum: "Manifest SHA-256 Verified",
     },
     {
       name: "ULB Credit Card Fraud",
-      size: "284,807 transactions",
-      fraudRate: "0.172%",
+      sizeCount: 284807,
+      sizeUnit: "transactions",
+      fraudRate: 0.172,
+      rateDecimals: 3,
       status: "Adapter Implemented",
       designation: "REAL ANONYMIZED (ULB ML Group)",
       checksum: "Zero Lookahead Splitter Ready",
     },
     {
       name: "PaySim Mobile Money",
-      size: "6,362,620 transactions",
-      fraudRate: "0.129%",
+      sizeCount: 6362620,
+      sizeUnit: "transactions",
+      fraudRate: 0.129,
+      rateDecimals: 3,
       status: "Adapter Implemented",
       designation: "SIMULATED MULTI-AGENT (PaySim)",
       checksum: "Graph Replay Ready",
@@ -65,65 +125,69 @@ export const ResearchCenter: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="p-5 rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm">
-        <div className="flex items-center space-x-2">
-          <span className="p-1.5 rounded-lg bg-blue-500/10 text-blue-500">
-            <BookOpenCheck className="w-4 h-4" />
-          </span>
-          <span className="text-xs font-bold uppercase tracking-wider text-blue-500">
-            Scientific Reproducibility
-          </span>
+      <div className="relative overflow-hidden rounded-2xl border p-6 bg-gradient-to-r from-navy-900 via-navy-800 to-navy-950 border-navy-700 text-white shadow-card-ultra">
+        <div className="ultra-grid-overlay absolute inset-0" aria-hidden="true" />
+        <div className="relative z-10 space-y-1.5">
+          <div className="flex items-center space-x-2">
+            <span className="p-1.5 rounded-lg bg-blue-500/20 text-blue-400 border border-blue-500/30">
+              <BookOpenCheck className="w-4 h-4" />
+            </span>
+            <span className="text-xs font-bold uppercase tracking-wider text-blue-400">
+              Scientific Reproducibility
+            </span>
+          </div>
+          <h1 className="text-2xl font-display font-bold tracking-tight text-white">
+            Research, Provenance <span className="ultra-shimmer-text">&amp; Evidence Center</span>
+          </h1>
+          <p className="text-xs text-slate-300 max-w-3xl">
+            All benchmark numbers, model cards, and ablation claims are bound to verifiable repository artifacts.
+          </p>
+          <div className="flex flex-wrap items-center gap-2 pt-1.5">
+            <CountChip icon={Award} value={artifacts.length} label="Deliverables" />
+            <CountChip icon={Database} value={datasets.length} label="Datasets" />
+          </div>
         </div>
-        <h1 className="text-xl font-bold text-slate-900 dark:text-white mt-1">
-          Research, Provenance &amp; Evidence Center
-        </h1>
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          All benchmark numbers, model cards, and ablation claims are bound to verifiable repository artifacts.
-        </p>
       </div>
 
       {/* Dataset Provenance Matrix */}
-      <div className="rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm p-5 space-y-4">
+      <div className="ultra-card ultra-crown p-5 space-y-4">
         <h2 className="text-sm font-bold text-slate-900 dark:text-white">
           Dataset Provenance &amp; Integrity Manifests
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="ultra-stagger grid grid-cols-1 md:grid-cols-3 gap-4">
           {datasets.map((d, i) => (
-            <div key={i} className="p-4 rounded-xl border border-slate-100 dark:border-navy-700 bg-slate-50 dark:bg-navy-900/40 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-xs text-slate-900 dark:text-white">{d.name}</span>
-                <span className="text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded">
-                  {d.status}
-                </span>
-              </div>
-              <div className="text-[11px] text-slate-500 space-y-0.5">
-                <div>Scale: <strong className="text-slate-700 dark:text-slate-300">{d.size}</strong></div>
-                <div>Prevalence: <strong className="text-slate-700 dark:text-slate-300">{d.fraudRate}</strong></div>
-                <div className="text-[10px] font-mono text-accent-teal pt-1">{d.designation}</div>
-              </div>
-            </div>
+            <DatasetCard
+              key={i}
+              name={d.name}
+              sizeCount={d.sizeCount}
+              sizeUnit={d.sizeUnit}
+              fraudRate={d.fraudRate}
+              rateDecimals={d.rateDecimals}
+              status={d.status}
+              designation={d.designation}
+            />
           ))}
         </div>
       </div>
 
       {/* Verified Artifacts List */}
-      <div className="rounded-2xl border bg-white dark:bg-navy-800 border-slate-200 dark:border-navy-700 shadow-sm p-5 space-y-4">
+      <div className="ultra-card ultra-crown p-5 space-y-4">
         <h2 className="text-sm font-bold text-slate-900 dark:text-white">
           Competition Submission Deliverables
         </h2>
 
-        <div className="space-y-3">
+        <div className="ultra-stagger space-y-3">
           {artifacts.map((art, i) => (
             <div
               key={i}
-              className="p-4 rounded-xl border border-slate-100 dark:border-navy-700 bg-slate-50 dark:bg-navy-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              className="ultra-row p-4 rounded-xl border border-slate-200/80 dark:border-navy-700/70 bg-slate-50/80 dark:bg-navy-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
             >
               <div className="space-y-1">
-                <div className="flex items-center space-x-2">
-                  <FileText className="w-4 h-4 text-accent-teal" />
+                <div className="flex flex-wrap items-center gap-2">
+                  <FileText className="w-4 h-4 text-accent-teal dark:text-accent-cyan shrink-0" aria-hidden="true" />
                   <span className="font-bold text-xs text-slate-900 dark:text-white">{art.title}</span>
-                  <span className="text-[10px] font-mono text-slate-400 bg-slate-200 dark:bg-navy-700 px-2 py-0.5 rounded">
+                  <span className="ultra-chip text-slate-500 dark:text-slate-400 font-mono">
                     {art.type}
                   </span>
                 </div>
@@ -132,9 +196,9 @@ export const ResearchCenter: React.FC = () => {
               </div>
 
               <div className="flex items-center space-x-2 shrink-0">
-                <span className="text-xs font-semibold text-emerald-500 flex items-center space-x-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" />
-                  <span>Verified</span>
+                <span className="ultra-chip text-emerald-500">
+                  <CheckCircle2 className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                  <span className="font-bold">Verified</span>
                 </span>
               </div>
             </div>

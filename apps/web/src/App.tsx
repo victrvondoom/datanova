@@ -106,7 +106,10 @@ export const App: React.FC = () => {
         <div className="flex flex-1 overflow-hidden">
           <Sidebar currentView={currentView} setCurrentView={setCurrentView} />
 
-          <main className={currentView === "atlas" ? "flex-1 overflow-hidden w-full" : "flex-1 overflow-y-auto p-6 lg:p-8 max-w-7xl mx-auto w-full"}>
+          <main
+            key={currentView}
+            className={`${!["trail", "lab", "atlas"].includes(currentView) ? "animate-fade-up " : ""}${currentView === "atlas" ? "flex-1 overflow-hidden w-full" : "flex-1 overflow-y-auto p-6 lg:p-8 max-w-7xl mx-auto w-full"}`}
+          >
             {currentView === "mission" && <MissionControl onNavigate={(v) => setCurrentView(v as ViewType)} />}
             {currentView === "stream" && <TransactionStream />}
             {currentView === "graph" && <FraudGraphView />}
