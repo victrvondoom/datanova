@@ -19,7 +19,7 @@ import { blastRadius } from "../lab/engines/blastradius";
 import { recoveryTimeline, recoveryBottlenecks } from "../lab/engines/recovery-timeline";
 import { toVisGraph, type VisGraph } from "./graph";
 import { layeredLayout, layoutBounds, applyUserLayout, type UserLayout } from "./layout";
-import { computeLayer, MAP_MODES, type MapMode, type LayerContext, type LayerResult } from "./layers";
+import { computeLayer, MAP_MODES, REALITY_MAP_MODES, ALL_MAP_MODES, type MapMode, type LayerContext, type LayerResult } from "./layers";
 import { AtlasScene } from "./scene";
 import { ABadge, AButton, ADialog, AInput, ASelect, AAnnouncer } from "./ui";
 import type { PanelPrefs, Project } from "./state";
@@ -420,7 +420,12 @@ export const StudioView: React.FC<{
           <label htmlFor="mode-select" className="sr-only">Map mode</label>
           <select id="mode-select" value={mode} onChange={(e) => { setMode(e.target.value as MapMode); onPanels((p) => ({ ...p, mode: e.target.value as MapMode })); }}
             className="rounded-md border border-slate-600 bg-slate-800/80 px-2 py-1 text-xs text-slate-100">
-            {MAP_MODES.map((m) => <option key={m.mode} value={m.mode}>{m.label}</option>)}
+            <optgroup label="Architecture Modes">
+              {MAP_MODES.map((m) => <option key={m.mode} value={m.mode}>{m.label}</option>)}
+            </optgroup>
+            <optgroup label="Operational Reality Modes">
+              {REALITY_MAP_MODES.map((m) => <option key={m.mode} value={m.mode}>{m.label}</option>)}
+            </optgroup>
           </select>
           <span className="w-px h-5 bg-slate-700 mx-1" />
           <AButton aria-label="Focus selection" disabled={!selection} onClick={() => selection && sceneRef.current?.focusNode(selection.id)}><Crosshair size={12} aria-hidden /></AButton>
@@ -634,7 +639,7 @@ export const StudioView: React.FC<{
                   {layer.legend.map((l, i) => (
                     <li key={i}><span className="font-semibold text-slate-200">{l.label}</span> — {l.description}</li>
                   ))}
-                  <li className="text-slate-500">Mode: {MAP_MODES.find((m) => m.mode === mode)?.purpose}</li>
+                  <li className="text-slate-500">Mode: {ALL_MAP_MODES.find((m) => m.mode === mode)?.purpose}</li>
                 </ul>
               )}
             </div>

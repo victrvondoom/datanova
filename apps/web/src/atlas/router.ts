@@ -6,7 +6,7 @@
 import { useEffect, useState } from "react";
 
 export const ATLAS_SECTIONS = [
-  "mission", "studio", "experiments", "validation", "exchange",
+  "mission", "reality", "studio", "experiments", "validation", "exchange",
   "benchmarks", "sources", "decisions", "settings", "system", "agents",
 ] as const;
 
@@ -14,6 +14,7 @@ export type AtlasSection = (typeof ATLAS_SECTIONS)[number];
 
 export const SECTION_LABELS: Record<AtlasSection, string> = {
   mission: "Mission Control",
+  reality: "Reality Engine",
   studio: "Architecture Studio",
   experiments: "Experiments",
   validation: "Validation Room",

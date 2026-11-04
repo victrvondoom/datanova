@@ -1,0 +1,263 @@
+# Campaign 07 — DataNova Reality Engine: Master Plan
+
+**Objective:** Transform DataNova Atlas into a comprehensive, evidence-driven architecture-to-reality reconciliation and operational intelligence workstation.
+
+---
+
+## Phase Breakdown (40 Tasks × 5 Work Packages = 200 Work Packages)
+
+### Phase 0 — Baseline, Data Contracts & Governance
+- **Task 01:** Complete DataNova architecture and implementation audit
+  - WP 1.1: Audit existing Atlas, Lab, and engine capabilities
+  - WP 1.2: Map existing entities, relationships, evidence schemas
+  - WP 1.3: Identify reusable modules for operational telemetry
+  - WP 1.4: Identify constraints, duplicate logic, and integration risks
+  - WP 1.5: File-level implementation map linking existing system to all 40 tasks
+- **Task 02:** Operational Evidence Envelope
+  - WP 2.1: Versioned envelope schema definition with strict typing
+  - WP 2.2: Source metadata, timestamps, identifiers, and environment attributes
+  - WP 2.3: Runtime validation and informative schema errors
+  - WP 2.4: Source-specific extension support without breaking common envelope
+  - WP 2.5: Serialization, compatibility, corruption, and validation tests
+- **Task 03:** Intended, configured, observed, and derived graph model
+  - WP 3.1: Multi-view graph data contract extending canonical graph adapter
+  - WP 3.2: Typed provenance and evidence attachment per relationship
+  - WP 3.3: Guard against silent inference-to-observed promotion
+  - WP 3.4: Connection to architecture versions and immutable snapshots
+  - WP 3.5: Multi-source relationship and contradictory evidence tests
+- **Task 04:** Immutable operational snapshots and event history
+  - WP 4.1: Versioned operational snapshots for architecture, config, and runtime
+  - WP 4.2: Append-only event and observation log
+  - WP 4.3: Deterministic SHA-256 content hashes
+  - WP 4.4: Source record linking and time-window indexing
+  - WP 4.5: Snapshot reproducibility and replay verification
+- **Task 05:** Ingestion governance and data-quality foundation
+  - WP 5.1: Data freshness, completeness, coverage, and source health metadata
+  - WP 5.2: Evidence quarantine for invalid, malformed, or suspicious inputs
+  - WP 5.3: Workspace isolation and tenancy boundaries
+  - WP 5.4: Retention, privacy defaults, and credential redaction
+  - WP 5.5: Data quality report generating completeness and coverage diagnostics
+
+### Phase 1 — Operational Connector and Ingestion Plane
+- **Task 06:** Extensible connector registry
+  - WP 6.1: Typed connector contract (discovery, validation, ingestion, normalization)
+  - WP 6.2: Connector registry with format versions and capability flags
+  - WP 6.3: Local file and payload import execution path
+  - WP 6.4: Connector execution state, progress, and error logging
+  - WP 6.5: Connector compatibility and retry tests
+- **Task 07:** OpenTelemetry trace ingestion
+  - WP 7.1: OTel JSON / protobuf-JSON trace export format parser
+  - WP 7.2: Span extraction preserving trace IDs, parent IDs, timestamps, status, attributes
+  - WP 7.3: Service name, operation name, and semantic attribute normalization
+  - WP 7.4: Trace relationship path reconstruction and span hierarchy
+  - WP 7.5: Synthetic and multi-service trace fixtures with deterministic tests
+- **Task 08:** Prometheus and OpenMetrics ingestion
+  - WP 8.1: Prometheus text exposition / OpenMetrics JSON parser
+  - WP 8.2: Metric name, label, timestamp, unit, and type normalization
+  - WP 8.3: Counter, gauge, and histogram metric handling
+  - WP 8.4: Label identity preservation and invalid sample filtering
+  - WP 8.5: Aggregation, duplicate sample, and unit interpretation tests
+- **Task 09:** Structured log and event ingestion
+  - WP 9.1: Structured JSON log and event parser
+  - WP 9.2: Timestamp, severity, service, message, and attribute normalization
+  - WP 9.3: Trace and architecture entity correlation
+  - WP 9.4: Oversized record, malformed payload, and sensitive field redaction
+  - WP 9.5: Timestamp anomaly, missing correlation ID, and burst tests
+- **Task 10:** Infrastructure and deployment artifact ingestion
+  - WP 10.1: Kubernetes Deployment, Service, and ConfigMap YAML parser
+  - WP 10.2: Docker Compose service and network relationship parser
+  - WP 10.3: Terraform plan JSON / state parser (read-only)
+  - WP 10.4: Configured resource identity, labels, ownership, and dependency extraction
+  - WP 10.5: Unsupported resource, schema variation, and duplicate ID tests
+
+### Phase 2 — Identity Resolution and Architecture Reconciliation
+- **Task 11:** Service and resource identity resolution engine
+  - WP 11.1: Multi-strategy matching rules (service name, labels, endpoints, aliases)
+  - WP 11.2: Deterministic matching scoring (Exact, Probable, Ambiguous, Unmatched)
+  - WP 11.3: Confidence classification and match audit trail
+  - WP 11.4: Human confirmation and manual alias resolution workflow
+  - WP 11.5: Duplicate names, namespace collisions, and rename tests
+- **Task 12:** Runtime topology reconstruction
+  - WP 12.1: Graph synthesis from observed span parentage and service calls
+  - WP 12.2: Time-windowed relationship aggregation (call volume, error count, p95 latency)
+  - WP 12.3: Distinction between observed direct calls and inferred paths
+  - WP 12.4: Observation metadata, trace references, and relationship counts
+  - WP 12.5: Sparse trace, fan-out, and cross-environment topology tests
+- **Task 13:** Three-way architecture reconciliation
+  - WP 13.1: Graph reconciliation engine joining Intended, Configured, and Observed
+  - WP 13.2: Detection of missing, unexpected, undocumented, and absent relationships
+  - WP 13.3: Ambiguous entity preservation without forced misclassification
+  - WP 13.4: Generation of evidence-backed reconciliation records
+  - WP 13.5: Mandatory Section 8 reconciliation fixture verification
+- **Task 14:** Drift taxonomy and transparent severity engine
+  - WP 14.1: Drift classification taxonomy (topology, resource, network, API, security, data)
+  - WP 14.2: Transparent severity calculation (Critical, High, Medium, Low, Info)
+  - WP 14.3: Separation of impact priority from evidence certainty
+  - WP 14.4: Mapping of affected nodes, dependencies, users, and scenarios
+  - WP 14.5: Severity boundary and false-absence tests
+- **Task 15:** Drift triage and remediation workflow
+  - WP 15.1: Drift inbox with multi-dimensional grouping and filtering
+  - WP 15.2: Triage actions (Acknowledge, Investigate, Assign, Resolve, Accept-as-Intended)
+  - WP 15.3: Mandatory rationale capture and preservation of original automated record
+  - WP 15.4: Linking remediation to architecture revisions and ADRs
+  - WP 15.5: End-to-end triage lifecycle tests
+
+### Phase 3 — Spatial Runtime Intelligence
+- **Task 16:** Runtime topology layer in Atlas
+  - WP 16.1: 3D scene runtime layer rendering observed topology on ground plane
+  - WP 16.2: Visual encoding distinguishing Intended, Configured, and Observed links
+  - WP 16.3: Highlighting unexpected dependencies and unmatched services
+  - WP 16.4: Filter controls by source, environment, time window, and confidence
+  - WP 16.5: View switching tests preserving selection and camera orientation
+- **Task 17:** Temporal architecture map and replay
+  - WP 17.1: Temporal time-window selector bound to actual observation timestamps
+  - WP 17.2: Side-by-side or diff comparison between two observation windows
+  - WP 17.3: Animated temporal scrubber replaying topology, drift, and traffic
+  - WP 17.4: Architecture version preservation during historical replay
+  - WP 17.5: Out-of-order event and deterministic replay tests
+- **Task 18:** Service health and dependency performance overlay
+  - WP 18.1: Ingested metrics aggregation by resolved service identity (RPS, p95, errors)
+  - WP 18.2: Explicit units, window denominators, and missing-data indicator
+  - WP 18.3: Direct visualization on 3D meshes and 2D canvas nodes
+  - WP 18.4: Node inspection showing metric breakdowns and historical charts
+  - WP 18.5: Zero traffic, counter reset, and missing metric tests
+- **Task 19:** Trace-to-architecture exploration
+  - WP 19.1: Searchable trace list with service, duration, and error filters
+  - WP 19.2: Interactive trace waterfall with parent-child hierarchy and span timings
+  - WP 19.3: Bidirectional selection sync: span selection illuminates 3D node
+  - WP 19.4: Error and slow-span visual callouts
+  - WP 19.5: Fan-out, parallel call, and missing parent trace tests
+- **Task 20:** Evidence coverage and runtime confidence map
+  - WP 20.1: Coverage metrics calculation (observed vs unobserved components and edges)
+  - WP 20.2: Spatial layer showing telemetry blind spots and evidence gaps
+  - WP 20.3: Provenance link inspection for every confidence rating
+  - WP 20.4: Data freshness and staleness heatmaps
+  - WP 20.5: Coverage calculation and sparse telemetry tests
+
+### Phase 4 — Operational Reliability and Anomaly Intelligence
+- **Task 21:** Runtime SLI and SLO engine
+  - WP 21.1: Service and journey-linked SLI/SLO definitions
+  - WP 21.2: Availability and latency objective evaluation from actual metrics
+  - WP 21.3: Error budget consumption and burn rate calculations
+  - WP 21.4: Measurement source, units, and objective version provenance
+  - WP 21.5: Incomplete window and counter reset tests
+- **Task 22:** Critical-path latency intelligence
+  - WP 22.1: Critical request path reconstruction from distributed traces
+  - WP 22.2: Per-span execution duration accounting without double-counting
+  - WP 22.3: Parallel vs sequential call analysis
+  - WP 22.4: Spatial highlighting of high-latency bottlenecks
+  - WP 22.5: Fan-out and nested span latency tests
+- **Task 23:** Saturation and bottleneck detection
+  - WP 23.1: Saturation signal modeling (queue depth, request rate, worker utilization)
+  - WP 23.2: Evidence-backed bottleneck identification with explicit thresholds
+  - WP 23.3: Downstream degradation propagation analysis
+  - WP 23.4: Visual alert badges on saturated architecture components
+  - WP 23.5: Burst traffic and partial metric saturation tests
+- **Task 24:** Baseline and anomaly detection engine
+  - WP 24.1: Historical baseline calculation with minimum sample requirements
+  - WP 24.2: Statistical anomaly detection (Z-score / IQR) on latency and errors
+  - WP 24.3: Differentiation between abrupt shifts and sustained trends
+  - WP 24.4: Correlating anomalies to affected services and downstream dependencies
+  - WP 24.5: Known anomaly fixture tests and false-positive prevention
+- **Task 25:** Operational scorecards and health evidence
+  - WP 25.1: Multi-dimensional scorecards (Availability, Latency, Errors, Drift, Coverage)
+  - WP 25.2: Measurable formula-driven scoring with inspectable inputs
+  - WP 25.3: Explicit representation of unknown or missing telemetry
+  - WP 25.4: Scorecard drill-down to supporting traces, metrics, and logs
+  - WP 25.5: Scorecard consistency tests
+
+### Phase 5 — Incident Investigation and Causal Reasoning
+- **Task 26:** Incident investigation workspace
+  - WP 26.1: Incident management UI (active investigations, severity, timestamps)
+  - WP 26.2: Integrated timeline linking traces, logs, metrics, deployments, and drift
+  - WP 26.3: Dynamic focus filtering the 3D scene to incident-involved components
+  - WP 26.4: Structured investigation notes, hypothesis tracking, and status transitions
+  - WP 26.5: Incident creation, investigation, and reopening tests
+- **Task 27:** Multi-signal incident timeline
+  - WP 27.1: Timestamp normalization across disparate telemetry sources
+  - WP 27.2: Unified interactive timeline visualizer
+  - WP 27.3: Event selection with detailed source payload inspection
+  - WP 27.4: Highlighting cross-signal correlation and temporal triggers
+  - WP 27.5: Delayed ingestion and timestamp uncertainty handling tests
+- **Task 28:** Causal hypothesis graph
+  - WP 28.1: Causal hypothesis model (candidate cause, affected path, confidence)
+  - WP 28.2: Candidate generation combining topology, metrics, and deployments
+  - WP 28.3: Separate tracking of supporting vs contradicting evidence
+  - WP 28.4: Visual representation in Atlas without false AI certainty
+  - WP 28.5: Ambiguous cause and contradictory evidence tests
+- **Task 29:** Observed blast radius and impact analysis
+  - WP 29.1: Blast radius calculation on Intended vs Observed graphs separately
+  - WP 29.2: Spatial visualization of confirmed affected vs potential downstream nodes
+  - WP 29.3: Real SLO/SLI error-budget impact correlation
+  - WP 29.4: Root-cause vs victim component differentiation
+  - WP 29.5: Multi-fault and cyclic dependency tests
+- **Task 30:** Evidence-backed incident review and postmortem
+  - WP 30.1: Postmortem report generator compiling timelines, traces, and drift
+  - WP 30.2: Structured review fields (impact, timeline, root cause, action items)
+  - WP 30.3: Explicit attachment of supporting evidence and open questions
+  - WP 30.4: Exportable, versioned postmortem package via DEP protocol
+  - WP 30.5: Postmortem reproducibility and export tests
+
+### Phase 6 — Change Intelligence and Deployment Risk
+- **Task 31:** Git and source-change ingestion
+  - WP 31.1: Git commit metadata and unified diff parser
+  - WP 31.2: Extraction of changed files, modules, and author metadata
+  - WP 31.3: Deterministic mapping of file paths to architecture components
+  - WP 31.4: Preservation of commit hashes and repository provenance
+  - WP 31.5: Renamed files, deleted files, and multi-service commit tests
+- **Task 32:** API contract drift and compatibility analysis
+  - WP 32.1: OpenAPI 3.0 / 3.1 and AsyncAPI specification parser
+  - WP 32.2: Semantic contract diff engine (breaking, compatible, deprecated)
+  - WP 32.3: Identification of affected consumer components using runtime topology
+  - WP 32.4: Spatial visualization of breaking API changes along dependency paths
+  - WP 32.5: Breaking change fixture tests
+- **Task 33:** Infrastructure change and deployment plan diff
+  - WP 33.1: Terraform plan JSON diff parser (resource create, update, delete)
+  - WP 33.2: Kubernetes manifest diff parser (spec changes, env vars, replicas)
+  - WP 33.3: Resource-to-architecture entity mapping
+  - WP 33.4: Trust-boundary crossing and security group change detection
+  - WP 33.5: Infrastructure addition, deletion, and modification tests
+- **Task 34:** Pre-deployment impact intelligence
+  - WP 34.1: Unified impact model synthesizing code, API, and infra diffs
+  - WP 34.2: Dependency traversal identifying affected services and users
+  - WP 34.3: SLO risk projection and reliability warnings
+  - WP 34.4: Separation of proven risks from speculative warnings
+  - WP 34.5: Pre-deployment impact assessment tests
+- **Task 35:** Release readiness and engineering gate
+  - WP 35.1: Configurable release policy engine (tests, contract, drift, incidents)
+  - WP 35.2: Transparent evaluation reporting Passed, Failed, and Unknown criteria
+  - WP 35.3: Evidence linking for every release criterion
+  - WP 35.4: Recommended verification steps and human review requirements
+  - WP 35.5: Human sign-off workflow without deployment execution
+
+### Phase 7 — Security, Reliability of Ingestion & Professional Integration
+- **Task 36:** Secure connector execution and read-only boundaries
+  - WP 36.1: Read-only capability declarations and permission boundaries
+  - WP 36.2: Ingestion quotas (payload size, memory, timeout, record limits)
+  - WP 36.3: Safe parsing without code evaluation or shell execution
+  - WP 36.4: Credential, token, and secret masking
+  - WP 36.5: Malicious payload and oversized record tests
+- **Task 37:** Sensitive data protection and workspace isolation
+  - WP 37.1: Data classification and automated PII redaction rules
+  - WP 37.2: Preservation of correlation hashes without exposing raw sensitive strings
+  - WP 37.3: Strict workspace isolation for ingested operational data
+  - WP 37.4: Audit trail and data retention controls
+  - WP 37.5: Cross-workspace isolation and redaction leakage tests
+- **Task 38:** Ingestion health, replay, and reproducibility
+  - WP 38.1: Connector health dashboard (freshness, error count, sample rates)
+  - WP 38.2: Deterministic replay of stored raw evidence through pipeline
+  - WP 38.3: Deduplication and idempotent ingestion handling
+  - WP 38.4: Adapter and schema version tracking
+  - WP 38.5: Replay consistency and partial failure tests
+- **Task 39:** Integrated Reality Engine user experience
+  - WP 39.1: Nested navigation shell (`#/atlas/reality/*`) in Atlas
+  - WP 39.2: Cross-navigation between architecture, runtime evidence, and drift
+  - WP 39.3: Informative empty, loading, error, and stale data states
+  - WP 39.4: Command palette integration (Ctrl+K shortcuts for Reality Engine)
+  - WP 39.5: Responsive, keyboard, and accessibility verification
+- **Task 40:** Integrated capstone, independent QA, and release
+  - WP 40.1: Full 40-step Section 10 Capstone journey implementation
+  - WP 40.2: Mandatory Section 8 reconciliation fixture demonstration
+  - WP 40.3: Adversarial QA challenge, falsification, and regression suite
+  - WP 40.4: Spatial benchmarks on Small, Medium, Large, and Stress profiles
+  - WP 40.5: Final verification and comprehensive completion report

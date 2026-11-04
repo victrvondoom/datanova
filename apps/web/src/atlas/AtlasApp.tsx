@@ -7,7 +7,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   LayoutDashboard, Boxes, FlaskConical, ShieldCheck, Send, Gauge,
-  BookOpen, GitBranch, Settings, Palette, Search, ChevronRight, Plus, Bot,
+  BookOpen, GitBranch, Settings, Palette, Search, ChevronRight, Plus, Bot, Activity,
 } from "lucide-react";
 import {
   ATLAS_SECTIONS, SECTION_LABELS, useAtlasSection, type AtlasSection,
@@ -34,10 +34,12 @@ import { DecisionsView } from "./views/Decisions";
 import { SettingsView } from "./views/Settings";
 import { DesignSystemView } from "./views/DesignSystem";
 import { AgentStudioView } from "../agents/AgentStudio";
+import { RealityEngineApp } from "../reality/ui/RealityEngineApp";
 import { CommandPalette } from "./CommandPalette";
 
 const SECTION_ICONS: Record<AtlasSection, React.ReactNode> = {
   mission: <LayoutDashboard size={16} aria-hidden />,
+  reality: <Activity size={16} aria-hidden />,
   studio: <Boxes size={16} aria-hidden />,
   experiments: <FlaskConical size={16} aria-hidden />,
   validation: <ShieldCheck size={16} aria-hidden />,
@@ -182,6 +184,7 @@ export const AtlasApp: React.FC = () => {
         {/* Section content */}
         <main className="flex-1 min-h-0 overflow-hidden">
           {section === "mission" && <MissionView state={state} reviews={reviews} onNavigate={navigate} onOpenProject={(id) => { setState((s) => selectProject(s, id)); navigate("studio"); }} />}
+          {section === "reality" && <RealityEngineApp model={model} onNavigateAtlas={navigate} onAdoptModel={setModel} />}
           {section === "studio" && (
             <StudioView
               model={model}
