@@ -10,8 +10,6 @@ import { test, expect } from "@playwright/test";
  * persistence across reload -> reset works.
  */
 
-const LAB_TAB = "Architecture Lab";
-
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
   await page.evaluate(() => window.localStorage.clear());

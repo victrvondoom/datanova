@@ -83,6 +83,8 @@ export interface SceneCallbacks {
   onFocus?: (id: string) => void;
   onDiagnostics?: (d: { drawCalls: number; triangles: number; webgl: boolean }) => void;
   onDoubleSelect?: (id: string) => void;
+  onNodeDrag?: (id: string, x: number, z: number) => void;
+  onNodeDragEnd?: (id: string, x: number, z: number) => void;
 }
 
 export class AtlasScene {
@@ -108,6 +110,13 @@ export class AtlasScene {
   private lastFrameMs = 0;
   private frameCount = 0;
   private reducedMotion = false;
+  private dragNodeId: string | null = null;
+  private isDragging = false;
+  private dragMoved = false;
+  private dragStartX = 0;
+  private dragStartY = 0;
+  private groundPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -1.5);
+  private planePoint = new THREE.Vector3();
   webglAvailable = false;
   lastFrameStats = { fps: 0, frameMs: 0 };
 
@@ -153,7 +162,9 @@ export class AtlasScene {
 
   private attachPointerEvents(): void {
     const el = this.renderer!.domElement;
+    el.addEventListener("pointerdown", (e) => this.onPointerDown(e));
     el.addEventListener("pointermove", (e) => this.onPointerMove(e));
+    el.addEventListener("pointerup", (e) => this.onPointerUp(e));
     el.addEventListener("click", (e) => this.onClick(e));
     el.addEventListener("dblclick", (e) => this.onDoubleClick(e));
   }
@@ -175,8 +186,57 @@ export class AtlasScene {
     return null;
   }
 
+  private onPointerDown(e: PointerEvent): void {
+    if (!this.webglAvailable || e.button !== 0) return;
+    const hit = this.pick(e.clientX, e.clientY);
+    if (hit?.kind === "node") {
+      this.dragNodeId = hit.id;
+      this.isDragging = false;
+      this.dragMoved = false;
+      this.dragStartX = e.clientX;
+      this.dragStartY = e.clientY;
+    }
+  }
+
+  private onPointerUp(_e: PointerEvent): void {
+    if (!this.webglAvailable) return;
+    if (this.dragNodeId) {
+      if (this.isDragging && this.layout) {
+        const pos = this.layout.positions[this.dragNodeId];
+        if (pos) {
+          this.callbacks.onNodeDragEnd?.(this.dragNodeId, pos.x, pos.z);
+        }
+      }
+      this.controls.enabled = true;
+      this.isDragging = false;
+      this.dragNodeId = null;
+    }
+  }
+
   private onPointerMove(e: PointerEvent): void {
     if (!this.webglAvailable) return;
+    if (this.dragNodeId) {
+      const dx = e.clientX - this.dragStartX;
+      const dy = e.clientY - this.dragStartY;
+      if (!this.isDragging && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
+        this.isDragging = true;
+        this.dragMoved = true;
+        this.controls.enabled = false;
+      }
+      if (this.isDragging) {
+        const rect = this.renderer!.domElement.getBoundingClientRect();
+        this.pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        this.pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        this.raycaster.setFromCamera(this.pointer, this.camera);
+        if (this.raycaster.ray.intersectPlane(this.groundPlane, this.planePoint)) {
+          const x = Math.round(this.planePoint.x * 10) / 10;
+          const z = Math.round(this.planePoint.z * 10) / 10;
+          this.repositionNodeMesh(this.dragNodeId, x, z);
+          this.callbacks.onNodeDrag?.(this.dragNodeId, x, z);
+        }
+        return;
+      }
+    }
     const hit = this.pick(e.clientX, e.clientY);
     const id = hit?.id ?? null;
     if (id !== this.hovered) {
@@ -189,6 +249,10 @@ export class AtlasScene {
 
   private onClick(e: MouseEvent): void {
     if (!this.webglAvailable) return;
+    if (this.dragMoved) {
+      this.dragMoved = false;
+      return;
+    }
     const hit = this.pick(e.clientX, e.clientY);
     this.callbacks.onSelect?.(hit?.id ?? null, hit?.kind ?? null, e.shiftKey);
   }
@@ -198,6 +262,44 @@ export class AtlasScene {
     const hit = this.pick(e.clientX, e.clientY);
     if (hit?.kind === "node") this.callbacks.onFocus?.(hit.id);
     else this.callbacks.onDoubleSelect?.(hit?.id ?? "");
+  }
+
+  repositionNodeMesh(nodeId: string, x: number, z: number): void {
+    if (!this.layout || !this.graph) return;
+    this.layout.positions[nodeId] = { x, y: 0, z };
+    const mesh = this.nodeMeshes.get(nodeId);
+    if (mesh) mesh.position.set(x, 1.5, z);
+    const label = this.nodeLabels.get(nodeId);
+    if (label) label.position.set(x, 4.6, z);
+    this.updateConnectedEdges(nodeId);
+  }
+
+  private updateConnectedEdges(nodeId: string): void {
+    if (!this.graph || !this.layout) return;
+    for (const e of this.graph.edges) {
+      if (e.from !== nodeId && e.to !== nodeId) continue;
+      const a = this.layout.positions[e.from];
+      const b = this.layout.positions[e.to];
+      if (!a || !b) continue;
+      const start = new THREE.Vector3(a.x, 1.5, a.z);
+      const end = new THREE.Vector3(b.x, 1.5, b.z);
+      const dir = end.clone().sub(start);
+      const length = dir.length();
+      const mid = start.clone().add(end).multiplyScalar(0.5).setY(1.5 + length * 0.12);
+
+      const mesh = this.edgeMeshes.get(e.id);
+      if (mesh) {
+        mesh.position.copy(mid);
+        mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+        mesh.scale.set(1, Math.max(length - 3.4, 0.5), 1);
+      }
+      const cone = this.edgeMeshes.get(`${e.id}:cone`);
+      if (cone) {
+        const before = end.clone().sub(dir.clone().normalize().multiplyScalar(3.2));
+        cone.position.copy(before.setY(1.5 + length * 0.12));
+        cone.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+      }
+    }
   }
 
   /** Rebuild the scene from graph + layout (deterministic). */
@@ -260,11 +362,12 @@ export class AtlasScene {
       const length = dir.length();
       const mid = start.clone().add(end).multiplyScalar(0.5).setY(1.5 + length * 0.12);
       const mesh = new THREE.Mesh(
-        new THREE.CylinderGeometry(e.kind === "event" ? 0.09 : 0.14, e.kind === "event" ? 0.09 : 0.14, Math.max(length - 3.4, 0.5), 8),
+        new THREE.CylinderGeometry(e.kind === "event" ? 0.09 : 0.14, e.kind === "event" ? 0.09 : 0.14, 1, 8),
         new THREE.MeshStandardMaterial({ color: EDGE_COLOR.normal, roughness: 0.6 }),
       );
       mesh.position.copy(mid);
       mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+      mesh.scale.set(1, Math.max(length - 3.4, 0.5), 1);
       mesh.userData = { id: e.id, kind: "edge" };
       this.scene.add(mesh);
       this.edgeMeshes.set(e.id, mesh);

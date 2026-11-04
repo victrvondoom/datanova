@@ -30,7 +30,7 @@ const LiveMetric: React.FC<{
   const animated = useCountUp(target, { durationMs: 700 });
   return (
     <div className="min-w-0">
-      <div className="text-[11px] font-semibold text-slate-400">{label}</div>
+      <div className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">{label}</div>
       <div className={`ultra-metric ultra-metric-drawn font-black ${tone} ${size}`}>
         {formatKpiValue(animated, { decimals: 2, prefix: "$" })}
       </div>
@@ -221,28 +221,28 @@ export const TransactionStream: React.FC = () => {
     switch (action) {
       case "ALLOW":
         return (
-          <span className="ultra-chip bg-emerald-500/10 border-emerald-500/30 text-emerald-500">
+          <span className="ultra-chip bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400">
             <ShieldCheck className="w-3 h-3 shrink-0" />
             <span className="font-mono font-bold tracking-wide">ALLOW</span>
           </span>
         );
       case "CHALLENGE":
         return (
-          <span className="ultra-chip bg-blue-500/10 border-blue-500/30 text-accent-teal">
+          <span className="ultra-chip bg-blue-500/10 border-blue-500/30 text-cyan-700 dark:text-accent-teal">
             <KeyRound className="w-3 h-3 shrink-0" />
             <span className="font-mono font-bold tracking-wide">CHALLENGE (OTP)</span>
           </span>
         );
       case "REVIEW":
         return (
-          <span className="ultra-chip bg-amber-500/10 border-amber-500/30 text-amber-500">
+          <span className="ultra-chip bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400">
             <SearchCheck className="w-3 h-3 shrink-0" />
             <span className="font-mono font-bold tracking-wide">MANUAL REVIEW</span>
           </span>
         );
       case "BLOCK":
         return (
-          <span className="ultra-chip bg-rose-500/10 border-rose-500/30 text-rose-500">
+          <span className="ultra-chip bg-rose-500/10 border-rose-500/30 text-rose-700 dark:text-rose-300">
             <ShieldAlert className="w-3 h-3 shrink-0" />
             <span className="font-mono font-bold tracking-wide">BLOCK</span>
           </span>
@@ -272,17 +272,17 @@ export const TransactionStream: React.FC = () => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-              <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500">
+              <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400">
                 <Zap className="w-4 h-4" />
               </span>
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-500">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
                 Live Digital Twin Replay Engine
               </span>
             </div>
             <h1 className="text-xl font-bold mt-1">
               <span className="ultra-shimmer-text font-display">Real-Time Transaction Stream &amp; Policy Comparator</span>
             </h1>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-zinc-600 dark:text-zinc-300">
               Comparing standard industry baseline policy vs. AEGIS-Fraud X cost-aware optimization on live streaming transactions.
             </p>
           </div>
@@ -292,40 +292,40 @@ export const TransactionStream: React.FC = () => {
             <LiveMetric
               label="Cumulative Savings"
               target={cumulativeSavings}
-              tone="text-emerald-500"
+              tone="text-emerald-700 dark:text-emerald-400"
               size="text-lg"
             />
             <div className="h-8 w-px bg-navy-700" />
             <LiveMetric
               label="Baseline Loss / Friction"
               target={baselineCostTotal}
-              tone="text-rose-500"
+              tone="text-rose-700 dark:text-rose-400"
             />
             <div className="h-8 w-px bg-navy-700" />
             <LiveMetric
               label="AEGIS Loss / Labor"
               target={aegisCostTotal}
-              tone="text-accent-teal"
+              tone="text-cyan-700 dark:text-accent-teal"
             />
             <div className="h-8 w-px bg-navy-700" />
             <LiveMetric
               label="Fraud Value Intercepted"
               target={preventedLossTotal}
-              tone="text-amber-500"
+              tone="text-amber-700 dark:text-amber-400"
             />
           </div>
         </div>
       </div>
 
       {/* Replay Controls & Injection Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border bg-white/80 dark:bg-navy-800/80 border-slate-200 dark:border-navy-700 backdrop-blur-md shadow-sm text-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl border bg-white/80 dark:bg-navy-800/80 border-zinc-200 dark:border-navy-700 backdrop-blur-md shadow-sm text-sm">
         <div className="flex items-center space-x-3">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             className={`flex items-center space-x-2 px-3.5 py-1.5 rounded-lg font-semibold text-xs transition-all ${
               isPlaying
-                ? "bg-amber-500/10 text-amber-500 border border-amber-500/20"
-                : "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20"
+                ? "bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/20"
+                : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20"
             }`}
           >
             {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
@@ -334,7 +334,7 @@ export const TransactionStream: React.FC = () => {
 
           <button
             onClick={handleReset}
-            className="flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-medium border border-slate-200 dark:border-navy-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-700 transition-all"
+            className="flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-medium border border-zinc-200 dark:border-navy-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-navy-700 transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Reset</span>
@@ -352,8 +352,8 @@ export const TransactionStream: React.FC = () => {
 
         {/* Filter Controls & Speed Controls */}
         <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-1 bg-slate-100 dark:bg-navy-900 p-1 rounded-lg text-xs">
-            <Filter className="w-3.5 h-3.5 text-slate-400 ml-1.5 mr-1" />
+          <div className="flex items-center space-x-1 bg-zinc-100 dark:bg-navy-900 p-1 rounded-lg text-xs">
+            <Filter className="w-3.5 h-3.5 text-zinc-600 dark:text-zinc-300 ml-1.5 mr-1" />
             {[
               { id: "all", label: "All" },
               { id: "fraud", label: "Fraud (Ground Truth)" },
@@ -364,10 +364,10 @@ export const TransactionStream: React.FC = () => {
               <button
                 key={f.id}
                 onClick={() => setStreamFilter(f.id)}
-                className={`px-2 py-0.5 rounded text-[11px] font-semibold transition-all ${
+                className={`px-2.5 py-1.5 rounded-md text-[11px] font-semibold transition-all ${
                   streamFilter === f.id
-                    ? "bg-white dark:bg-navy-800 text-slate-900 dark:text-white shadow-xs"
-                    : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                    ? "bg-white dark:bg-navy-800 text-zinc-900 dark:text-white shadow-xs"
+                    : "text-zinc-600 dark:text-zinc-300 hover:text-zinc-700 dark:hover:text-zinc-300"
                 }`}
               >
                 {f.label}
@@ -376,7 +376,7 @@ export const TransactionStream: React.FC = () => {
           </div>
 
           <div className="flex items-center space-x-1.5">
-            <span className="text-xs text-slate-400">Speed:</span>
+            <span className="text-xs text-zinc-600 dark:text-zinc-300">Speed:</span>
             {[
               { label: "1x", delay: 1200 },
               { label: "2x", delay: 600 },
@@ -388,7 +388,7 @@ export const TransactionStream: React.FC = () => {
                 className={`px-2 py-1 rounded text-xs font-bold transition-all ${
                   speed === sp.delay
                     ? "bg-accent-teal text-navy-900 shadow-glow-teal"
-                    : "bg-slate-100 dark:bg-navy-700 text-slate-600 dark:text-slate-300"
+                    : "bg-zinc-100 dark:bg-navy-700 text-zinc-600 dark:text-zinc-300"
                 }`}
               >
                 {sp.label}
@@ -402,19 +402,19 @@ export const TransactionStream: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left 2 Cols: Streaming Replay Table */}
         <div className="lg:col-span-2 ultra-card ultra-crown overflow-hidden flex flex-col">
-          <div className="px-5 py-3.5 border-b border-slate-200 dark:border-navy-700 flex items-center justify-between">
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+          <div className="px-5 py-3.5 border-b border-zinc-200 dark:border-navy-700 flex items-center justify-between">
+            <h2 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center space-x-2">
               <span>Streaming Event Queue</span>
-              <span className="text-xs font-normal text-slate-400">({filteredRecords.length} visible in memory)</span>
+              <span className="text-xs font-normal text-zinc-600 dark:text-zinc-300">({filteredRecords.length} visible in memory)</span>
             </h2>
-            <div className="ultra-metric ultra-metric-drawn text-xs text-accent-teal font-mono">
+            <div className="ultra-metric ultra-metric-drawn text-xs text-cyan-700 dark:text-accent-teal font-mono">
               Live Tx #{currentIndex + 1}
             </div>
           </div>
 
           <div className="overflow-x-auto flex-1 max-h-[520px]">
             <table className="w-full text-left text-xs">
-              <thead className="sticky top-0 bg-slate-50 dark:bg-navy-900/90 backdrop-blur-sm text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-200 dark:border-navy-700">
+              <thead className="sticky top-0 bg-zinc-50 dark:bg-navy-900/90 backdrop-blur-sm text-zinc-600 dark:text-zinc-300 uppercase text-[10px] tracking-wider border-b border-zinc-200 dark:border-navy-700">
                 <tr>
                   <th className="px-4 py-2.5">Tx ID</th>
                   <th className="px-4 py-2.5">Amount</th>
@@ -425,7 +425,7 @@ export const TransactionStream: React.FC = () => {
                   <th className="px-4 py-2.5">Ground Truth</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-navy-700/50">
+              <tbody className="divide-y divide-zinc-100 dark:divide-navy-700/50">
                 {filteredRecords.map((rec, i) => {
                   const isCurrent = i === currentIndex;
                   const isSelected = selectedTx?.transaction.transaction_id === rec.transaction.transaction_id;
@@ -440,17 +440,17 @@ export const TransactionStream: React.FC = () => {
                         isCurrent
                           ? "bg-accent-teal/10 dark:bg-accent-teal/15 border-l-4 border-accent-teal"
                           : isSelected
-                          ? "bg-slate-100 dark:bg-navy-700/60"
-                          : "hover:bg-slate-50 dark:hover:bg-navy-900/40"
+                          ? "bg-zinc-100 dark:bg-navy-700/60"
+                          : "hover:bg-zinc-50 dark:hover:bg-navy-900/40"
                       }`}
                     >
-                      <td className="px-4 py-2.5 font-mono font-medium text-slate-900 dark:text-white">
+                      <td className="px-4 py-2.5 font-mono font-medium text-zinc-900 dark:text-white">
                         {rec.transaction.transaction_id}
                       </td>
-                      <td className="px-4 py-2.5 font-semibold text-slate-800 dark:text-slate-200">
+                      <td className="px-4 py-2.5 font-semibold text-zinc-800 dark:text-zinc-200">
                         ${rec.transaction.amount.toFixed(2)}
                       </td>
-                      <td className="px-4 py-2.5 text-slate-500 font-mono text-[11px]">
+                      <td className="px-4 py-2.5 text-zinc-600 dark:text-zinc-300 font-mono text-[11px]">
                         {rec.transaction.sender_id} &rarr; {rec.transaction.receiver_id}
                       </td>
                       <td className="px-4 py-2.5 font-mono">
@@ -464,10 +464,10 @@ export const TransactionStream: React.FC = () => {
                           <span
                             className={`font-bold ${
                               rec.aegis_result.calibrated_probability >= 0.5
-                                ? "text-rose-500"
+                                ? "text-rose-700 dark:text-rose-400"
                                 : rec.aegis_result.calibrated_probability >= 0.15
-                                ? "text-amber-500"
-                                : "text-emerald-500"
+                                ? "text-amber-700 dark:text-amber-400"
+                                : "text-emerald-700 dark:text-emerald-400"
                             }`}
                           >
                             {(rec.aegis_result.calibrated_probability * 100).toFixed(1)}%
@@ -482,13 +482,13 @@ export const TransactionStream: React.FC = () => {
                       </td>
                       <td className="px-4 py-2.5">
                         {isFraud ? (
-                          <span className="flex items-center space-x-1 text-rose-500 font-semibold text-[11px]">
+                          <span className="flex items-center space-x-1 text-rose-700 dark:text-rose-400 font-semibold text-[11px]">
                             <ShieldAlert className="w-3.5 h-3.5" />
                             <span>FRAUD</span>
                           </span>
                         ) : (
-                          <span className="flex items-center space-x-1 text-slate-400 text-[11px]">
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                          <span className="flex items-center space-x-1 text-zinc-600 dark:text-zinc-300 text-[11px]">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                             <span>Legit</span>
                           </span>
                         )}
@@ -504,12 +504,12 @@ export const TransactionStream: React.FC = () => {
         {/* Right Col: Live Inspection Card */}
         {selectedTx && (
           <div className="ultra-card ultra-crown ultra-gradient-ring ultra-stagger p-5 space-y-4 overflow-hidden">
-            <div className="pb-3 border-b border-slate-100 dark:border-navy-700 flex items-center justify-between">
+            <div className="pb-3 border-b border-zinc-100 dark:border-navy-700 flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">
                   Transaction Deep-Dive
                 </span>
-                <div className="text-sm font-bold font-mono text-slate-900 dark:text-white">
+                <div className="text-sm font-bold font-mono text-zinc-900 dark:text-white">
                   {selectedTx.transaction.transaction_id}
                 </div>
               </div>
@@ -519,14 +519,14 @@ export const TransactionStream: React.FC = () => {
             {/* Probability Gauge Bar */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs">
-                <span className="text-slate-500 font-medium">Calibrated Fraud Likelihood:</span>
+                <span className="text-zinc-600 dark:text-zinc-300 font-medium">Calibrated Fraud Likelihood:</span>
                 <span
                   className={`ultra-metric font-bold ${
                     selectedTx.aegis_result.calibrated_probability >= 0.5
-                      ? "text-rose-500"
+                      ? "text-rose-700 dark:text-rose-400"
                       : selectedTx.aegis_result.calibrated_probability >= 0.15
-                      ? "text-amber-500"
-                      : "text-emerald-500"
+                      ? "text-amber-700 dark:text-amber-400"
+                      : "text-emerald-700 dark:text-emerald-400"
                     }`}
                 >
                   {(animatedProbability * 100).toFixed(2)}%
@@ -542,27 +542,27 @@ export const TransactionStream: React.FC = () => {
 
             {/* Core Transaction Attributes */}
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700">
-                <span className="text-slate-400 block text-[10px]">Amount:</span>
-                <span className="ultra-metric font-bold text-slate-900 dark:text-white">
+              <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-navy-900/40 border border-zinc-100 dark:border-navy-700">
+                <span className="text-zinc-600 dark:text-zinc-300 block text-[10px]">Amount:</span>
+                <span className="ultra-metric font-bold text-zinc-900 dark:text-white">
                   ${animatedAmount.toFixed(2)}
                 </span>
               </div>
-              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700">
-                <span className="text-slate-400 block text-[10px]">Channel:</span>
-                <span className="font-semibold text-slate-900 dark:text-white uppercase">
+              <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-navy-900/40 border border-zinc-100 dark:border-navy-700">
+                <span className="text-zinc-600 dark:text-zinc-300 block text-[10px]">Channel:</span>
+                <span className="font-semibold text-zinc-900 dark:text-white uppercase">
                   {selectedTx.transaction.channel}
                 </span>
               </div>
-              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700">
-                <span className="text-slate-400 block text-[10px]">Sender:</span>
-                <span className="font-mono text-slate-800 dark:text-slate-200 truncate block">
+              <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-navy-900/40 border border-zinc-100 dark:border-navy-700">
+                <span className="text-zinc-600 dark:text-zinc-300 block text-[10px]">Sender:</span>
+                <span className="font-mono text-zinc-800 dark:text-zinc-200 truncate block">
                   {selectedTx.transaction.sender_id}
                 </span>
               </div>
-              <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700">
-                <span className="text-slate-400 block text-[10px]">Receiver:</span>
-                <span className="font-mono text-slate-800 dark:text-slate-200 truncate block">
+              <div className="p-2.5 rounded-lg bg-zinc-50 dark:bg-navy-900/40 border border-zinc-100 dark:border-navy-700">
+                <span className="text-zinc-600 dark:text-zinc-300 block text-[10px]">Receiver:</span>
+                <span className="font-mono text-zinc-800 dark:text-zinc-200 truncate block">
                   {selectedTx.transaction.receiver_id}
                 </span>
               </div>
@@ -570,9 +570,9 @@ export const TransactionStream: React.FC = () => {
 
             {/* TreeSHAP Local Feature Contributions */}
             <div className="space-y-2">
-              <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between">
+              <div className="text-xs font-bold text-zinc-900 dark:text-white flex items-center justify-between">
                 <span>Top TreeSHAP Attributions</span>
-                <span className="text-[10px] text-slate-400 font-normal">Exact Shapley Values</span>
+                <span className="text-[10px] text-zinc-600 dark:text-zinc-300 font-normal">Exact Shapley Values</span>
               </div>
               <div className="space-y-1.5">
                 {selectedTx.aegis_result.top_features && selectedTx.aegis_result.top_features.length > 0 ? (
@@ -580,17 +580,17 @@ export const TransactionStream: React.FC = () => {
                     <div
                       key={i}
                       style={{ animationDelay: `${staggerDelayMs(Math.min(i, 8))}ms` }}
-                      className="ultra-row animate-fade-up text-xs p-2 rounded-lg bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700 flex items-center justify-between"
+                      className="ultra-row animate-fade-up text-xs p-2 rounded-lg bg-zinc-50 dark:bg-navy-900/40 border border-zinc-100 dark:border-navy-700 flex items-center justify-between"
                     >
                       <div>
-                        <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono text-[11px]">
+                        <span className="font-semibold text-zinc-800 dark:text-zinc-200 font-mono text-[11px]">
                           {feat.feature_name}
                         </span>
-                        <span className="text-[10px] text-slate-400 block">Val: {String(feat.feature_value)}</span>
+                        <span className="text-[10px] text-zinc-600 dark:text-zinc-300 block">Val: {String(feat.feature_value)}</span>
                       </div>
                       <span
                         className={`font-mono text-xs font-bold ${
-                          feat.shap_value > 0 ? "text-rose-500" : "text-emerald-500"
+                          feat.shap_value > 0 ? "text-rose-700 dark:text-rose-400" : "text-emerald-700 dark:text-emerald-400"
                         }`}
                       >
                         {feat.shap_value > 0 ? `+${feat.shap_value.toFixed(3)}` : feat.shap_value.toFixed(3)}
@@ -598,21 +598,21 @@ export const TransactionStream: React.FC = () => {
                     </div>
                   ))
                 ) : (
-                  <div className="text-xs text-slate-400 italic p-2">Zero anomalous feature deviations.</div>
+                  <div className="text-xs text-zinc-600 dark:text-zinc-300 italic p-2">Zero anomalous feature deviations.</div>
                 )}
               </div>
             </div>
 
             {/* Cryptographic SHA-256 Receipt */}
-            <div className="p-3 rounded-xl border border-slate-100 dark:border-navy-700 bg-slate-50 dark:bg-navy-900/60 text-[11px] space-y-1">
-              <div className="flex items-center space-x-1.5 text-slate-500 dark:text-slate-400 font-semibold">
-                <Fingerprint className="w-3.5 h-3.5 text-accent-teal" />
+            <div className="p-3 rounded-xl border border-zinc-100 dark:border-navy-700 bg-zinc-50 dark:bg-navy-900/60 text-[11px] space-y-1">
+              <div className="flex items-center space-x-1.5 text-zinc-600 dark:text-zinc-300 font-semibold">
+                <Fingerprint className="w-3.5 h-3.5 text-cyan-700 dark:text-accent-teal" />
                 <span>SHA-256 Audit Signature</span>
               </div>
-              <div className="font-mono text-[10px] text-slate-600 dark:text-slate-300 break-all bg-white dark:bg-navy-900 p-1.5 rounded border border-slate-200 dark:border-navy-700">
+              <div className="font-mono text-[10px] text-zinc-600 dark:text-zinc-300 break-all bg-white dark:bg-navy-900 p-1.5 rounded border border-zinc-200 dark:border-navy-700">
                 {selectedTx.aegis_result.audit_receipt_hash || "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"}
               </div>
-              <div className="text-[10px] text-emerald-500 font-medium pt-0.5">
+              <div className="text-[10px] text-emerald-700 dark:text-emerald-400 font-medium pt-0.5">
                 &check; Tamper-Evident &bull; Model {selectedTx.aegis_result.model_version}
               </div>
             </div>
@@ -624,23 +624,23 @@ export const TransactionStream: React.FC = () => {
       {isInjectOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
           <div className="ultra-card w-full max-w-xl p-6 space-y-5 animate-in fade-in zoom-in-95">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-navy-700">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-navy-700">
               <div className="flex items-center space-x-2">
-                <span className="p-1.5 rounded-lg bg-accent-teal/10 text-accent-teal">
+                <span className="p-1.5 rounded-lg bg-accent-teal/10 text-cyan-700 dark:text-accent-teal">
                   <PlusCircle className="w-5 h-5" />
                 </span>
                 <div>
-                  <h3 className="text-base font-bold text-slate-900 dark:text-white font-display">
+                  <h3 className="text-base font-bold text-zinc-900 dark:text-white font-display">
                     Inject Dynamic Test Transaction
                   </h3>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-300">
                     Live inference via LightGBM + NetworkX Temporal Graph &amp; TreeSHAP.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsInjectOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white transition-all"
+                className="p-1 rounded-lg text-zinc-600 dark:text-zinc-300 hover:text-zinc-600 dark:hover:text-white transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -648,12 +648,12 @@ export const TransactionStream: React.FC = () => {
 
             {/* Presets Row */}
             <div className="space-y-1.5">
-              <span className="text-xs font-semibold text-slate-500">Fast Attack Presets:</span>
+              <span className="text-xs font-semibold text-zinc-600 dark:text-zinc-300">Fast Attack Presets:</span>
               <div className="ultra-stagger grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <button
                   type="button"
                   onClick={() => handleApplyPreset("smurfing")}
-                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-500 hover:bg-rose-500/20 transition-all text-center"
+                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-700 dark:text-rose-400 hover:bg-rose-500/20 transition-all text-center"
                 >
                   Smurfing $4,890
                 </button>
@@ -667,14 +667,14 @@ export const TransactionStream: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => handleApplyPreset("high_risk_cnp")}
-                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 transition-all text-center"
+                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-700 dark:text-amber-400 hover:bg-amber-500/20 transition-all text-center"
                 >
                   Account Takeover
                 </button>
                 <button
                   type="button"
                   onClick={() => handleApplyPreset("legit")}
-                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 hover:shadow-glow-emerald transition-all text-center"
+                  className="px-2.5 py-1.5 text-xs font-medium rounded-lg border border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/20 hover:shadow-glow-emerald transition-all text-center"
                 >
                   Legitimate $14.75
                 </button>
@@ -685,7 +685,7 @@ export const TransactionStream: React.FC = () => {
             <form onSubmit={handleInjectSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                  <label className="block text-zinc-600 dark:text-zinc-300 font-semibold mb-1">
                     Sender Account ID
                   </label>
                   <input
@@ -693,11 +693,11 @@ export const TransactionStream: React.FC = () => {
                     required
                     value={injectSender}
                     onChange={(e) => setInjectSender(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white font-mono transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
+                    className="w-full px-3 py-2 rounded-xl border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 text-zinc-900 dark:text-white font-mono transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                  <label className="block text-zinc-600 dark:text-zinc-300 font-semibold mb-1">
                     Receiver Account ID
                   </label>
                   <input
@@ -705,11 +705,11 @@ export const TransactionStream: React.FC = () => {
                     required
                     value={injectReceiver}
                     onChange={(e) => setInjectReceiver(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white font-mono transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
+                    className="w-full px-3 py-2 rounded-xl border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 text-zinc-900 dark:text-white font-mono transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                  <label className="block text-zinc-600 dark:text-zinc-300 font-semibold mb-1">
                     Transaction Amount ($)
                   </label>
                   <input
@@ -719,17 +719,17 @@ export const TransactionStream: React.FC = () => {
                     required
                     value={injectAmount}
                     onChange={(e) => setInjectAmount(parseFloat(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white font-mono font-bold transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
+                    className="w-full px-3 py-2 rounded-xl border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 text-zinc-900 dark:text-white font-mono font-bold transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                  <label className="block text-zinc-600 dark:text-zinc-300 font-semibold mb-1">
                     Payment Channel
                   </label>
                   <select
                     value={injectChannel}
                     onChange={(e) => setInjectChannel(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
+                    className="w-full px-3 py-2 rounded-xl border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 text-zinc-900 dark:text-white transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
                   >
                     <option value="mobile">Mobile App</option>
                     <option value="p2p">P2P Instant Transfer</option>
@@ -739,24 +739,24 @@ export const TransactionStream: React.FC = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                  <label className="block text-zinc-600 dark:text-zinc-300 font-semibold mb-1">
                     Device Fingerprint
                   </label>
                   <input
                     type="text"
                     value={injectDevice}
                     onChange={(e) => setInjectDevice(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white font-mono transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
+                    className="w-full px-3 py-2 rounded-xl border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 text-zinc-900 dark:text-white font-mono transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-slate-600 dark:text-slate-300 font-semibold mb-1">
+                  <label className="block text-zinc-600 dark:text-zinc-300 font-semibold mb-1">
                     Ground Truth (Simulation)
                   </label>
                   <select
                     value={injectIsFraud}
                     onChange={(e) => setInjectIsFraud(parseInt(e.target.value))}
-                    className="w-full px-3 py-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-900 dark:text-white transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
+                    className="w-full px-3 py-2 rounded-xl border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 text-zinc-900 dark:text-white transition-all focus:ring-2 focus:ring-accent-teal/40 focus:border-accent-teal/60 outline-none"
                   >
                     <option value={1}>1 - Actual Fraud</option>
                     <option value={0}>0 - Legitimate Transaction</option>
@@ -765,17 +765,17 @@ export const TransactionStream: React.FC = () => {
               </div>
 
               {injectSuccessMsg && (
-                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-xs font-semibold flex items-center space-x-2 animate-fade-up">
+                <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-400 text-xs font-semibold flex items-center space-x-2 animate-fade-up">
                   <CheckCircle className="w-4 h-4 shrink-0" />
                   <span>{injectSuccessMsg}</span>
                 </div>
               )}
 
-              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100 dark:border-navy-700">
+              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-zinc-100 dark:border-navy-700">
                 <button
                   type="button"
                   onClick={() => setIsInjectOpen(false)}
-                  className="px-4 py-2 rounded-xl text-xs font-semibold border border-slate-200 dark:border-navy-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-700 transition-all"
+                  className="px-4 py-2 rounded-xl text-xs font-semibold border border-zinc-200 dark:border-navy-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-navy-700 transition-all"
                 >
                   Cancel
                 </button>

@@ -17,5 +17,11 @@ export default defineConfig({
     baseURL: "http://localhost:4173",
     headless: true,
   },
+  webServer: {
+    command: "npx vite preview --port 4173 --strictPort",
+    port: 4173,
+    reuseExistingServer: true,
+    timeout: 30_000,
+  },
   reporter: [["list"]],
 });

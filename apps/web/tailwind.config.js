@@ -8,30 +8,41 @@ export default {
   theme: {
     extend: {
       colors: {
+        /* Inherited from moa's "Meadow" palette (vultr/moa-main src/app/globals.css):
+           zinc-neutral surfaces, grass green (#5aac45) as primary, stem green
+           (#3a7f2c) for links/gradients, pale meadow tint (#ecf6e6) for accents.
+           navy-* now maps moa's dark neutral ramp (near-black #0a0a0b, card
+           #1c1c1e, hairline #2b2b2e) so dark mode matches moa's dark tokens. */
         navy: {
-          950: '#060a18',
-          900: '#0b132b',
-          800: '#1c2541',
-          700: '#3a506b',
+          950: '#050505',
+          900: '#0a0a0b',
+          800: '#1c1c1e',
+          700: '#2b2b2e',
         },
         accent: {
-          teal: '#00b4d8',
-          cyan: '#90e0ef',
-          emerald: '#10b981',
+          teal: '#5aac45',   // moa --primary (grass)
+          cyan: '#d9e585',   // moa --brand-ink dark (pale stem — accent on dark)
+          emerald: '#34d399',
           rose: '#f43f5e',
           amber: '#f59e0b',
-          violet: '#8b5cf6',
+          violet: '#3a7f2c', // moa --brand-ink (stem green, gradient depth)
+        },
+        meadow: {
+          DEFAULT: '#5aac45',
+          soft: '#ecf6e6',
+          ink: '#3a7f2c',
+          dark: '#d9e585',
         }
       },
       fontFamily: {
-        display: ['Outfit', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        display: ['Geist', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+        mono: ['Geist Mono', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        'glow-teal': '0 0 24px -6px rgba(0, 180, 216, 0.45)',
-        'glow-emerald': '0 0 24px -6px rgba(16, 185, 129, 0.45)',
-        'glow-violet': '0 0 24px -6px rgba(139, 92, 246, 0.45)',
-        'card-ultra': '0 8px 32px -8px rgba(2, 6, 23, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.06)',
+        'glow-teal': '0 0 0 1px rgba(90, 172, 69, 0.22), 0 8px 24px -12px rgba(90, 172, 69, 0.35)',
+        'glow-emerald': '0 0 0 1px rgba(52, 211, 153, 0.22), 0 8px 24px -12px rgba(52, 211, 153, 0.35)',
+        'glow-violet': '0 0 0 1px rgba(58, 127, 44, 0.22), 0 8px 24px -12px rgba(58, 127, 44, 0.35)',
+        'card-ultra': '0 1px 2px rgba(9, 9, 11, 0.04), 0 8px 24px -16px rgba(9, 9, 11, 0.12)',
       },
       animation: {
         'aurora': 'aurora-drift 22s ease-in-out infinite alternate',

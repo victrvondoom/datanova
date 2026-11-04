@@ -74,6 +74,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
   // Dynamic trail badge: reflects real learning progress in localStorage.
   const [trailCompleted, setTrailCompleted] = useState<number>(() => readTrailCompleted());
 
+  // Dynamic benchmark badge: the real number of models in the current
+  // benchmark artifacts (falls back to a neutral label while loading).
+  const [modelCount, setModelCount] = useState<number | null>(null);
+
   // Animated KPI presentation of the API-provided champion metrics.
   const animatedPrAuc = useCountUp(champion.prAuc ?? 0, { durationMs: 1200 });
   const animatedLatency = useCountUp(champion.latencyMs ?? 0, { durationMs: 1200 });
@@ -85,6 +89,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
         const [health, benchmarks] = await Promise.all([checkHealth(), fetchBenchmarks()]);
         if (cancelled) return;
         const champ = (benchmarks as any).benchmark_summary?.["XGBoost"];
+        const summary = (benchmarks as any).benchmark_summary ?? {};
+        setModelCount(Object.keys(summary).length || null);
         setChampion({
           online: health?.status === "healthy",
           modelId: health?.model_id ?? null,
@@ -120,10 +126,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
 
   const navItems = [
     { id: "mission" as ViewType, label: "Mission Control", icon: LayoutDashboard, badge: "Live KPIs" },
+    // modelCount badge derives from the live benchmark payload.
     { id: "stream" as ViewType, label: "Live Digital Twin", icon: PlayCircle, badge: "Replay" },
     { id: "graph" as ViewType, label: "Fraud Network Graph", icon: Network, badge: "Mule Rings" },
     { id: "decision" as ViewType, label: "Decision Intelligence", icon: Sliders, badge: "Cost Engine" },
-    { id: "benchmark" as ViewType, label: "ML Benchmarks", icon: BarChart3, badge: "6 Models" },
+    { id: "benchmark" as ViewType, label: "ML Benchmarks", icon: BarChart3, badge: modelCount ? `${modelCount} Models` : "Artifacts" },
     { id: "drift" as ViewType, label: "Drift & Stress Lab", icon: Activity, badge: "PSI Alert" },
     { id: "explain" as ViewType, label: "Explainability Explorer", icon: FileCheck2, badge: "TreeSHAP" },
     { id: "research" as ViewType, label: "Evidence & Research", icon: BookOpenCheck, badge: "Artifacts" },
@@ -133,9 +140,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
   ];
 
   return (
-    <aside className="w-64 border-r flex flex-col justify-between p-4 bg-white/85 dark:bg-navy-900/75 backdrop-blur-xl border-slate-200 dark:border-navy-700 transition-colors">
+    <aside className="w-64 border-r flex flex-col justify-between p-4 bg-[#fbfbfa] dark:bg-navy-900 border-zinc-200 dark:border-white/10 transition-colors">
       <div className="space-y-1.5 ultra-stagger">
-        <div className="px-3 py-2 text-[11px] font-display font-bold tracking-wider uppercase text-slate-400 dark:text-slate-500">
+        <div className="px-3 py-2 text-[11px] font-display font-bold tracking-wider uppercase text-zinc-600 dark:text-zinc-300">
           Core Laboratories
         </div>
 
@@ -147,27 +154,27 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
               key={item.id}
               onClick={() => setCurrentView(item.id)}
               style={{ animationDelay: `${staggerDelayMs(index + 1)}ms` }}
-              className={`ultra-card w-full flex items-center justify-between px-3.5 py-2.5 text-sm font-medium transition-all ${
+              className={`relative w-full flex items-center justify-between h-9 px-2.5 rounded-lg text-[13px] font-medium transition-colors ${
                 isActive
-                  ? "text-accent-teal border-accent-teal/40 shadow-glow-teal font-semibold"
-                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:border-accent-teal/30"
+                  ? "bg-meadow-soft text-meadow-ink dark:bg-[#30341b] dark:text-meadow-dark"
+                  : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-zinc-100"
               }`}
             >
               {isActive && (
                 <span
                   aria-hidden
-                  className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-gradient-to-b from-accent-teal to-accent-violet"
+                  className="absolute left-0 top-1/2 -tranzinc-y-1/2 h-5 w-1 rounded-r-full bg-meadow dark:bg-meadow-dark"
                 />
               )}
               <div className="flex items-center space-x-3">
-                <Icon className={`w-4 h-4 ${isActive ? "text-accent-teal" : "text-slate-400"}`} />
+                <Icon className={`w-4 h-4 ${isActive ? "text-cyan-700 dark:text-accent-teal" : "text-zinc-600 dark:text-zinc-300"}`} />
                 <span>{item.label}</span>
               </div>
               <span
                 className={`text-[10px] font-mono px-2 py-0.5 rounded-md ${
                   isActive
-                    ? "bg-accent-teal text-navy-900 font-bold"
-                    : "bg-slate-100 dark:bg-navy-800 text-slate-500 dark:text-slate-400"
+                    ? "bg-meadow/15 text-meadow-ink dark:bg-meadow-dark/15 dark:text-meadow-dark font-semibold"
+                    : "bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400"
                 }`}
               >
                 {item.badge}
@@ -181,16 +188,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
       <div className="ultra-card ultra-crown p-3.5 mt-4">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center space-x-1.5">
-            <Trophy className="w-3.5 h-3.5 text-accent-teal" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-400">
+            <Trophy className="w-3.5 h-3.5 text-cyan-700 dark:text-accent-teal" />
+            <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">
               Active Champion
             </span>
           </div>
           <span
             className={`flex items-center space-x-1 text-[10px] font-semibold px-1.5 py-0.5 rounded-md border ${
               champion.online
-                ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
-                : "text-amber-600 dark:text-amber-400 bg-amber-500/10 border-amber-500/20"
+                ? "text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                : "text-amber-700 dark:text-amber-400 bg-amber-500/10 border-amber-500/20"
             }`}
           >
             {champion.online ? (
@@ -201,24 +208,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
             <span>{champion.online ? "Live" : "Offline"}</span>
           </span>
         </div>
-        <div className="text-xs font-mono font-bold text-slate-900 dark:text-white truncate">
+        <div className="text-xs font-mono font-bold text-zinc-900 dark:text-white truncate">
           {champion.modelId ?? "backend offline"}
         </div>
         {champion.artifactStatus && (
-          <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
+          <div className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300 truncate">
             artifact: {champion.artifactStatus}
           </div>
         )}
-        <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-200/70 dark:border-navy-700/70 text-[11px]">
-          <span className="text-slate-500">PR-AUC:</span>
-          <span className={`font-mono font-bold ${champion.degraded ? "text-amber-500" : "text-emerald-500"}`}>
+        <div className="flex items-center justify-between mt-2 pt-2 border-t border-zinc-200/70 dark:border-navy-700/70 text-[11px]">
+          <span className="text-zinc-600 dark:text-zinc-300">PR-AUC:</span>
+          <span className={`font-mono font-bold ${champion.degraded ? "text-amber-700 dark:text-amber-400" : "text-emerald-700 dark:text-emerald-400"}`}>
             {champion.prAuc !== null ? formatKpiValue(animatedPrAuc, { decimals: 4 }) : "—"}
             {champion.degraded ? " (cached)" : ""}
           </span>
         </div>
         <div className="flex items-center justify-between text-[11px] mt-0.5">
-          <span className="text-slate-500">Latency:</span>
-          <span className="font-mono font-semibold text-slate-700 dark:text-slate-300">
+          <span className="text-zinc-600 dark:text-zinc-300">Latency:</span>
+          <span className="font-mono font-semibold text-zinc-700 dark:text-zinc-300">
             {champion.latencyMs !== null
               ? `${formatKpiValue(animatedLatency, {
                   decimals: Number.isInteger(champion.latencyMs) ? 0 : 2,

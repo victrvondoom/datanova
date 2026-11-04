@@ -18,7 +18,7 @@ import { scenarioTemplate, runScenario } from "../lab/engines/scenario";
 import { blastRadius } from "../lab/engines/blastradius";
 import { recoveryTimeline, recoveryBottlenecks } from "../lab/engines/recovery-timeline";
 import { toVisGraph, type VisGraph } from "./graph";
-import { layeredLayout, layoutBounds } from "./layout";
+import { layeredLayout, layoutBounds, applyUserLayout, type UserLayout } from "./layout";
 import { computeLayer, MAP_MODES, type MapMode, type LayerContext, type LayerResult } from "./layers";
 import { AtlasScene } from "./scene";
 import { ABadge, AButton, ADialog, AInput, ASelect, AAnnouncer } from "./ui";
@@ -69,9 +69,36 @@ export const StudioView: React.FC<{
   const undoStack = useRef<string[]>([]);
   const redoStack = useRef<string[]>([]);
   const [historyState, setHistoryState] = useState({ undo: 0, redo: 0 });
+  const [userLayout, setUserLayout] = useState<UserLayout | null>(null);
+  const [simStep, setSimStep] = useState<number | null>(null);
+  const [groupBy, setGroupBy] = useState<"zone" | "group" | "type" | "none">("zone");
 
   const graph = useMemo<VisGraph>(() => toVisGraph(model), [model]);
-  const layout = useMemo(() => layeredLayout(graph), [graph]);
+  const baseLayout = useMemo(() => layeredLayout(graph), [graph]);
+  const layout = useMemo(() => applyUserLayout(baseLayout, userLayout), [baseLayout, userLayout]);
+
+  const maxStep = useMemo(() => {
+    if (!scenario) return 0;
+    const eventMax = scenario.recording.events.length > 0
+      ? Math.max(...scenario.recording.events.map((e) => e.t), scenario.recording.events.length)
+      : 0;
+    return Math.max(eventMax, 10);
+  }, [scenario]);
+
+  const activeEvents = useMemo(() => {
+    if (!scenario) return [];
+    if (simStep === null) return scenario.recording.events;
+    return scenario.recording.events.filter((e) => e.t <= simStep);
+  }, [scenario, simStep]);
+
+  const activeFailed = useMemo(() => {
+    if (!scenario) return [];
+    if (simStep === null) return scenario.failed;
+    return activeEvents
+      .filter((e) => e.type === "fault" || (e.type === "status-change" && e.to === "down"))
+      .map((e) => e.componentId)
+      .filter(Boolean) as string[];
+  }, [scenario, simStep, activeEvents]);
 
   const pushHistory = useCallback((m: ArchitectureModel): void => {
     undoStack.current.push(serializeModel(m));
@@ -87,7 +114,7 @@ export const StudioView: React.FC<{
     scenario: scenario ? {
       saturated: scenario.saturated, peakRps: scenario.peakRps,
       expectationResults: scenario.results, impactedOperations: scenario.impacted,
-      failedComponents: scenario.failed,
+      failedComponents: activeFailed,
     } : null,
     failure: selection && mode === "failure" ? (() => {
       const origin = selection.kind === "node" ? selection.id : graph.nodes[0]?.id;
@@ -110,7 +137,7 @@ export const StudioView: React.FC<{
         .filter((r) => !r.includes(":"))
         .map((r) => [r, (findings.filter((f) => f.evidence.some((e) => e.ref === `component:${r}`)).length)]),
     ),
-  }), [selection, scenario, mode, graph, model, findings]);
+  }), [selection, scenario, activeFailed, mode, graph, model, findings]);
 
   const layer = useMemo<LayerResult>(() => computeLayer(graph, model, mode, layerCtx), [graph, model, mode, layerCtx]);
 
@@ -133,6 +160,10 @@ export const StudioView: React.FC<{
       },
       onFocus: (id) => sceneRef.current?.focusNode(id),
       onDiagnostics: (d) => setDiagnostics((prev) => ({ ...d, fps: prev.fps })),
+      onNodeDragEnd: (id, x, z) => {
+        setUserLayout((prev) => ({ moved: { ...(prev?.moved ?? {}), [id]: { x: Math.round(x * 10) / 10, z: Math.round(z * 10) / 10 } } }));
+        setLocalAnnounce(`Position updated for ${id}.`);
+      },
     }, reducedMotion);
     sceneRef.current = scene;
     scene.build(graph, layout);
@@ -190,6 +221,7 @@ export const StudioView: React.FC<{
     };
     applyEdit(m, `Connected ${from} → ${to} (sync). Edit properties in the inspector.`);
     setConnectFrom(null);
+    setSelection({ id, kind: "edge" });
   };
 
   const deleteSelected = (): void => {
@@ -240,9 +272,19 @@ export const StudioView: React.FC<{
     }, `Property ${key} updated.`);
   };
 
+  const updateSelectedConnection = useCallback((patch: Partial<import("../lab/model").Connection>): void => {
+    if (!selection || selection.kind !== "edge") return;
+    const m: ArchitectureModel = {
+      ...model,
+      connections: model.connections.map((c) => (c.id === selection.id ? { ...c, ...patch } : c)),
+    };
+    applyEdit(m, "Updated connection properties.");
+  }, [selection, model, applyEdit]);
+
   const runBurst = (): void => {
     const s = scenarioTemplate("burst-overload", model, 120);
     const result = runScenario(model, s);
+    setSimStep(null);
     setScenario({
       summary: `burst-overload @ 120 rps — ${result.allPassed ? "all expectations pass" : "expectation failures"}; ${result.expectationResults.length} expectation(s)`,
       saturated: result.workload.saturated,
@@ -281,9 +323,18 @@ export const StudioView: React.FC<{
   const selectedComponent = selection?.kind === "node" ? model.components.find((c) => c.id === selection.id) : undefined;
   const selectedConnection = selection?.kind === "edge" ? model.connections.find((c) => c.id === selection.id) : undefined;
 
-  const navItems = graph.nodes
+  const navItems = useMemo(() => graph.nodes
     .filter((n) => (typeFilter === "all" || n.type === typeFilter) && (!navQuery || n.label.toLowerCase().includes(navQuery.toLowerCase()) || n.id.includes(navQuery)))
-    .sort((a, b) => a.zoneId?.localeCompare(b.zoneId ?? "") || a.id.localeCompare(b.id));
+    .sort((a, b) => {
+      if (groupBy === "zone") return (a.zoneId ?? "").localeCompare(b.zoneId ?? "") || a.id.localeCompare(b.id);
+      if (groupBy === "group") {
+        const ga = String(model.components.find((c) => c.id === a.id)?.config.group ?? "");
+        const gb = String(model.components.find((c) => c.id === b.id)?.config.group ?? "");
+        return ga.localeCompare(gb) || a.id.localeCompare(b.id);
+      }
+      if (groupBy === "type") return a.type.localeCompare(b.type) || a.id.localeCompare(b.id);
+      return a.id.localeCompare(b.id);
+    }), [graph.nodes, typeFilter, navQuery, groupBy, model.components]);
 
   const dockTabs: DockTab[] = [
     { id: "events", label: "Events" },
@@ -301,28 +352,57 @@ export const StudioView: React.FC<{
         <aside aria-label="Object navigator" className="w-56 shrink-0 border-r border-slate-800/80 bg-slate-900/50 flex flex-col min-h-0">
           <div className="p-2 space-y-1.5 border-b border-slate-800/80">
             <AInput aria-label="Filter components" placeholder="Filter…" value={navQuery} onChange={(e) => setNavQuery(e.target.value)} />
-            <ASelect aria-label="Filter by type" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
-              <option value="all">All types</option>
-              {KINDS.map((k) => <option key={k} value={k}>{KIND_LABEL[k]}</option>)}
-            </ASelect>
+            <div className="grid grid-cols-2 gap-1">
+              <ASelect aria-label="Filter by type" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+                <option value="all">All types</option>
+                {KINDS.map((k) => <option key={k} value={k}>{KIND_LABEL[k]}</option>)}
+              </ASelect>
+              <ASelect aria-label="Group components" value={groupBy} onChange={(e) => setGroupBy(e.target.value as "zone" | "group" | "type" | "none")}>
+                <option value="zone">By Zone</option>
+                <option value="group">By Group</option>
+                <option value="type">By Type</option>
+                <option value="none">Flat</option>
+              </ASelect>
+            </div>
           </div>
           <ul className="flex-1 overflow-y-auto p-1.5 space-y-0.5">
             {navItems.length === 0 && <li className="px-2 py-3 text-[11px] text-slate-500">No components match the filter.</li>}
-            {navItems.map((n) => {
+            {navItems.map((n, idx) => {
               const st = layer.nodes[n.id];
+              const comp = model.components.find((c) => c.id === n.id);
+              const groupLabel = groupBy === "zone" ? (n.zoneId ? (graph.zones.find((z) => z.id === n.zoneId)?.label ?? n.zoneId) : "Unzoned")
+                : groupBy === "group" ? (comp?.config.group ? String(comp.config.group) : "Ungrouped")
+                : groupBy === "type" ? KIND_LABEL[n.type]
+                : null;
+              const prev = idx > 0 ? navItems[idx - 1] : null;
+              const prevComp = prev ? model.components.find((c) => c.id === prev.id) : null;
+              const prevLabel = prev ? (
+                groupBy === "zone" ? (prev.zoneId ? (graph.zones.find((z) => z.id === prev.zoneId)?.label ?? prev.zoneId) : "Unzoned")
+                : groupBy === "group" ? (prevComp?.config.group ? String(prevComp.config.group) : "Ungrouped")
+                : groupBy === "type" ? KIND_LABEL[prev.type]
+                : null
+              ) : null;
+              const showHeader = groupLabel && groupLabel !== prevLabel;
               return (
-                <li key={n.id}>
-                  <button
-                    onClick={() => { setSelection({ id: n.id, kind: "node" }); sceneRef.current?.focusNode(n.id); }}
-                    aria-current={selection?.id === n.id ? "true" : undefined}
-                    className={`w-full text-left rounded px-2 py-1.5 text-xs transition-colors ${
-                      selection?.id === n.id ? "bg-sky-500/20 text-sky-200 border border-sky-500/40"
-                      : "text-slate-300 hover:bg-slate-800/70 border border-transparent"
-                    }`}>
-                    <span className="font-semibold block truncate">{n.label}</span>
-                    <span className="text-[10px] text-slate-500">{KIND_LABEL[n.type]} · {n.id}{st?.badge ? ` · ${st.badge}` : ""}</span>
-                  </button>
-                </li>
+                <React.Fragment key={n.id}>
+                  {showHeader && (
+                    <li className="px-2 pt-2 pb-0.5 text-[9px] font-bold uppercase tracking-wider text-slate-400 bg-slate-800/40 rounded">
+                      {groupLabel}
+                    </li>
+                  )}
+                  <li>
+                    <button
+                      onClick={() => { setSelection({ id: n.id, kind: "node" }); sceneRef.current?.focusNode(n.id); }}
+                      aria-current={selection?.id === n.id ? "true" : undefined}
+                      className={`w-full text-left rounded px-2 py-1.5 text-xs transition-colors ${
+                        selection?.id === n.id ? "bg-sky-500/20 text-sky-200 border border-sky-500/40"
+                        : "text-slate-300 hover:bg-slate-800/70 border border-transparent"
+                      }`}>
+                      <span className="font-semibold block truncate">{n.label}</span>
+                      <span className="text-[10px] text-slate-500">{KIND_LABEL[n.type]} · {n.id}{st?.badge ? ` · ${st.badge}` : ""}</span>
+                    </button>
+                  </li>
+                </React.Fragment>
               );
             })}
           </ul>
@@ -358,6 +438,11 @@ export const StudioView: React.FC<{
           <AButton variant="primary" onClick={runBurst}><span className="inline-flex items-center gap-1"><Play size={11} aria-hidden /> Run scenario</span></AButton>
           <AButton onClick={takeSnapshot}><span className="inline-flex items-center gap-1"><Sparkles size={11} aria-hidden /> Snapshot</span></AButton>
           <AButton disabled={!snapshot} onClick={compareSnapshot}><span className="inline-flex items-center gap-1"><GitCompare size={11} aria-hidden /> Compare</span></AButton>
+          {userLayout && Object.keys(userLayout.moved).length > 0 && (
+            <AButton onClick={() => { setUserLayout(null); setLocalAnnounce("Layout reset to deterministic grid."); }} title="Reset user-arranged node positions">
+              Reset layout
+            </AButton>
+          )}
           <span className="ml-auto flex items-center gap-1">
             <AButton aria-pressed={is2D} onClick={() => { setIs2D(!is2D); onPanels((p) => ({ ...p, is2D: !is2D })); }}
               title="Toggle the accessible 2D map">{is2D ? "2D" : "3D"}</AButton>
@@ -493,8 +578,38 @@ export const StudioView: React.FC<{
                 </ul>
               )}
               {dockTab === "scenario" && (scenario ? (
-                <div className="space-y-1">
-                  <p className="font-semibold text-slate-200">{scenario.summary}</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="font-semibold text-slate-200">{scenario.summary}</p>
+                    <span className="text-[10px] font-mono text-sky-300">t = {simStep ?? maxStep} ms</span>
+                  </div>
+                  {maxStep > 0 && (
+                    <div className="p-2 bg-slate-800/60 rounded border border-slate-700/60 space-y-1">
+                      <div className="flex justify-between text-[10px] text-slate-400">
+                        <span>Simulation Time Scrubber:</span>
+                        <span>{activeEvents.length} / {scenario.recording.events.length} events processed</span>
+                      </div>
+                      <input
+                        type="range"
+                        min={0}
+                        max={maxStep}
+                        value={simStep ?? maxStep}
+                        onChange={(e) => setSimStep(Number(e.target.value))}
+                        className="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-400"
+                        aria-label="Simulation step scrubber"
+                      />
+                      <div className="flex justify-between text-[9px] text-slate-500 font-mono">
+                        <span>0 ms (start)</span>
+                        <span>{Math.round(maxStep / 2)} ms</span>
+                        <span>{maxStep} ms (peak)</span>
+                      </div>
+                    </div>
+                  )}
+                  {activeFailed.length > 0 && (
+                    <div className="text-[11px] text-rose-300 bg-rose-950/30 border border-rose-900/40 rounded px-2 py-1">
+                      Active failures at t={simStep ?? maxStep}ms: {activeFailed.join(", ")}
+                    </div>
+                  )}
                   {scenario.results.map((r) => (
                     <p key={r.expectationId}>
                       <span className={r.outcome === "pass" ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>[{r.outcome}]</span> {r.expectationId}: {r.detail}
@@ -560,7 +675,34 @@ export const StudioView: React.FC<{
                   onBlur={(e) => { if (e.target.value !== selectedComponent.name) renameSelected(e.target.value); }}
                   aria-label="Component name" />
               </label>
-              <InspectorSection title="Properties">
+              <label className="block space-y-1">
+                <span className="text-[10px] uppercase tracking-wider text-slate-400">Assigned Zone</span>
+                <ASelect
+                  value={selectedComponent.zoneId ?? ""}
+                  onChange={(e) => {
+                    const z = e.target.value || undefined;
+                    applyEdit({
+                      ...model,
+                      components: model.components.map((c) => (c.id === selectedComponent.id ? { ...c, zoneId: z } : c)),
+                    }, `Assigned ${selectedComponent.name} to ${z ? (model.zones.find((x) => x.id === z)?.name ?? z) : "unzoned"}.`);
+                  }}
+                  aria-label="Component trust zone">
+                  <option value="">(No zone assigned)</option>
+                  {model.zones.map((z) => (
+                    <option key={z.id} value={z.id}>{z.name}</option>
+                  ))}
+                </ASelect>
+              </label>
+              <label className="block space-y-1">
+                <span className="text-[10px] uppercase tracking-wider text-slate-400">Domain / Logical Tag</span>
+                <AInput
+                  defaultValue={String(selectedComponent.config.group ?? "")}
+                  placeholder="e.g. Ingestion, Core, Storage"
+                  onBlur={(e) => setConfig("group", e.target.value.trim())}
+                  aria-label="Component logical tag"
+                />
+              </label>
+              <InspectorSection title="Properties" defaultOpen>
                 {Object.entries(selectedComponent.config).length === 0 && <Empty />}
                 {Object.entries(selectedComponent.config).map(([k, v]) => (
                   <label key={k} className="flex items-center gap-2 mb-1">
@@ -573,8 +715,30 @@ export const StudioView: React.FC<{
               <InspectorSection title="Dependencies">
                 <p className="text-slate-400">In: {model.connections.filter((c) => c.to === selectedComponent.id).map((c) => c.from).join(", ") || "none"}</p>
                 <p className="text-slate-400">Out: {model.connections.filter((c) => c.from === selectedComponent.id).map((c) => c.to).join(", ") || "none"}</p>
+                {model.connections.some((c) => c.to === selectedComponent.id || c.from === selectedComponent.id) && (
+                  <div className="flex flex-wrap gap-1 mt-1 pt-1 border-t border-slate-800">
+                    {model.connections.filter((c) => c.to === selectedComponent.id).map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => setSelection({ id: c.id, kind: "edge" })}
+                        className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-300 text-[10px] border border-slate-700"
+                        title={`Inspect connection ${c.id}`}>
+                        🔗 {c.from}
+                      </button>
+                    ))}
+                    {model.connections.filter((c) => c.from === selectedComponent.id).map((c) => (
+                      <button
+                        key={c.id}
+                        onClick={() => setSelection({ id: c.id, kind: "edge" })}
+                        className="px-1.5 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-sky-300 text-[10px] border border-slate-700"
+                        title={`Inspect connection ${c.id}`}>
+                        🔗 {c.to}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 {layer.focusPaths.length > 0 && (
-                  <p className="mt-1 text-slate-400">Traced paths: {layer.focusPaths.slice(0, 3).map((p) => p.join(" → ")).join(" | ")}</p>
+                  <p className="mt-1 text-slate-400 text-[10px]">Traced paths: {layer.focusPaths.slice(0, 3).map((p) => p.join(" → ")).join(" | ")}</p>
                 )}
               </InspectorSection>
               <InspectorSection title="Data">
@@ -613,12 +777,61 @@ export const StudioView: React.FC<{
                 <div className="text-sm font-bold text-slate-100">Connection</div>
                 <div className="text-[10px] text-slate-500">{selectedConnection.from} → {selectedConnection.to}</div>
               </div>
-              <InspectorSection title="Properties">
-                <p className="text-slate-400">Kind: {selectedConnection.kind}</p>
-                <p className="text-slate-400">Criticality: {selectedConnection.criticality}/5</p>
-                <p className="text-slate-400">Failure behavior: {selectedConnection.failureBehavior}</p>
-                <p className="text-slate-400">Latency: {selectedConnection.latencyMs ?? "not modeled"} ms</p>
-                <p className="text-slate-400">Controls: {selectedConnection.controls?.join(", ") || "none declared"}</p>
+              <div className="flex gap-1">
+                <AButton className="text-[10px] py-0.5" onClick={() => sceneRef.current?.focusNode(selectedConnection.from)}>
+                  From: {selectedConnection.from}
+                </AButton>
+                <AButton className="text-[10px] py-0.5" onClick={() => sceneRef.current?.focusNode(selectedConnection.to)}>
+                  To: {selectedConnection.to}
+                </AButton>
+              </div>
+              <InspectorSection title="Properties" defaultOpen>
+                <label className="block space-y-1 mb-2">
+                  <span className="text-[10px] uppercase tracking-wider text-slate-400">Interaction Kind</span>
+                  <ASelect
+                    value={selectedConnection.kind}
+                    onChange={(e) => updateSelectedConnection({ kind: e.target.value as "sync" | "async" | "event" })}
+                    aria-label="Connection kind">
+                    <option value="sync">Sync (RPC / HTTP)</option>
+                    <option value="async">Async (Worker / Message)</option>
+                    <option value="event">Event (Publish / Subscribe)</option>
+                  </ASelect>
+                </label>
+                <label className="block space-y-1 mb-2">
+                  <span className="text-[10px] uppercase tracking-wider text-slate-400">Criticality (1-5)</span>
+                  <ASelect
+                    value={String(selectedConnection.criticality)}
+                    onChange={(e) => updateSelectedConnection({ criticality: Number(e.target.value) as 1 | 2 | 3 | 4 | 5 })}
+                    aria-label="Connection criticality">
+                    <option value="1">1 — Trivial / Optional</option>
+                    <option value="2">2 — Low Impact</option>
+                    <option value="3">3 — Moderate</option>
+                    <option value="4">4 — Critical Path</option>
+                    <option value="5">5 — Essential (Blocks)</option>
+                  </ASelect>
+                </label>
+                <label className="block space-y-1 mb-2">
+                  <span className="text-[10px] uppercase tracking-wider text-slate-400">Failure Behavior</span>
+                  <ASelect
+                    value={selectedConnection.failureBehavior}
+                    onChange={(e) => updateSelectedConnection({ failureBehavior: e.target.value as "blocks" | "degrades" | "isolated" })}
+                    aria-label="Failure behavior">
+                    <option value="blocks">Blocks (fails upstream caller)</option>
+                    <option value="degrades">Degrades (graceful degradation)</option>
+                    <option value="isolated">Isolated (failure is contained)</option>
+                  </ASelect>
+                </label>
+                <label className="block space-y-1 mb-2">
+                  <span className="text-[10px] uppercase tracking-wider text-slate-400">Latency SLA (ms)</span>
+                  <AInput
+                    type="number"
+                    defaultValue={String(selectedConnection.latencyMs ?? "")}
+                    placeholder="e.g. 25"
+                    onBlur={(e) => updateSelectedConnection({ latencyMs: e.target.value ? Number(e.target.value) : undefined })}
+                    aria-label="Latency SLA ms"
+                  />
+                </label>
+                <p className="text-slate-400 text-[10px]">Controls: {selectedConnection.controls?.join(", ") || "none declared"}</p>
               </InspectorSection>
               <InspectorSection title="Operations">
                 <p className="text-slate-400">{selectedConnection.operationIds.join(", ") || "not mapped to an operation"}</p>
@@ -689,8 +902,8 @@ export const StudioView: React.FC<{
   );
 };
 
-const InspectorSection: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <details className="rounded-md border border-slate-700/60 bg-slate-900/60">
+const InspectorSection: React.FC<{ title: string; children: React.ReactNode; defaultOpen?: boolean }> = ({ title, children, defaultOpen = false }) => (
+  <details open={defaultOpen} className="rounded-md border border-slate-700/60 bg-slate-900/60">
     <summary className="px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 cursor-pointer">{title}</summary>
     <div className="px-2 pb-2">{children}</div>
   </details>

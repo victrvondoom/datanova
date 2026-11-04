@@ -11,6 +11,7 @@ import { runCounterexamples, buildCounterexamples } from "../../lab/engines/coun
 import { critiqueArchitecture } from "../../lab/engines/critic";
 import { AMetric, APanel, ABadge } from "../ui";
 import { flawedCheckoutModel, docflowModel } from "../../lab/samples";
+import { runSpatialBenchmarks } from "../benchmark";
 
 export const BenchmarksView: React.FC = () => {
   const run = useMemo(() => runBenchmarkV2(new Date(0).toISOString()), []);
@@ -21,6 +22,7 @@ export const BenchmarksView: React.FC = () => {
   const reconstructed = useMemo(() => reconstructSummary(traces), [traces]);
   const report = useMemo(() => externalValidationReport(run, []), [run]);
   const challenges = useMemo(() => runCounterexamples(buildCounterexamples()), []);
+  const spatialResults = useMemo(() => runSpatialBenchmarks(), []);
   const [selectedCase, setSelectedCase] = useState<string>("");
   const caseTrace = traces.find((t) => t.scenarioId === selectedCase);
 
@@ -58,6 +60,40 @@ export const BenchmarksView: React.FC = () => {
             ))}
           </tbody>
         </table>
+      </APanel>
+
+      <APanel title="Spatial Graph & Rendering Stress Benchmarks (Section 9)" subtitle="Deterministic synthetic architecture performance across Small, Medium, Large, and Stress profiles">
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="text-slate-400 text-left border-b border-slate-800">
+              <th className="py-1">Profile</th>
+              <th>Nodes / Edges</th>
+              <th>Graph IR</th>
+              <th>3D Layout</th>
+              <th>8 Map Modes</th>
+              <th>Total Pipeline</th>
+              <th>Layout Sanity</th>
+            </tr>
+          </thead>
+          <tbody>
+            {spatialResults.map((r) => (
+              <tr key={r.profile.name} className="border-t border-slate-800/60 font-mono">
+                <td className="py-1.5 font-bold text-slate-200">{r.profile.name}</td>
+                <td className="text-slate-400">{r.profile.nodes} nodes / {r.profile.edges} edges</td>
+                <td className="text-slate-300">{r.graphConversionMs} ms</td>
+                <td className="text-slate-300">{r.layoutCalculationMs} ms</td>
+                <td className="text-slate-300">{r.layersCalculationMs} ms</td>
+                <td className="text-sky-300 font-bold">{r.totalMs} ms</td>
+                <td>
+                  <ABadge status={r.layoutSane ? "ok" : "bad"} label={r.layoutSane ? "✓ sane" : "invalid"} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="text-[10px] text-slate-500 mt-2">
+          Synthetic profiles benchmark graph conversion, deterministic layered 3D layout bounds, and analytical layer computation across all 8 modes without dropping disconnected nodes.
+        </p>
       </APanel>
 
       <div className="grid gap-3 lg:grid-cols-2">

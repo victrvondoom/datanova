@@ -46,20 +46,20 @@ const ScoreMetric: React.FC<{ probability: number }> = ({ probability }) => {
   }, []);
 
   return (
-    <div className="flex items-end justify-between rounded-xl border border-slate-200/80 dark:border-navy-700/60 bg-slate-50/80 dark:bg-navy-900/40 px-4 py-3">
+    <div className="flex items-end justify-between rounded-xl border border-zinc-200/80 dark:border-navy-700/60 bg-zinc-50/80 dark:bg-navy-900/40 px-4 py-3">
       <div>
-        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">
           Calibrated Fraud Probability
         </div>
         <span
-          className={`ultra-metric text-2xl font-extrabold text-slate-900 dark:text-white ${
+          className={`ultra-metric text-2xl font-extrabold text-zinc-900 dark:text-white ${
             drawn ? "ultra-metric-drawn" : ""
           }`}
         >
           {formatKpiValue(animated, { decimals: 1, suffix: "%" })}
         </span>
       </div>
-      <Activity className="w-5 h-5 text-accent-teal dark:text-accent-cyan shrink-0" aria-hidden="true" />
+      <Activity className="w-5 h-5 text-cyan-700 dark:text-accent-cyan shrink-0" aria-hidden="true" />
     </div>
   );
 };
@@ -70,12 +70,12 @@ const ActionChip: React.FC<{ action: string; probability: number }> = ({ action,
 
   const meta =
     action === "BLOCK"
-      ? { icon: ShieldAlert, cls: "text-rose-500" }
+      ? { icon: ShieldAlert, cls: "text-rose-700 dark:text-rose-400" }
       : action === "REVIEW"
-      ? { icon: Search, cls: "text-amber-500" }
+      ? { icon: Search, cls: "text-amber-700 dark:text-amber-400" }
       : action === "CHALLENGE"
-      ? { icon: ShieldQuestion, cls: "text-accent-teal" }
-      : { icon: ShieldCheck, cls: "text-emerald-500" };
+      ? { icon: ShieldQuestion, cls: "text-cyan-700 dark:text-accent-teal" }
+      : { icon: ShieldCheck, cls: "text-emerald-700 dark:text-emerald-400" };
   const Icon = meta.icon;
 
   return (
@@ -246,17 +246,17 @@ export const ExplainabilityView: React.FC = () => {
         <div className="ultra-grid-overlay absolute inset-0" aria-hidden="true" />
         <div className="relative z-10 space-y-1.5">
           <div className="flex items-center space-x-2">
-            <span className="p-1.5 rounded-lg bg-accent-teal/20 text-accent-cyan border border-accent-teal/30">
+            <span className="p-1.5 rounded-lg bg-accent-teal/20 text-cyan-700 dark:text-accent-cyan border border-accent-teal/30">
               <FileCheck2 className="w-4 h-4" />
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-accent-cyan">
+            <span className="text-xs font-bold uppercase tracking-wider text-cyan-700 dark:text-accent-cyan">
               Responsible AI &amp; Audit Trail
             </span>
           </div>
           <h1 className="text-2xl font-display font-bold tracking-tight text-white">
             Explainability Explorer <span className="ultra-shimmer-text">&amp; Cryptographic Receipts</span>
           </h1>
-          <p className="text-xs text-slate-300 max-w-3xl">
+          <p className="text-xs text-zinc-300 max-w-3xl">
             Complies with GDPR Article 22, ECOA Reg B &amp; EU AI Act high-risk AI governance via exact local TreeSHAP attributions and SHA-256 HMAC cryptographic tokens.
           </p>
         </div>
@@ -264,39 +264,39 @@ export const ExplainabilityView: React.FC = () => {
 
       {/* Dynamic Transaction Scoring Form */}
       <div className="ultra-card ultra-crown p-5 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-200/70 dark:border-navy-700/60">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-200/70 dark:border-navy-700/60">
           <div>
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center space-x-2">
-              <Sparkles className="w-4 h-4 text-accent-teal dark:text-accent-cyan" />
+            <h2 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center space-x-2">
+              <Sparkles className="w-4 h-4 text-cyan-700 dark:text-accent-cyan" />
               <span>Interactive Transaction Scoring Playground</span>
             </h2>
-            <p className="text-xs text-slate-400">Input any transaction payload to trigger live TreeSHAP calculation.</p>
+            <p className="text-xs text-zinc-600 dark:text-zinc-300">Input any transaction payload to trigger live TreeSHAP calculation.</p>
           </div>
 
           {/* Preset Buttons */}
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-slate-400">Presets:</span>
+            <span className="text-xs text-zinc-600 dark:text-zinc-300">Presets:</span>
             <button
               onClick={() => handleApplyPreset("mule")}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20 transition-all"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-purple-500/10 text-purple-700 dark:text-purple-300 border border-purple-500/20 hover:bg-purple-500/20 transition-all"
             >
               Mule Ring
             </button>
             <button
               onClick={() => handleApplyPreset("smurfing")}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20 transition-all"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 transition-all"
             >
               Smurfing
             </button>
             <button
               onClick={() => handleApplyPreset("legit")}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all"
             >
               Legit Coffee
             </button>
             <button
               onClick={() => handleApplyPreset("high_value")}
-              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-blue-500/10 text-accent-teal border border-blue-500/20 hover:bg-blue-500/20 transition-all"
+              className="px-2.5 py-1 text-xs font-medium rounded-lg bg-blue-500/10 text-cyan-700 dark:text-accent-teal border border-blue-500/20 hover:bg-blue-500/20 transition-all"
             >
               High Value
             </button>
@@ -305,39 +305,39 @@ export const ExplainabilityView: React.FC = () => {
 
         <form onSubmit={handleScore} className="grid grid-cols-2 sm:grid-cols-6 gap-3 text-xs">
           <div>
-            <label className="block text-slate-500 font-semibold mb-1">Sender</label>
+            <label className="block text-zinc-600 dark:text-zinc-300 font-semibold mb-1">Sender</label>
             <input
               type="text"
               value={senderId}
               onChange={(e) => setSenderId(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
+              className="w-full px-2.5 py-1.5 rounded-lg border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 font-mono transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
             />
           </div>
           <div>
-            <label className="block text-slate-500 font-semibold mb-1">Receiver</label>
+            <label className="block text-zinc-600 dark:text-zinc-300 font-semibold mb-1">Receiver</label>
             <input
               type="text"
               value={receiverId}
               onChange={(e) => setReceiverId(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
+              className="w-full px-2.5 py-1.5 rounded-lg border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 font-mono transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
             />
           </div>
           <div>
-            <label className="block text-slate-500 font-semibold mb-1">Amount ($)</label>
+            <label className="block text-zinc-600 dark:text-zinc-300 font-semibold mb-1">Amount ($)</label>
             <input
               type="number"
               step="0.01"
               value={amount}
               onChange={(e) => setAmount(parseFloat(e.target.value) || 0)}
-              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono font-bold transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
+              className="w-full px-2.5 py-1.5 rounded-lg border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 font-mono font-bold transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
             />
           </div>
           <div>
-            <label className="block text-slate-500 font-semibold mb-1">Channel</label>
+            <label className="block text-zinc-600 dark:text-zinc-300 font-semibold mb-1">Channel</label>
             <select
               value={channel}
               onChange={(e) => setChannel(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
+              className="w-full px-2.5 py-1.5 rounded-lg border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
             >
               <option value="mobile">Mobile</option>
               <option value="p2p">P2P</option>
@@ -346,12 +346,12 @@ export const ExplainabilityView: React.FC = () => {
             </select>
           </div>
           <div>
-            <label className="block text-slate-500 font-semibold mb-1">Device ID</label>
+            <label className="block text-zinc-600 dark:text-zinc-300 font-semibold mb-1">Device ID</label>
             <input
               type="text"
               value={deviceId}
               onChange={(e) => setDeviceId(e.target.value)}
-              className="w-full px-2.5 py-1.5 rounded-lg border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 font-mono transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
+              className="w-full px-2.5 py-1.5 rounded-lg border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 font-mono transition-colors focus:border-accent-teal dark:focus:border-accent-teal focus:outline-none"
             />
           </div>
           <div className="flex items-end">
@@ -370,12 +370,12 @@ export const ExplainabilityView: React.FC = () => {
       <div className="ultra-stagger grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Col: TreeSHAP Attribution Visualizer */}
         <div className="ultra-card ultra-crown p-5 space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-200/70 dark:border-navy-700/60">
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-zinc-200/70 dark:border-navy-700/60">
             <div>
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+              <h2 className="text-sm font-bold text-zinc-900 dark:text-white">
                 TreeSHAP Local Feature Attribution
               </h2>
-              <span className="text-xs text-slate-400 font-mono">
+              <span className="text-xs text-zinc-600 dark:text-zinc-300 font-mono">
                 {prediction ? `Tx #${prediction.transaction_id}` : "Calculating..."}
               </span>
             </div>
@@ -394,10 +394,10 @@ export const ExplainabilityView: React.FC = () => {
                 return (
                   <div key={idx} className="space-y-1">
                     <div className="flex items-center justify-between text-xs font-mono">
-                      <span className="text-slate-700 dark:text-slate-300 font-semibold">
-                        {feat.feature_name} = <strong className="text-accent-teal dark:text-accent-cyan">{String(feat.feature_value)}</strong>
+                      <span className="text-zinc-700 dark:text-zinc-300 font-semibold">
+                        {feat.feature_name} = <strong className="text-cyan-700 dark:text-accent-cyan">{String(feat.feature_value)}</strong>
                       </span>
-                      <span className={`font-bold ${isPositive ? "text-rose-500" : "text-emerald-500"}`}>
+                      <span className={`font-bold ${isPositive ? "text-rose-700 dark:text-rose-400" : "text-emerald-700 dark:text-emerald-400"}`}>
                         {isPositive ? `+${feat.shap_value.toFixed(3)}` : feat.shap_value.toFixed(3)}
                       </span>
                     </div>
@@ -406,17 +406,17 @@ export const ExplainabilityView: React.FC = () => {
                 );
               })
             ) : (
-              <div className="text-xs text-slate-400 p-4 text-center">Loading feature attributions...</div>
+              <div className="text-xs text-zinc-600 dark:text-zinc-300 p-4 text-center">Loading feature attributions...</div>
             )}
           </div>
 
           {/* Adverse Action Notice Generator */}
-          <div className="p-4 rounded-xl border border-slate-200/80 dark:border-navy-700/70 bg-slate-50/80 dark:bg-navy-900/60 text-xs space-y-1.5">
-            <div className="font-bold text-slate-900 dark:text-white flex items-center space-x-1.5">
+          <div className="p-4 rounded-xl border border-zinc-200/80 dark:border-navy-700/70 bg-zinc-50/80 dark:bg-navy-900/60 text-xs space-y-1.5">
+            <div className="font-bold text-zinc-900 dark:text-white flex items-center space-x-1.5">
               <span>Regulatory Adverse Action Narrative</span>
-              <span className="text-[10px] text-slate-400 font-normal">(Automated Plain-English)</span>
+              <span className="text-[10px] text-zinc-600 dark:text-zinc-300 font-normal">(Automated Plain-English)</span>
             </div>
-            <p className="text-slate-600 dark:text-slate-300 text-[11px] leading-relaxed">
+            <p className="text-zinc-600 dark:text-zinc-300 text-[11px] leading-relaxed">
               {generateNarrative()}
             </p>
           </div>
@@ -425,33 +425,33 @@ export const ExplainabilityView: React.FC = () => {
         {/* Right Col: Cryptographic Receipt Inspector & Verification Workbench (focal panel) */}
         <div className="ultra-gradient-ring rounded-2xl">
           <div className="ultra-card rounded-2xl p-5 space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-200/70 dark:border-navy-700/60">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-200/70 dark:border-navy-700/60">
               <div className="flex items-center space-x-2">
-                <Fingerprint className="w-4 h-4 text-accent-teal dark:text-accent-cyan" />
-                <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+                <Fingerprint className="w-4 h-4 text-cyan-700 dark:text-accent-cyan" />
+                <h2 className="text-sm font-bold text-zinc-900 dark:text-white">
                   Cryptographic HMAC-SHA256 Receipt
                 </h2>
               </div>
               <button
                 onClick={handleCopy}
-                className="flex items-center space-x-1 text-xs text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors"
+                className="flex items-center space-x-1 text-xs py-1.5 px-2 rounded-md text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white transition-colors"
               >
-                {copied ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                 <span>{copied ? "Copied" : "Copy JSON"}</span>
               </button>
             </div>
 
-            <div className="p-3.5 rounded-xl bg-slate-900 text-slate-200 font-mono text-[11px] overflow-x-auto max-h-[220px] border border-slate-700/60 shadow-inner">
+            <div className="p-3.5 rounded-xl bg-zinc-900 text-zinc-200 font-mono text-[11px] overflow-x-auto max-h-[220px] border border-zinc-700/60 shadow-inner">
               <pre>{receiptPayload ? JSON.stringify(receiptPayload, null, 2) : "Generating receipt..."}</pre>
             </div>
 
             {/* Live Cryptographic Verification Workbench */}
             <div className="space-y-3 pt-2">
               <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center space-x-2">
+                <span className="font-bold text-zinc-700 dark:text-zinc-300 flex items-center space-x-2">
                   <span>Live Tamper-Evidence Workbench:</span>
                   {verifyResult && (
-                    <span className={`ultra-chip font-bold ${isTampered ? "text-rose-500" : "text-emerald-500"}`}>
+                    <span className={`ultra-chip font-bold ${isTampered ? "text-rose-700 dark:text-rose-400" : "text-emerald-700 dark:text-emerald-400"}`}>
                       {isTampered ? (
                         <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                       ) : (
@@ -461,14 +461,14 @@ export const ExplainabilityView: React.FC = () => {
                     </span>
                   )}
                 </span>
-                <span className="text-[10px] text-slate-400 font-mono">Calls /api/receipts/verify</span>
+                <span className="text-[10px] text-zinc-600 dark:text-zinc-300 font-mono">Calls /api/receipts/verify</span>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <button
                   onClick={() => handleVerify(false)}
                   disabled={verifying}
-                  className="py-2 px-3 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-500/20 hover:scale-[1.02] transition-all text-center flex items-center justify-center space-x-1.5 shadow-glow-emerald disabled:opacity-50 disabled:hover:scale-100"
+                  className="py-2 px-3 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 hover:scale-[1.02] transition-all text-center flex items-center justify-center space-x-1.5 shadow-glow-emerald disabled:opacity-50 disabled:hover:scale-100"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>Verify Authentic</span>
@@ -476,7 +476,7 @@ export const ExplainabilityView: React.FC = () => {
                 <button
                   onClick={() => handleVerify(true)}
                   disabled={verifying}
-                  className="py-2 px-3 rounded-xl text-xs font-bold bg-rose-500/10 text-rose-500 border border-rose-500/20 hover:bg-rose-500/20 hover:scale-[1.02] transition-all text-center flex items-center justify-center space-x-1.5 disabled:opacity-50 disabled:hover:scale-100"
+                  className="py-2 px-3 rounded-xl text-xs font-bold bg-rose-500/10 text-rose-700 dark:text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 hover:scale-[1.02] transition-all text-center flex items-center justify-center space-x-1.5 disabled:opacity-50 disabled:hover:scale-100"
                 >
                   <AlertCircle className="w-4 h-4" />
                   <span>Simulate Tamper Edit</span>
@@ -487,20 +487,20 @@ export const ExplainabilityView: React.FC = () => {
                 <div
                   className={`p-3 rounded-xl border text-xs space-y-1 ${
                     verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE"
-                      ? "bg-amber-500/10 border-amber-500/30 text-amber-500"
+                      ? "bg-amber-500/10 border-amber-500/30 text-amber-700 dark:text-amber-400"
                       : verifyResult.is_valid
-                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
-                      : "bg-rose-500/10 border-rose-500/30 text-rose-500"
+                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-400"
+                      : "bg-rose-500/10 border-rose-500/30 text-rose-700 dark:text-rose-400"
                   }`}
                 >
                   <div className="flex items-center">
                     <span
                       className={`ultra-chip font-bold ${
                         verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE"
-                          ? "text-amber-500"
+                          ? "text-amber-700 dark:text-amber-400"
                           : verifyResult.is_valid
-                          ? "text-emerald-500"
-                          : "text-rose-500"
+                          ? "text-emerald-700 dark:text-emerald-400"
+                          : "text-rose-700 dark:text-rose-400"
                       }`}
                     >
                       {verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE" ? (
@@ -513,7 +513,7 @@ export const ExplainabilityView: React.FC = () => {
                       <span className="font-mono">VERIFICATION RESULT: {verifyResult.status}</span>
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300">
+                  <p className="text-[11px] text-zinc-600 dark:text-zinc-300">
                     {verifyResult.status === "VERIFICATION_UNAVAILABLE_OFFLINE"
                       ? "Verification engine is offline. No authenticity claim can be made without the server-side HMAC key — start the API to verify this receipt."
                       : verifyResult.is_valid

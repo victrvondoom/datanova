@@ -1,6 +1,6 @@
 # AEGIS-Fraud X — Comprehensive Benchmark & Empirical Evidence Report
 
-**Generated:** 2026-10-31 08:16:21 UTC
+**Generated:** 2026-11-04 08:38:46 UTC
 **Evaluation Protocol:** Strict Chronological Train (60%) -> Val (20%) -> Test (20%)
 **Dataset:** Deterministic Synthetic Benchmark (10,000 transactions, 2% ground truth fraud)
 
@@ -10,21 +10,21 @@
 
 | Model Architecture | PR-AUC | ROC-AUC | Recall @ FPR=1% | Brier Score | ECE | Latency (ms) | Operational Cost ($) |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
-| **Rule-Based Heuristic** | **0.0949** | 0.6091 | 0.1245 | 0.0198 | 0.0041 | 0.00 ms | $35,750.07 |
-| **Logistic Regression** | **0.4509** | 0.9646 | 0.4303 | 0.0143 | 0.0039 | 0.00 ms | $27,844.57 |
-| **Random Forest** | **0.7190** | 0.9783 | 0.6724 | 0.0096 | 0.0036 | 0.01 ms | $9,581.30 |
-| **LightGBM (Tabular)** | **0.7240** | 0.9891 | 0.6887 | 0.0086 | 0.0043 | 0.00 ms | $5,960.88 |
-| **XGBoost** | **0.7147** | 0.9915 | 0.7141 | 0.0091 | 0.0048 | 0.00 ms | $7,442.83 |
-| **AEGIS LightGBM + Graph** | **0.7667** | 0.9905 | 0.7753 | 0.0082 | 0.0037 | 0.00 ms | $5,940.88 |
+| **Rule-Based Heuristic** | **0.0924** | 0.6006 | 0.2108 | 0.0196 | 0.0032 | 0.00 ms | $38,577.83 |
+| **Logistic Regression** | **0.5374** | 0.9875 | 0.5016 | 0.0124 | 0.0043 | 0.00 ms | $30,761.07 |
+| **Random Forest** | **0.8537** | 0.9944 | 0.8569 | 0.0069 | 0.0043 | 0.01 ms | $4,069.70 |
+| **LightGBM (Tabular)** | **0.8603** | 0.9959 | 0.9135 | 0.0056 | 0.0039 | 0.00 ms | $5,761.16 |
+| **XGBoost** | **0.8520** | 0.9929 | 0.8409 | 0.0060 | 0.0013 | 0.00 ms | $4,322.79 |
+| **AEGIS LightGBM + Graph** | **0.8513** | 0.9943 | 0.9104 | 0.0063 | 0.0039 | 0.00 ms | $6,556.41 |
 
 ---
 
 ## 2. Champion Model 95% Bootstrap Confidence Intervals
 
-**Champion Model:** `XGBoost`
+**Champion Model:** `AEGIS LightGBM + Graph`
 
-- **PR-AUC (95% CI):** [0.5912, 0.8294] (Mean: 0.7169)
-- **ROC-AUC (95% CI):** [0.9863, 0.9961] (Mean: 0.9916)
+- **PR-AUC (95% CI):** [0.7407, 0.9326] (Mean: 0.8533)
+- **ROC-AUC (95% CI):** [0.9880, 0.9983] (Mean: 0.9946)
 
 ---
 
@@ -32,9 +32,9 @@
 
 | Operational Regime | Allow ($	au_{allow}$) | Review ($	au_{rev}$) | Block ($	au_{blk}$) | False Alarm Rate (FPR) | Total Cost ($) | Net Dollar Savings ($) |
 |:---|:---:|:---:|:---:|:---:|:---:|:---:|
-| Fixed-Threshold (p>=0.5) | 0.50 | 0.50 | 0.50 | 0.10% | $7,107.83 | **$31,470.00** (81.6%) |
-| Conservative Heuristic | 0.30 | 0.70 | 0.95 | 0.10% | $7,107.83 | **$31,470.00** (81.6%) |
-| Cost-Aware-Optimized | 0.22 | 1.00 | 1.00 | 0.20% | $5,376.27 | **$33,201.56** (86.1%) |
+| Fixed-Threshold (p>=0.5) | 0.50 | 0.50 | 0.50 | 0.05% | $6,171.41 | **$32,406.42** (84.0%) |
+| Conservative Heuristic | 0.30 | 0.70 | 0.95 | 0.41% | $2,492.29 | **$36,085.54** (93.5%) |
+| Cost-Aware-Optimized | 0.18 | 0.50 | 0.50 | 0.82% | $1,757.21 | **$36,820.62** (95.5%) |
 
 ---
 
@@ -46,11 +46,11 @@ is provably optimal under the hard constraints.
 
 | Solver | Validation Cost ($) | Solve Time (ms) | Out-of-Sample Test Cost ($) | Test FPR |
 |:---|:---:|:---:|:---:|:---:|
-| Exact (deployed) | 4,711.44 | 2.42 | 5,376.27 | 0.20% |
-| Legacy coarse grid | 4,711.44 | 63.15 | 5,376.27 | 0.20% |
+| Exact (deployed) | 1,912.94 | 2.85 | 1,757.21 | 0.82% |
+| Legacy coarse grid | 2,460.29 | 89.90 | 2,722.70 | 0.36% |
 
-- **Optimization gap (validation):** $0.00
-  (0.00% of the exact optimum)
+- **Optimization gap (validation):** $547.35
+  (28.61% of the exact optimum)
 - Out-of-sample figures are frozen-policy evaluations on the held-out test set;
   they are NOT used for selection or tuning.
 

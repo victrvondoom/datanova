@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Network, Search, ShieldAlert, RefreshCw, ArrowUpRight, ArrowDownLeft, Store, User, Smartphone, Zap } from "lucide-react";
 import { fetchGraphSubgraph } from "../api";
+import { useLive } from "../lib/useLive";
+import { LiveStatusChip } from "../components/LiveStatusChip";
 import { GraphNode, GraphEdge } from "../types";
 import { useCountUp } from "../lib/useCountUp";
 import { formatKpiValue } from "../lib/ultra";
@@ -17,6 +19,10 @@ const AnimatedMoney: React.FC<{ value: number }> = ({ value }) => {
   return <>{formatKpiValue(animated, { decimals: 2, prefix: "$" })}</>;
 };
 
+// Stable empty payloads so derived mememos don't re-run while connecting.
+const EMPTY_NODES: GraphNode[] = [];
+const EMPTY_EDGES: GraphEdge[] = [];
+
 /** Animated percentage readout (risk score). */
 const AnimatedPercent: React.FC<{ value: number }> = ({ value }) => {
   const animated = useCountUp(value, { durationMs: 1100 });
@@ -24,37 +30,25 @@ const AnimatedPercent: React.FC<{ value: number }> = ({ value }) => {
 };
 
 export const FraudGraphView: React.FC = () => {
-  const [nodes, setNodes] = useState<GraphNode[]>([]);
-  const [edges, setEdges] = useState<GraphEdge[]>([]);
-  const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
+  // The user's click is the only selection state; the graph itself derives
+  // straight from the live payload (no state sync, no cascading renders).
+  const [userSelected, setUserSelected] = useState<GraphNode | null>(null);
   const [filterType, setFilterType] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(false);
 
-  const loadGraph = async () => {
-    setLoading(true);
-    try {
-      const data = await fetchGraphSubgraph();
-      setNodes(data.nodes);
-      setEdges(data.edges);
-      if (data.nodes.length > 0) {
-        // Select first mule node or first node
-        const firstMule = data.nodes.find((n) => n.id.includes("mule")) || data.nodes[0];
-        setSelectedNode(firstMule);
-      }
-    } catch (err: any) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // The fraud graph is live: the base ego-net polls every 45s (and refetches
+  // on focus) so newly observed relationships appear without a reload.
+  const graphLive = useLive(fetchGraphSubgraph, 45_000);
+  const loading = graphLive.refreshing;
+  const nodes: GraphNode[] = graphLive.data?.nodes ?? EMPTY_NODES;
+  const edges: GraphEdge[] = graphLive.data?.edges ?? EMPTY_EDGES;
 
-  useEffect(() => {
-    // deferred off the render commit (avoids cascading setState in the
-    // effect body)
-    const t = window.setTimeout(() => loadGraph(), 0);
-    return () => window.clearTimeout(t);
-  }, []);
+  // Preserve the user's selection across refreshes; fall back to the first
+  // mule node when the selection disappears from the live graph.
+  const selectedNode = useMemo<GraphNode | null>(() => {
+    if (userSelected && nodes.some((n) => n.id === userSelected.id)) return userSelected;
+    return nodes.find((n) => n.id.includes("mule")) ?? nodes[0] ?? null;
+  }, [userSelected, nodes]);
 
   const filteredNodes = useMemo(() => {
     return nodes.filter((n) => {
@@ -113,17 +107,17 @@ export const FraudGraphView: React.FC = () => {
         <div className="ultra-grid-overlay absolute inset-0 pointer-events-none" aria-hidden="true" />
         <div className="relative">
           <div className="flex items-center space-x-2">
-            <span className="p-1.5 rounded-lg bg-accent-teal/10 text-accent-teal">
+            <span className="p-1.5 rounded-lg bg-accent-teal/10 text-cyan-700 dark:text-accent-teal">
               <Network className="w-4 h-4" />
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-accent-teal">
+            <span className="text-xs font-bold uppercase tracking-wider text-cyan-700 dark:text-accent-teal">
               Temporal Ego-Net Intelligence
             </span>
           </div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white mt-1">
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-white mt-1">
             Fraud Syndicate &amp; Mule Ring <span className="ultra-shimmer-text">Graph Explorer</span>
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-zinc-600 dark:text-zinc-300">
             Uncovering circular laundering structures (A &rarr; B &rarr; C &rarr; A) and multi-account device proliferation.
           </p>
         </div>
@@ -131,20 +125,20 @@ export const FraudGraphView: React.FC = () => {
         {/* Filter Controls & Reload */}
         <div className="relative flex flex-wrap items-center gap-3">
           <div className="relative">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
+            <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-zinc-600 dark:text-zinc-300" />
             <input
               type="text"
               placeholder="Search account / device..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 pr-3 py-1.5 text-xs rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-800 dark:text-slate-200 focus:outline-none focus:border-accent-teal"
+              className="pl-8 pr-3 py-1.5 text-xs rounded-xl border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:border-accent-teal"
             />
           </div>
 
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-3 py-1.5 text-xs rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-800 dark:text-slate-200 focus:outline-none"
+            className="px-3 py-1.5 text-xs rounded-xl border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 text-zinc-800 dark:text-zinc-200 focus:outline-none"
           >
             <option value="all">All Entities</option>
             <option value="mule_account">Mule Rings Only</option>
@@ -153,12 +147,18 @@ export const FraudGraphView: React.FC = () => {
             <option value="device">Devices</option>
           </select>
 
+          <LiveStatusChip
+            lastUpdatedAt={graphLive.lastUpdatedAt}
+            refreshing={graphLive.refreshing}
+            onRefresh={() => void graphLive.refresh()}
+          />
           <button
-            onClick={loadGraph}
+            onClick={() => void graphLive.refresh()}
             disabled={loading}
-            className="p-2 rounded-xl border bg-slate-50 dark:bg-navy-900 border-slate-200 dark:border-navy-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-navy-700"
+            className="p-2 rounded-xl border bg-zinc-50 dark:bg-navy-900 border-zinc-200 dark:border-navy-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-navy-700"
+            aria-label="Reload graph"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-accent-teal" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin text-cyan-700 dark:text-accent-teal" : ""}`} />
           </button>
         </div>
       </div>
@@ -167,18 +167,18 @@ export const FraudGraphView: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 ultra-stagger">
         {/* Left 2 Cols: Network Visualizer SVG */}
         <div className="ultra-card ultra-gradient-ring lg:col-span-2 p-5 flex flex-col justify-between min-h-[520px]">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-navy-700 text-xs text-slate-400">
+          <div className="flex items-center justify-between pb-3 border-b border-zinc-100 dark:border-navy-700 text-xs text-zinc-600 dark:text-zinc-300">
             <span>Dynamic Bipartite Ego-Net (<AnimatedCount value={nodes.length} /> Nodes &bull; <AnimatedCount value={edges.length} /> Directed Edges)</span>
             <div className="flex items-center space-x-2">
-              <span className="ultra-chip text-slate-600 dark:text-slate-300">
+              <span className="ultra-chip text-zinc-600 dark:text-zinc-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-500"></span>
                 <span>Mule Ring Node</span>
               </span>
-              <span className="ultra-chip text-slate-600 dark:text-slate-300">
+              <span className="ultra-chip text-zinc-600 dark:text-zinc-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-accent-teal"></span>
                 <span>Legitimate User</span>
               </span>
-              <span className="ultra-chip text-slate-600 dark:text-slate-300">
+              <span className="ultra-chip text-zinc-600 dark:text-zinc-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
                 <span>Merchant / Gateway</span>
               </span>
@@ -186,7 +186,7 @@ export const FraudGraphView: React.FC = () => {
           </div>
 
           {/* Render Network Graph in SVG */}
-          <div className="ultra-grid-overlay relative w-full h-[400px] my-3 rounded-xl bg-slate-50 dark:bg-navy-950/80 border border-slate-100 dark:border-navy-750 overflow-hidden flex items-center justify-center">
+          <div className="ultra-grid-overlay relative w-full h-[400px] my-3 rounded-xl bg-zinc-50 dark:bg-navy-950/80 border border-zinc-100 dark:border-navy-750 overflow-hidden flex items-center justify-center">
             <svg viewBox="0 0 720 400" className="w-full h-full select-none">
               <defs>
                 <marker
@@ -255,7 +255,7 @@ export const FraudGraphView: React.FC = () => {
                   <g
                     key={`node-${node.id}`}
                     className="cursor-pointer transition-transform hover:scale-115"
-                    onClick={() => setSelectedNode(node)}
+                    onClick={() => setUserSelected(node)}
                   >
                     {isMule && (
                       <circle
@@ -281,7 +281,7 @@ export const FraudGraphView: React.FC = () => {
                       y={pos.y + 22}
                       textAnchor="middle"
                       fill="currentColor"
-                      className="text-[10px] font-bold font-mono text-slate-700 dark:text-slate-200 pointer-events-none drop-shadow-xs"
+                      className="text-[10px] font-bold font-mono text-zinc-700 dark:text-zinc-200 pointer-events-none drop-shadow-xs"
                     >
                       {node.id}
                     </text>
@@ -291,9 +291,9 @@ export const FraudGraphView: React.FC = () => {
             </svg>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100 dark:border-navy-700">
+          <div className="flex items-center justify-between text-xs text-zinc-600 dark:text-zinc-300 pt-2 border-t border-zinc-100 dark:border-navy-700">
             <span>Tip: Click any node to highlight immediate counterparties and flow volumes.</span>
-            <span className="ultra-chip font-mono text-accent-teal">
+            <span className="ultra-chip font-mono text-cyan-700 dark:text-accent-teal">
               <Zap className="w-3 h-3 shrink-0" />
               <span>Sub-20ms Ego-Net Latency Bounded</span>
             </span>
@@ -308,22 +308,22 @@ export const FraudGraphView: React.FC = () => {
           const ChipIcon = isMuleNode ? ShieldAlert : isMerchNode ? Store : isDeviceNode ? Smartphone : User;
           return (
           <div className="ultra-card ultra-crown p-5 space-y-4">
-            <div className="pb-3 border-b border-slate-100 dark:border-navy-700 flex items-center justify-between">
+            <div className="pb-3 border-b border-zinc-100 dark:border-navy-700 flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-zinc-600 dark:text-zinc-300">
                   Node Investigation
                 </span>
-                <div className="text-sm font-bold font-mono text-slate-900 dark:text-white">
+                <div className="text-sm font-bold font-mono text-zinc-900 dark:text-white">
                   {selectedNode.id}
                 </div>
               </div>
               <span
                 className={`ultra-chip uppercase font-bold ${
                   isMuleNode
-                    ? "text-rose-500 border-rose-500/30 bg-rose-500/10"
+                    ? "text-rose-700 dark:text-rose-400 border-rose-500/30 bg-rose-500/10"
                     : isMerchNode
-                    ? "text-amber-500 border-amber-500/30 bg-amber-500/10"
-                    : "text-accent-teal border-accent-teal/30 bg-accent-teal/10"
+                    ? "text-amber-700 dark:text-amber-400 border-amber-500/30 bg-amber-500/10"
+                    : "text-cyan-700 dark:text-accent-teal border-accent-teal/30 bg-accent-teal/10"
                 }`}
               >
                 <ChipIcon className="w-3 h-3 shrink-0" />
@@ -334,14 +334,14 @@ export const FraudGraphView: React.FC = () => {
             {/* Risk Score */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-semibold">
-                <span className="text-slate-500">Node Structural Risk Score:</span>
+                <span className="text-zinc-600 dark:text-zinc-300">Node Structural Risk Score:</span>
                 <span
                   className={`font-mono font-bold ${
                     selectedNode.risk_score >= 0.75
-                      ? "text-rose-500"
+                      ? "text-rose-700 dark:text-rose-400"
                       : selectedNode.risk_score >= 0.4
-                      ? "text-amber-500"
-                      : "text-emerald-500"
+                      ? "text-amber-700 dark:text-amber-400"
+                      : "text-emerald-700 dark:text-emerald-400"
                   }`}
                 >
                   <AnimatedPercent value={selectedNode.risk_score * 100} />
@@ -357,17 +357,17 @@ export const FraudGraphView: React.FC = () => {
 
             {/* Degree & Topology Metrics */}
             <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700">
-                <span className="text-slate-400 block text-[10px]">In-Degree (Fan-In):</span>
-                <span className="text-base font-bold text-slate-900 dark:text-white font-mono flex items-center space-x-1">
-                  <ArrowDownLeft className="w-3.5 h-3.5 text-accent-teal" />
+              <div className="p-3 rounded-xl bg-zinc-50 dark:bg-navy-900/40 border border-zinc-100 dark:border-navy-700">
+                <span className="text-zinc-600 dark:text-zinc-300 block text-[10px]">In-Degree (Fan-In):</span>
+                <span className="text-base font-bold text-zinc-900 dark:text-white font-mono flex items-center space-x-1">
+                  <ArrowDownLeft className="w-3.5 h-3.5 text-cyan-700 dark:text-accent-teal" />
                   <span><AnimatedCount value={selectedNode.in_degree} /></span>
                 </span>
               </div>
-              <div className="p-3 rounded-xl bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700">
-                <span className="text-slate-400 block text-[10px]">Out-Degree (Fan-Out):</span>
-                <span className="text-base font-bold text-slate-900 dark:text-white font-mono flex items-center space-x-1">
-                  <ArrowUpRight className="w-3.5 h-3.5 text-rose-500" />
+              <div className="p-3 rounded-xl bg-zinc-50 dark:bg-navy-900/40 border border-zinc-100 dark:border-navy-700">
+                <span className="text-zinc-600 dark:text-zinc-300 block text-[10px]">Out-Degree (Fan-Out):</span>
+                <span className="text-base font-bold text-zinc-900 dark:text-white font-mono flex items-center space-x-1">
+                  <ArrowUpRight className="w-3.5 h-3.5 text-rose-700 dark:text-rose-400" />
                   <span><AnimatedCount value={selectedNode.out_degree} /></span>
                 </span>
               </div>
@@ -375,41 +375,41 @@ export const FraudGraphView: React.FC = () => {
 
             {/* Connected Transaction Flows */}
             <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs font-bold text-slate-900 dark:text-white">
+              <div className="flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-white">
                 <span>Direct Flows (<AnimatedCount value={connectedEdges.length} />)</span>
-                <span className="text-[10px] text-slate-400 font-normal">24h Ego Window</span>
+                <span className="text-[10px] text-zinc-600 dark:text-zinc-300 font-normal">24h Ego Window</span>
               </div>
               <div className="space-y-1.5 max-h-[160px] overflow-y-auto">
                 {connectedEdges.length > 0 ? (
                   connectedEdges.map((e, idx) => (
                     <div
                       key={idx}
-                      className="ultra-row p-2 rounded-lg bg-slate-50 dark:bg-navy-900/40 border border-slate-100 dark:border-navy-700 text-xs flex items-center justify-between font-mono"
+                      className="ultra-row p-2 rounded-lg bg-zinc-50 dark:bg-navy-900/40 border border-zinc-100 dark:border-navy-700 text-xs flex items-center justify-between font-mono"
                     >
-                      <div className="truncate text-slate-700 dark:text-slate-300">
+                      <div className="truncate text-zinc-700 dark:text-zinc-300">
                         {e.source === selectedNode.id ? (
                           <span>&rarr; {e.target}</span>
                         ) : (
                           <span>&larr; {e.source}</span>
                         )}
                       </div>
-                      <span className="font-bold text-accent-teal"><AnimatedMoney value={e.amount} /></span>
+                      <span className="font-bold text-cyan-700 dark:text-accent-teal"><AnimatedMoney value={e.amount} /></span>
                     </div>
                   ))
                 ) : (
-                  <div className="text-xs text-slate-400 p-2 italic">No active direct flows in 24h window.</div>
+                  <div className="text-xs text-zinc-600 dark:text-zinc-300 p-2 italic">No active direct flows in 24h window.</div>
                 )}
               </div>
             </div>
 
             {/* Syndicate Loop Indicator */}
             {selectedNode.id.includes("mule") && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 text-xs space-y-1">
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-700 dark:text-rose-400 text-xs space-y-1">
                 <div className="flex items-center space-x-1.5 font-bold">
                   <ShieldAlert className="w-4 h-4 shrink-0" />
                   <span>Circular Laundering Ring Detected</span>
                 </div>
-                <p className="text-[11px] text-slate-600 dark:text-slate-300">
+                <p className="text-[11px] text-zinc-600 dark:text-zinc-300">
                   NetworkX 2-to-3 hop cycle detection confirms circular smurfing topology (A &rarr; B &rarr; C &rarr; A).
                 </p>
               </div>

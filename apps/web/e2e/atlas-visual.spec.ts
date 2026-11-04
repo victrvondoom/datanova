@@ -6,7 +6,7 @@
 import { test, expect } from "@playwright/test";
 import * as fs from "node:fs";
 
-const OUT = "docs/campaign-06/evidence/screens";
+const OUT = fs.existsSync("../../docs/campaign-06") ? "../../docs/campaign-06/evidence/screens" : "docs/campaign-06/evidence/screens";
 
 const shoot = async (page: import("@playwright/test").Page, name: string): Promise<void> => {
   await page.screenshot({ path: `${OUT}/${name}.png`, fullPage: false });

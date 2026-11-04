@@ -201,7 +201,7 @@ export const AtlasApp: React.FC = () => {
               setAnnounce={setAnnounce}
             />
           )}
-          {section === "exchange" && <ExchangeView model={model} onNavigate={navigate} />}
+          {section === "exchange" && <ExchangeView model={model} onNavigate={navigate} onAdoptModel={setModel} />}
           {section === "benchmarks" && <BenchmarksView />}
           {section === "sources" && <SourcesView />}
           {section === "decisions" && <DecisionsView model={model} project={project} />}

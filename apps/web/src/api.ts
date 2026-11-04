@@ -220,6 +220,22 @@ export async function evaluateDrift() {
   }
 }
 
+/** Live process metrics (uptime + request counters). Offline: degraded snapshot. */
+export async function fetchMetrics() {
+  try {
+    const res = await fetch(`${getApiBase()}/metrics`);
+    if (!res.ok) throw new Error("Metrics failed");
+    return await res.json();
+  } catch {
+    return {
+      degraded: true,
+      source: "offline-fallback",
+      uptime_seconds: null as number | null,
+      counters: {} as Record<string, number>,
+    };
+  }
+}
+
 export async function scoreTransaction(tx: any): Promise<PredictionResult> {
   try {
     const res = await fetch(`${getApiBase()}/score`, {

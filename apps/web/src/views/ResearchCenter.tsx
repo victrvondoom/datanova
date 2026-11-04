@@ -2,6 +2,9 @@ import React from "react";
 import { BookOpenCheck, FileText, CheckCircle2, Database, Award } from "lucide-react";
 import { useCountUp } from "../lib/useCountUp";
 import { formatKpiValue } from "../lib/ultra";
+import { fetchBenchmarks } from "../api";
+import { useLive } from "../lib/useLive";
+import { LiveStatusChip } from "../components/LiveStatusChip";
 
 /** Animated count chip for the hero (icon + mono count-up label). */
 const CountChip: React.FC<{
@@ -11,7 +14,7 @@ const CountChip: React.FC<{
 }> = ({ icon: Icon, value, label }) => {
   const animated = useCountUp(value, { durationMs: 1200 });
   return (
-    <span className="ultra-chip text-accent-cyan">
+    <span className="ultra-chip text-cyan-700 dark:text-accent-cyan">
       <Icon className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
       <span className="font-mono font-bold">
         {formatKpiValue(animated, { decimals: 0 })} {label}
@@ -36,26 +39,31 @@ const DatasetCard: React.FC<{
   return (
     <div className="ultra-card ultra-crown p-4 space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <span className="font-bold text-xs text-slate-900 dark:text-white">{name}</span>
-        <span className="ultra-chip text-emerald-500">
+        <span className="font-bold text-xs text-zinc-900 dark:text-white">{name}</span>
+        <span className="ultra-chip text-emerald-700 dark:text-emerald-400">
           <CheckCircle2 className="w-3 h-3 shrink-0" aria-hidden="true" />
           <span className="font-bold">{status}</span>
         </span>
       </div>
-      <div className="text-[11px] text-slate-500 space-y-0.5">
+      <div className="text-[11px] text-zinc-600 dark:text-zinc-300 space-y-0.5">
         <div>
-          Scale: <strong className="text-slate-700 dark:text-slate-300">{formatKpiValue(size, { decimals: 0 })} {sizeUnit}</strong>
+          Scale: <strong className="text-zinc-700 dark:text-zinc-300">{formatKpiValue(size, { decimals: 0 })} {sizeUnit}</strong>
         </div>
         <div>
-          Prevalence: <strong className="text-slate-700 dark:text-slate-300">{formatKpiValue(rate, { decimals: rateDecimals })}%</strong>
+          Prevalence: <strong className="text-zinc-700 dark:text-zinc-300">{formatKpiValue(rate, { decimals: rateDecimals })}%</strong>
         </div>
-        <div className="text-[10px] font-mono text-accent-teal dark:text-accent-cyan pt-1">{designation}</div>
+        <div className="text-[10px] font-mono text-cyan-700 dark:text-accent-cyan pt-1">{designation}</div>
       </div>
     </div>
   );
 };
 
 export const ResearchCenter: React.FC = () => {
+  // The artifact catalog is repository content, but its freshness is live:
+  // when benchmark artifacts are regenerated, this chip picks it up.
+  const artifactsLive = useLive(fetchBenchmarks, 60_000);
+  const artifactsData: any = artifactsLive.data;
+
   const artifacts = [
     {
       title: "Comprehensive Benchmark Report",
@@ -139,9 +147,20 @@ export const ResearchCenter: React.FC = () => {
           <h1 className="text-2xl font-display font-bold tracking-tight text-white">
             Research, Provenance <span className="ultra-shimmer-text">&amp; Evidence Center</span>
           </h1>
-          <p className="text-xs text-slate-300 max-w-3xl">
+          <p className="text-xs text-zinc-300 max-w-3xl">
             All benchmark numbers, model cards, and ablation claims are bound to verifiable repository artifacts.
           </p>
+          <div className="flex items-center gap-2 flex-wrap pt-1">
+            <LiveStatusChip
+              lastUpdatedAt={artifactsLive.lastUpdatedAt}
+              refreshing={artifactsLive.refreshing}
+              degraded={artifactsData?.degraded === true}
+              onRefresh={() => void artifactsLive.refresh()}
+            />
+            <span className="text-[11px] font-mono text-zinc-300">
+              last artifact run: {artifactsData?.timestamp ?? "—"}
+            </span>
+          </div>
           <div className="flex flex-wrap items-center gap-2 pt-1.5">
             <CountChip icon={Award} value={artifacts.length} label="Deliverables" />
             <CountChip icon={Database} value={datasets.length} label="Datasets" />
@@ -151,7 +170,7 @@ export const ResearchCenter: React.FC = () => {
 
       {/* Dataset Provenance Matrix */}
       <div className="ultra-card ultra-crown p-5 space-y-4">
-        <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+        <h2 className="text-sm font-bold text-zinc-900 dark:text-white">
           Dataset Provenance &amp; Integrity Manifests
         </h2>
 
@@ -173,7 +192,7 @@ export const ResearchCenter: React.FC = () => {
 
       {/* Verified Artifacts List */}
       <div className="ultra-card ultra-crown p-5 space-y-4">
-        <h2 className="text-sm font-bold text-slate-900 dark:text-white">
+        <h2 className="text-sm font-bold text-zinc-900 dark:text-white">
           Competition Submission Deliverables
         </h2>
 
@@ -181,22 +200,22 @@ export const ResearchCenter: React.FC = () => {
           {artifacts.map((art, i) => (
             <div
               key={i}
-              className="ultra-row p-4 rounded-xl border border-slate-200/80 dark:border-navy-700/70 bg-slate-50/80 dark:bg-navy-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+              className="ultra-row p-4 rounded-xl border border-zinc-200/80 dark:border-navy-700/70 bg-zinc-50/80 dark:bg-navy-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
             >
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <FileText className="w-4 h-4 text-accent-teal dark:text-accent-cyan shrink-0" aria-hidden="true" />
-                  <span className="font-bold text-xs text-slate-900 dark:text-white">{art.title}</span>
-                  <span className="ultra-chip text-slate-500 dark:text-slate-400 font-mono">
+                  <FileText className="w-4 h-4 text-cyan-700 dark:text-accent-cyan shrink-0" aria-hidden="true" />
+                  <span className="font-bold text-xs text-zinc-900 dark:text-white">{art.title}</span>
+                  <span className="ultra-chip text-zinc-600 dark:text-zinc-300 font-mono">
                     {art.type}
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400">{art.desc}</p>
-                <div className="text-[10px] font-mono text-slate-400">{art.path}</div>
+                <p className="text-[11px] text-zinc-600 dark:text-zinc-300">{art.desc}</p>
+                <div className="text-[10px] font-mono text-zinc-600 dark:text-zinc-300">{art.path}</div>
               </div>
 
               <div className="flex items-center space-x-2 shrink-0">
-                <span className="ultra-chip text-emerald-500">
+                <span className="ultra-chip text-emerald-700 dark:text-emerald-400">
                   <CheckCircle2 className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                   <span className="font-bold">Verified</span>
                 </span>

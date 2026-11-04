@@ -6,14 +6,15 @@
  */
 
 import React from "react";
-import type { ArchitectureModel } from "../../lab/model";
+import { parseModel, type ArchitectureModel } from "../../lab/model";
 import { ExchangePanel } from "../../lab/panels/Exchange";
 import { APanel } from "../ui";
 
 export const ExchangeView: React.FC<{
   model: ArchitectureModel;
   onNavigate: (s: "studio" | "validation") => void;
-}> = ({ model, onNavigate }) => (
+  onAdoptModel?: (m: ArchitectureModel) => void;
+}> = ({ model, onNavigate, onAdoptModel }) => (
   <div className="h-full overflow-y-auto p-4">
     <header className="mb-4">
       <h1 className="text-lg font-black text-slate-100">Evidence Exchange</h1>
@@ -32,6 +33,14 @@ export const ExchangeView: React.FC<{
         <li>Continue editing in the <button className="text-sky-300 underline" onClick={() => onNavigate("studio")}>Studio</button>.</li>
       </ol>
     </APanel>
-    <ExchangePanel model={model} onAdoptJson={() => undefined} />
+    <ExchangePanel
+      model={model}
+      onAdoptJson={(json) => {
+        if (onAdoptModel) {
+          onAdoptModel(parseModel(json));
+          onNavigate("studio");
+        }
+      }}
+    />
   </div>
 );

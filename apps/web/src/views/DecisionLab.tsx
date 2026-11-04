@@ -81,17 +81,17 @@ export const DecisionLab: React.FC = () => {
         <div className="ultra-grid-overlay absolute inset-0 pointer-events-none" aria-hidden="true" />
         <div className="relative">
           <div className="flex items-center space-x-2">
-            <span className="p-1.5 rounded-lg bg-accent-cyan/10 text-accent-cyan">
+            <span className="p-1.5 rounded-lg bg-accent-cyan/10 text-cyan-700 dark:text-accent-cyan">
               <Sliders className="w-4 h-4" />
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-accent-cyan">
+            <span className="text-xs font-bold uppercase tracking-wider text-cyan-700 dark:text-accent-cyan">
               Optimization Frontier Engine
             </span>
           </div>
-          <h1 className="text-xl font-bold text-slate-900 dark:text-white mt-1">
+          <h1 className="text-xl font-bold text-zinc-900 dark:text-white mt-1">
             Cost-Aware Operational <span className="ultra-shimmer-text">Decision Intelligence</span> Laboratory
           </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400">
+          <p className="text-xs text-zinc-600 dark:text-zinc-300">
             Minimizes Expected Fraud Loss + Labor Cost + Customer Friction subject to hard investigator capacity constraint ($K \le {capacity}$/day).
           </p>
         </div>
@@ -107,7 +107,7 @@ export const DecisionLab: React.FC = () => {
       </div>
 
       {appliedBanner && (
-        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-500 text-xs font-semibold flex items-center justify-between animate-in fade-in">
+        <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-semibold flex items-center justify-between animate-in fade-in">
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{appliedBanner}</span>
@@ -120,16 +120,16 @@ export const DecisionLab: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Sliders Panel */}
         <div className="ultra-card ultra-crown p-5 space-y-5">
-          <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center justify-between">
+          <h2 className="text-sm font-bold text-zinc-900 dark:text-white flex items-center justify-between">
             <span>Configurable Economic Assumptions</span>
-            <span className="ultra-chip font-mono text-slate-400">Real-Time Solver</span>
+            <span className="ultra-chip font-mono text-zinc-600 dark:text-zinc-300">Real-Time Solver</span>
           </h2>
 
           {/* Slider 1: Investigation Cost */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-semibold">
-              <span className="text-slate-600 dark:text-slate-300">Investigation Cost ($c_{"inv"}$)</span>
-              <span className="ultra-metric ultra-metric-drawn text-accent-teal font-bold">${invCost.toFixed(2)}</span>
+              <span className="text-zinc-600 dark:text-zinc-300">Investigation Cost ($c_{"inv"}$)</span>
+              <span className="ultra-metric ultra-metric-drawn text-cyan-700 dark:text-accent-teal font-bold">${invCost.toFixed(2)}</span>
             </div>
             <input
               type="range"
@@ -138,16 +138,16 @@ export const DecisionLab: React.FC = () => {
               step="1"
               value={invCost}
               onChange={(e) => setInvCost(parseFloat(e.target.value))}
-              className="w-full h-1.5 bg-slate-200 dark:bg-navy-700 rounded-lg appearance-none cursor-pointer accent-accent-teal"
+              className="w-full h-1.5 bg-zinc-200 dark:bg-navy-700 rounded-lg appearance-none cursor-pointer accent-accent-teal"
             />
-            <p className="text-[10px] text-slate-400">Labor expense per manually investigated alert</p>
+            <p className="text-[10px] text-zinc-600 dark:text-zinc-300">Labor expense per manually investigated alert</p>
           </div>
 
           {/* Slider 2: Customer Friction */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-semibold">
-              <span className="text-slate-600 dark:text-slate-300">Friction Cost ($c_{"fric"}$)</span>
-              <span className="ultra-metric ultra-metric-drawn text-accent-teal font-bold">${fricCost.toFixed(2)}</span>
+              <span className="text-zinc-600 dark:text-zinc-300">Friction Cost ($c_{"fric"}$)</span>
+              <span className="ultra-metric ultra-metric-drawn text-cyan-700 dark:text-accent-teal font-bold">${fricCost.toFixed(2)}</span>
             </div>
             <input
               type="range"
@@ -156,16 +156,16 @@ export const DecisionLab: React.FC = () => {
               step="0.5"
               value={fricCost}
               onChange={(e) => setFricCost(parseFloat(e.target.value))}
-              className="w-full h-1.5 bg-slate-200 dark:bg-navy-700 rounded-lg appearance-none cursor-pointer accent-accent-teal"
+              className="w-full h-1.5 bg-zinc-200 dark:bg-navy-700 rounded-lg appearance-none cursor-pointer accent-accent-teal"
             />
-            <p className="text-[10px] text-slate-400">Disruption cost when legitimate user enters challenge/review</p>
+            <p className="text-[10px] text-zinc-600 dark:text-zinc-300">Disruption cost when legitimate user enters challenge/review</p>
           </div>
 
           {/* Slider 3: False Decline Block Cost */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-semibold">
-              <span className="text-slate-600 dark:text-slate-300">False Decline Churn ($c_{"block"}$)</span>
-              <span className="ultra-metric ultra-metric-drawn text-accent-teal font-bold">${blkCost.toFixed(2)}</span>
+              <span className="text-zinc-600 dark:text-zinc-300">False Decline Churn ($c_{"block"}$)</span>
+              <span className="ultra-metric ultra-metric-drawn text-cyan-700 dark:text-accent-teal font-bold">${blkCost.toFixed(2)}</span>
             </div>
             <input
               type="range"
@@ -174,16 +174,16 @@ export const DecisionLab: React.FC = () => {
               step="5"
               value={blkCost}
               onChange={(e) => setBlkCost(parseFloat(e.target.value))}
-              className="w-full h-1.5 bg-slate-200 dark:bg-navy-700 rounded-lg appearance-none cursor-pointer accent-accent-teal"
+              className="w-full h-1.5 bg-zinc-200 dark:bg-navy-700 rounded-lg appearance-none cursor-pointer accent-accent-teal"
             />
-            <p className="text-[10px] text-slate-400">Brand damage and customer churn when legitimate user is blocked</p>
+            <p className="text-[10px] text-zinc-600 dark:text-zinc-300">Brand damage and customer churn when legitimate user is blocked</p>
           </div>
 
           {/* Slider 4: Daily Capacity Limit */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-semibold">
-              <span className="text-slate-600 dark:text-slate-300">Daily Review Capacity ($K$)</span>
-              <span className="ultra-metric ultra-metric-drawn text-amber-500 font-bold">{capacity} alerts/day</span>
+              <span className="text-zinc-600 dark:text-zinc-300">Daily Review Capacity ($K$)</span>
+              <span className="ultra-metric ultra-metric-drawn text-amber-700 dark:text-amber-400 font-bold">{capacity} alerts/day</span>
             </div>
             <input
               type="range"
@@ -192,16 +192,16 @@ export const DecisionLab: React.FC = () => {
               step="10"
               value={capacity}
               onChange={(e) => setCapacity(parseInt(e.target.value))}
-              className="w-full h-1.5 bg-slate-200 dark:bg-navy-700 rounded-lg appearance-none cursor-pointer accent-amber-500"
+              className="w-full h-1.5 bg-zinc-200 dark:bg-navy-700 rounded-lg appearance-none cursor-pointer accent-amber-500"
             />
-            <p className="text-[10px] text-slate-400">Maximum queue capacity of human fraud investigators</p>
+            <p className="text-[10px] text-zinc-600 dark:text-zinc-300">Maximum queue capacity of human fraud investigators</p>
           </div>
 
           {/* Slider 5: Maximum FPR Constraint */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-semibold">
-              <span className="text-slate-600 dark:text-slate-300">Max Tolerated False Positive Rate</span>
-              <span className="ultra-metric ultra-metric-drawn text-rose-500 font-bold">{(maxFpr * 100).toFixed(1)}%</span>
+              <span className="text-zinc-600 dark:text-zinc-300">Max Tolerated False Positive Rate</span>
+              <span className="ultra-metric ultra-metric-drawn text-rose-700 dark:text-rose-400 font-bold">{(maxFpr * 100).toFixed(1)}%</span>
             </div>
             <input
               type="range"
@@ -210,9 +210,9 @@ export const DecisionLab: React.FC = () => {
               step="0.001"
               value={maxFpr}
               onChange={(e) => setMaxFpr(parseFloat(e.target.value))}
-              className="w-full h-1.5 bg-slate-200 dark:bg-navy-700 rounded-lg appearance-none cursor-pointer accent-rose-500"
+              className="w-full h-1.5 bg-zinc-200 dark:bg-navy-700 rounded-lg appearance-none cursor-pointer accent-rose-500"
             />
-            <p className="text-[10px] text-slate-400">Hard regulatory &amp; merchant service level agreement bound</p>
+            <p className="text-[10px] text-zinc-600 dark:text-zinc-300">Hard regulatory &amp; merchant service level agreement bound</p>
           </div>
         </div>
 
@@ -221,28 +221,28 @@ export const DecisionLab: React.FC = () => {
           {/* Top KPI Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 ultra-stagger">
             <div className="ultra-card ultra-crown p-4 space-y-1">
-              <span className="text-[11px] font-semibold text-slate-500">AEGIS Total Operational Loss</span>
-              <div className="ultra-metric ultra-metric-drawn text-2xl font-black text-slate-900 dark:text-white">
+              <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">AEGIS Total Operational Loss</span>
+              <div className="ultra-metric ultra-metric-drawn text-2xl font-black text-zinc-900 dark:text-white">
                 <AnimatedMoney value={opt.total_cost} />
               </div>
-              <p className="text-[10px] text-emerald-500 font-semibold">
+              <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">
                 Vs. <AnimatedMoney value={fixed.total_cost} durationMs={1000} /> (Fixed p &ge; 0.5)
               </p>
             </div>
 
             <div className="ultra-card ultra-crown p-4 space-y-1">
-              <span className="text-[11px] font-semibold text-slate-500">Net Operational Savings</span>
-              <div className="ultra-metric ultra-metric-drawn text-2xl font-black text-emerald-500">
+              <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">Net Operational Savings</span>
+              <div className="ultra-metric ultra-metric-drawn text-2xl font-black text-emerald-700 dark:text-emerald-400">
                 <AnimatedMoney value={netAdvantage} />
               </div>
-              <p className="text-[10px] text-slate-400">
+              <p className="text-[10px] text-zinc-600 dark:text-zinc-300">
                 <AnimatedPercent value={(netAdvantage / Math.max(1, fixed.total_cost)) * 100} /> Cost Reduction
               </p>
             </div>
 
             <div className="ultra-card ultra-crown p-4 space-y-1.5">
-              <span className="text-[11px] font-semibold text-slate-500">False Positive Rate</span>
-              <div className="ultra-metric ultra-metric-drawn text-2xl font-black text-accent-teal">
+              <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300">False Positive Rate</span>
+              <div className="ultra-metric ultra-metric-drawn text-2xl font-black text-cyan-700 dark:text-accent-teal">
                 <AnimatedPercent value={opt.false_positive_rate * 100} decimals={2} />
               </div>
               <div className="ultra-progress-track h-1.5 w-full" aria-hidden="true">
@@ -251,7 +251,7 @@ export const DecisionLab: React.FC = () => {
                   style={{ width: `${Math.min(100, (opt.false_positive_rate / Math.max(1e-9, maxFpr)) * 100)}%` }}
                 />
               </div>
-              <p className="text-[10px] text-emerald-500 font-semibold">
+              <p className="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">
                 &check; Within &le; {(maxFpr * 100).toFixed(1)}% Hard Constraint
               </p>
             </div>
@@ -259,57 +259,57 @@ export const DecisionLab: React.FC = () => {
 
           {/* Action Decision Thresholds Card */}
           <div className="ultra-card ultra-crown p-5 space-y-4">
-            <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-navy-700">
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-navy-700">
+              <h3 className="text-sm font-bold text-zinc-900 dark:text-white">
                 Active Operational Multi-Tier Thresholds
               </h3>
-              <span className="ultra-chip font-mono text-accent-teal">Policy: {activePol.policy_name || "Cost-Aware-Optimized"}</span>
+              <span className="ultra-chip font-mono text-cyan-700 dark:text-accent-teal">Policy: {activePol.policy_name || "Cost-Aware-Optimized"}</span>
             </div>
 
             <div className="grid grid-cols-4 gap-2 text-center text-xs">
               <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 mx-auto mb-1.5" />
-                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block uppercase">ALLOW</span>
-                <span className="text-sm font-mono font-black text-emerald-500">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400 mx-auto mb-1.5" />
+                <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold block uppercase">ALLOW</span>
+                <span className="text-sm font-mono font-black text-emerald-700 dark:text-emerald-400">
                   p &lt; <AnimatedThreshold value={activePol.tau_allow} />
                 </span>
-                <span className="text-[10px] text-slate-400 block pt-1">Zero friction approval</span>
+                <span className="text-[10px] text-zinc-600 dark:text-zinc-300 block pt-1">Zero friction approval</span>
               </div>
               <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                <Fingerprint className="w-3.5 h-3.5 text-accent-teal mx-auto mb-1.5" />
-                <span className="text-[10px] text-accent-teal font-bold block uppercase">CHALLENGE</span>
-                <span className="text-sm font-mono font-black text-accent-teal">
+                <Fingerprint className="w-3.5 h-3.5 text-cyan-700 dark:text-accent-teal mx-auto mb-1.5" />
+                <span className="text-[10px] text-cyan-700 dark:text-accent-teal font-bold block uppercase">CHALLENGE</span>
+                <span className="text-sm font-mono font-black text-cyan-700 dark:text-accent-teal">
                   [<AnimatedThreshold value={activePol.tau_allow} />, <AnimatedThreshold value={activePol.tau_review} />)
                 </span>
-                <span className="text-[10px] text-slate-400 block pt-1">Step-up OTP verify</span>
+                <span className="text-[10px] text-zinc-600 dark:text-zinc-300 block pt-1">Step-up OTP verify</span>
               </div>
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
-                <Search className="w-3.5 h-3.5 text-amber-500 mx-auto mb-1.5" />
-                <span className="text-[10px] text-amber-500 font-bold block uppercase">REVIEW</span>
-                <span className="text-sm font-mono font-black text-amber-500">
+                <Search className="w-3.5 h-3.5 text-amber-700 dark:text-amber-400 mx-auto mb-1.5" />
+                <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold block uppercase">REVIEW</span>
+                <span className="text-sm font-mono font-black text-amber-700 dark:text-amber-400">
                   [<AnimatedThreshold value={activePol.tau_review} />, <AnimatedThreshold value={activePol.tau_block} />)
                 </span>
-                <span className="text-[10px] text-slate-400 block pt-1">Analyst investigation</span>
+                <span className="text-[10px] text-zinc-600 dark:text-zinc-300 block pt-1">Analyst investigation</span>
               </div>
               <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20">
-                <Ban className="w-3.5 h-3.5 text-rose-500 mx-auto mb-1.5" />
-                <span className="text-[10px] text-rose-500 font-bold block uppercase">BLOCK</span>
-                <span className="text-sm font-mono font-black text-rose-500">
+                <Ban className="w-3.5 h-3.5 text-rose-700 dark:text-rose-400 mx-auto mb-1.5" />
+                <span className="text-[10px] text-rose-700 dark:text-rose-400 font-bold block uppercase">BLOCK</span>
+                <span className="text-sm font-mono font-black text-rose-700 dark:text-rose-400">
                   p &ge; <AnimatedThreshold value={activePol.tau_block} />
                 </span>
-                <span className="text-[10px] text-slate-400 block pt-1">Hard transaction decline</span>
+                <span className="text-[10px] text-zinc-600 dark:text-zinc-300 block pt-1">Hard transaction decline</span>
               </div>
             </div>
 
             {/* Invariant 5 Enforcement Notice */}
-            <div className="ultra-row p-3 rounded-xl bg-slate-50 dark:bg-navy-900/60 border border-slate-100 dark:border-navy-700 text-xs flex items-center justify-between">
-              <div className="flex items-center space-x-2 text-slate-700 dark:text-slate-300">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+            <div className="ultra-row p-3 rounded-xl bg-zinc-50 dark:bg-navy-900/60 border border-zinc-100 dark:border-navy-700 text-xs flex items-center justify-between">
+              <div className="flex items-center space-x-2 text-zinc-700 dark:text-zinc-300">
+                <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
                 <span>
                   <strong>Invariant 5 Hard Capacity Limit Verified:</strong> Quantile-guided search bounds review rate &le; {capacity} alerts/day by mathematical construction.
                 </span>
               </div>
-              <span className="font-mono text-emerald-500 font-bold">100% SATISFIED</span>
+              <span className="font-mono text-emerald-700 dark:text-emerald-400 font-bold">100% SATISFIED</span>
             </div>
           </div>
         </div>
