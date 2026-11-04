@@ -15,6 +15,7 @@ import { checkHealth } from "./api";
 const TrailApp = React.lazy(() => import("./trail/TrailApp").then((m) => ({ default: m.TrailApp })));
 const LabApp = React.lazy(() => import("./lab/LabApp").then((m) => ({ default: m.LabApp })));
 const AtlasApp = React.lazy(() => import("./atlas/AtlasApp").then((m) => ({ default: m.AtlasApp })));
+const DataNovaApp = React.lazy(() => import("./unified/DataNovaApp").then((m) => ({ default: m.DataNovaApp })));
 
 const ViewSuspense: React.FC = () => (
   <div className="flex items-center justify-center min-h-[60vh]">
@@ -31,12 +32,21 @@ export const App: React.FC = () => {
   const [darkMode, setDarkMode] = useState<boolean>(false);
   // Deep-link support: a fresh load (or navigation) to a #/trail/... URL
   // opens the TRACEN learning trail view directly.
-  const [currentView, setCurrentView] = useState<ViewType>(() =>
-    window.location.hash.startsWith("#/trail") ? "trail"
-      : window.location.hash.startsWith("#/lab") ? "lab"
-        : window.location.hash.startsWith("#/atlas") ? "atlas"
-          : "mission"
-  );
+  const [currentView, setCurrentView] = useState<ViewType>(() => {
+    const hash = window.location.hash;
+    if (hash.startsWith("#/trail")) return "trail";
+    if (hash.startsWith("#/lab")) return "lab";
+    if (hash.startsWith("#/atlas")) return "atlas";
+    if (
+      hash.startsWith("#/home") ||
+      hash.startsWith("#/workspace") ||
+      hash.startsWith("#/evidence") ||
+      hash.startsWith("#/datanova")
+    ) {
+      return "datanova";
+    }
+    return "mission";
+  });
   const [online, setOnline] = useState<boolean>(false);
   const [showDeckModal, setShowDeckModal] = useState<boolean>(false);
 
@@ -52,19 +62,42 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     const onHashChange = () => {
-      if (window.location.hash.startsWith("#/trail")) {
+      const hash = window.location.hash;
+      if (hash.startsWith("#/trail")) {
         setCurrentView("trail");
-      }
-      if (window.location.hash.startsWith("#/lab")) {
+      } else if (hash.startsWith("#/lab")) {
         setCurrentView("lab");
-      }
-      if (window.location.hash.startsWith("#/atlas")) {
+      } else if (hash.startsWith("#/atlas")) {
         setCurrentView("atlas");
+      } else if (
+        hash.startsWith("#/home") ||
+        hash.startsWith("#/workspace") ||
+        hash.startsWith("#/evidence") ||
+        hash.startsWith("#/datanova")
+      ) {
+        setCurrentView("datanova");
       }
     };
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
+
+  if (currentView === "datanova") {
+    return (
+      <div className={darkMode ? "dark" : ""}>
+        <Suspense fallback={<ViewSuspense />}>
+          <DataNovaApp
+            onOpenLegacyView={(v) => {
+              setCurrentView(v as ViewType);
+              window.location.hash = `#/${v}`;
+            }}
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
+          />
+        </Suspense>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen ${darkMode ? "dark bg-navy-900 text-zinc-100" : "bg-white text-zinc-800"}`}>

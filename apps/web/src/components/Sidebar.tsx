@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 
 export type ViewType =
+  | "datanova"
   | "mission"
   | "stream"
   | "graph"
@@ -125,6 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
   }, []);
 
   const navItems = [
+    { id: "datanova" as ViewType, label: "DataNova Unified", icon: Boxes, badge: "Flagship" },
     { id: "mission" as ViewType, label: "Mission Control", icon: LayoutDashboard, badge: "Live KPIs" },
     // modelCount badge derives from the live benchmark payload.
     { id: "stream" as ViewType, label: "Live Digital Twin", icon: PlayCircle, badge: "Replay" },
@@ -152,7 +154,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
           return (
             <button
               key={item.id}
-              onClick={() => setCurrentView(item.id)}
+              onClick={() => {
+                setCurrentView(item.id);
+                if (item.id === "datanova") {
+                  window.location.hash = "#/home";
+                }
+              }}
               style={{ animationDelay: `${staggerDelayMs(index + 1)}ms` }}
               className={`relative w-full flex items-center justify-between h-9 px-2.5 rounded-lg text-[13px] font-medium transition-colors ${
                 isActive
