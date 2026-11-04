@@ -62,3 +62,37 @@ npx playwright test e2e/reality-capstone.spec.ts
 # 6. Capture Visual Evidence screenshots
 npx playwright test e2e/reality-visual.spec.ts
 ```
+
+---
+
+## 4. Independent Post-Completion Re-Verification (adversarial QA pass)
+
+An independent QA pass re-executed the full verification stack on the committed
+Campaign 07 state (`58f92fd`, clean working tree). Results:
+
+| Check | Command | Result |
+|---|---|---|
+| Frontend unit suite | `cd apps/web && npm run test` | **475 passed (23 files)** |
+| Production build | `cd apps/web && npm run build` | **Clean** (`tsc -b && vite build`) |
+| Reality lint | `cd apps/web && npx oxlint src/reality src/atlas` | **0 warnings, 0 errors** |
+| Reality capstone E2E (browser) | `npx playwright test e2e/reality-capstone.spec.ts` | **9 passed (20.9s)** |
+| Reality + Atlas E2E regression (browser) | `npx playwright test e2e/atlas.spec.ts e2e/reality-visual.spec.ts` | **10 passed (18.8s)** |
+| Python release gates | `.venv/Scripts/python.exe -m pytest tests/release/ -v` | **12 passed (6.27s)** |
+| mypy | `.venv/Scripts/python.exe -m mypy packages apps scripts --ignore-missing-imports` | **no issues in 59 files** |
+| ruff | `.venv/Scripts/python.exe -m ruff check .` | **All checks passed** |
+
+Campaign 07 claims are **confirmed** at the committed state.
+
+**Known pre-existing, out-of-scope failures (not Campaign 07 regressions):**
+`python -m pytest tests/unit/test_batch_g.py` has 4 failures. The champion
+feature registry is missing semantic definitions for 6 features
+(33 registered vs 39 required, first missing: `g_out_degree`), causing
+`test_registry_explains_every_champion_feature`, `test_semantics_generator_output_is_complete`,
+and `test_generated_semantics_files_are_current` to fail; the stale generated
+model card (does not contain the expected champion metric `0.8520`) fails
+`test_model_card_reads_only_real_artifacts`. The involved files were last
+modified in commit `c0caba8` (M3fg) and were **not touched** by the Campaign 07
+commit. Fixing these requires adding the missing semantic definitions with
+their real derivation sources in `packages/features/semantics.py` and
+regenerating the model card — not fabricated here.
+
