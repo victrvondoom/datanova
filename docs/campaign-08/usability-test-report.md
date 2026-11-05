@@ -44,3 +44,4 @@ An objective evaluation was conducted simulating a first-time engineer or techni
 ## 3. First-Time Usability Verdict
 
 A new user can now understand DataNova's purpose, inspect an active system architecture, and run a multi-agent investigation in under **60 seconds**, without consulting external documentation or training materials.
+

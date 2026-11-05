@@ -89,3 +89,4 @@ Existing routes and bookmarks never break. The router handles both modern and le
    - `#/lab` paths continue to function directly.
    - `#/trail` paths continue to function directly.
    - Direct calls from existing tests (like `page.goto("/#/atlas/reality")`) remain 100% operational.
+

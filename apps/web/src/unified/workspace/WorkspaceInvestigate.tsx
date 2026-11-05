@@ -31,3 +31,4 @@ export const WorkspaceInvestigate: React.FC<WorkspaceInvestigateProps> = ({
     </div>
   );
 };
+

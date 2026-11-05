@@ -71,3 +71,4 @@ The active project and its canonical architecture model (`ArchitectureModel` fro
 4. **Improve & Compare** creates proposed architecture mutations and tests release readiness.
 5. **Evidence & Review** links all findings and reviews to the exact version of the architecture.
 6. **Orchestrator** reads and mutates the active model when approved by the human engineer.
+

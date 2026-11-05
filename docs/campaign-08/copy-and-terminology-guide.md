@@ -56,3 +56,4 @@ Every major view or workflow in DataNova must answer:
 - **Evidence:** Tangible proof—such as traces, configuration manifests, or test outputs—that supports a technical conclusion.
 - **Provenance:** The verifiable chain of custody showing where an insight came from and who produced it.
 - **Independent Review:** An objective inspection of findings and evidence by an independent technical reviewer.
+

@@ -44,3 +44,4 @@ export const WorkspaceSystemMap: React.FC<WorkspaceSystemMapProps> = ({
     </div>
   );
 };
+

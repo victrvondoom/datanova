@@ -81,3 +81,4 @@ Every orchestration execution produces a structured report containing:
 6. **Uncertainties & Known Limitations:** Clear statements of what could not be determined or where evidence is modeled.
 7. **Recommended Next Actions:** One-click actions to investigate deeper, accept a drift, adopt into architecture, or open a review.
 8. **Technical Activity Drawer (Optional):** Expandable execution logs detailing specialist task assignments, durations, and tool outputs for advanced engineers.
+

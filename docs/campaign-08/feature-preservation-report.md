@@ -35,3 +35,4 @@ Regression tests for Campaign 08 are codified in `e2e/campaign08-unification.spe
 - Proves Evidence & Review transitions across all 6 validation subviews.
 - Proves DataNova Orchestrator executes multi-agent planning and produces unified evidence-linked reports.
 - Proves all legacy URLs (`#/atlas/reality`, `#/trail`, `#/lab`) load their respective interfaces without regressions.
+
