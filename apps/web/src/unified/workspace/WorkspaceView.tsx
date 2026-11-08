@@ -7,6 +7,8 @@
  * 3. Analyze (Simulations, queues, SLOs)
  * 4. Investigate (Reality engine, traces, drift, incidents)
  * 5. Improve & Compare (Decisions, changes, release readiness)
+ *
+ * Styled in creamy white & creamy black aesthetic.
  */
 
 import React from "react";
@@ -36,6 +38,7 @@ interface WorkspaceViewProps {
   onNavigateAtlas: (sec: AtlasSection) => void;
   onOpenOrchestrator: (initialPrompt?: string) => void;
   setAnnounce?: (msg: string) => void;
+  darkMode?: boolean;
 }
 
 export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
@@ -50,18 +53,27 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   onNavigateAtlas,
   onOpenOrchestrator,
   setAnnounce,
+  darkMode = false,
 }) => {
   return (
-    <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden bg-slate-950">
+    <div className={`flex-1 flex flex-col h-full min-h-0 overflow-hidden transition-colors ${
+      darkMode ? "bg-[#141312] text-[#f5f2eb]" : "bg-[#faf7f2] text-[#181716]"
+    }`}>
       {/* Workspace Sub-Navigation Rail */}
-      <div className="h-11 shrink-0 border-b border-slate-800/80 bg-slate-900/70 px-4 lg:px-6 flex items-center justify-between gap-4">
+      <div className={`h-11 shrink-0 border-b px-4 lg:px-6 flex items-center justify-between gap-4 transition-colors ${
+        darkMode ? "border-[#2a2723] bg-[#1a1816]/90" : "border-[#e5dec9] bg-[#f5efe3]/90"
+      }`}>
         <nav aria-label="Workspace Views" className="flex items-center gap-1 overflow-x-auto py-1">
           <button
             onClick={() => onChangeSubview("overview")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               subview === "overview"
-                ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                ? darkMode
+                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
+                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                : darkMode
+                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
+                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
             }`}
           >
             <LayoutDashboard size={13} />
@@ -72,8 +84,12 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
             onClick={() => onChangeSubview("map")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               subview === "map"
-                ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                ? darkMode
+                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
+                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                : darkMode
+                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
+                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
             }`}
           >
             <Boxes size={13} />
@@ -84,8 +100,12 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
             onClick={() => onChangeSubview("analyze")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               subview === "analyze"
-                ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                ? darkMode
+                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
+                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                : darkMode
+                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
+                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
             }`}
           >
             <Activity size={13} />
@@ -96,21 +116,29 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
             onClick={() => onChangeSubview("investigate")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               subview === "investigate"
-                ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                ? darkMode
+                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
+                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                : darkMode
+                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
+                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
             }`}
           >
             <ShieldAlert size={13} />
             <span>Investigate</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
           </button>
 
           <button
             onClick={() => onChangeSubview("improve")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               subview === "improve"
-                ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                ? darkMode
+                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
+                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                : darkMode
+                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
+                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
             }`}
           >
             <GitBranch size={13} />
@@ -118,9 +146,11 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
           </button>
         </nav>
 
-        <div className="hidden sm:flex items-center gap-2 text-xs text-slate-500 font-mono">
+        <div className={`hidden sm:flex items-center gap-2 text-xs font-mono ${
+          darkMode ? "text-[#857d72]" : "text-[#857d72]"
+        }`}>
           <span>Target:</span>
-          <span className="text-slate-300 font-bold">{project.name}</span>
+          <span className={`font-bold ${darkMode ? "text-[#f5f2eb]" : "text-[#181716]"}`}>{project.name}</span>
         </div>
       </div>
 
@@ -132,6 +162,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
             model={model}
             onNavigateSubView={onChangeSubview}
             onOpenOrchestrator={onOpenOrchestrator}
+            darkMode={darkMode}
           />
         )}
 
@@ -151,6 +182,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
           <WorkspaceAnalyze
             model={model}
             setAnnounce={setAnnounce}
+            darkMode={darkMode}
           />
         )}
 
@@ -166,6 +198,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
           <WorkspaceImprove
             model={model}
             project={project}
+            darkMode={darkMode}
           />
         )}
       </div>

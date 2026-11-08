@@ -3,6 +3,7 @@
  *
  * Unifies architecture alternatives, mutation workflows, counterfactual experiments,
  * Architecture Decision Records (ADRs), change impact, and release readiness gates.
+ * Styled in luxury creamy white and creamy black aesthetic with cursive typography.
  */
 
 import React, { useState } from "react";
@@ -14,38 +15,51 @@ import { ChangeReview } from "../../reality/ui/ChangeReview";
 interface WorkspaceImproveProps {
   model: ArchitectureModel;
   project: Project;
+  darkMode?: boolean;
 }
 
 export const WorkspaceImprove: React.FC<WorkspaceImproveProps> = ({
   model,
   project,
+  darkMode = true,
 }) => {
   const [activeTab, setActiveTab] = useState<"decisions" | "release">("decisions");
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className={`max-w-6xl mx-auto space-y-6 transition-colors ${
+      darkMode ? "text-[#f5f2eb]" : "text-[#181716]"
+    }`}>
       {/* Header and Sub-Tab Switcher */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-md">
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border backdrop-blur-md shadow-lg ${
+        darkMode ? "border-[#2e2a24] bg-[#1c1a17]/90" : "border-[#e5dec9] bg-[#fdfcf9]"
+      }`}>
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-white tracking-tight">Improve & Compare</h2>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-              ARCHITECTURE EVOLUTION
+            <h2 className="text-lg font-bold tracking-tight">Improve & Compare</h2>
+            <span className="font-cursive text-xl text-[#b8860b] dark:text-[#dfba49]">
+              Architecture Evolution
+            </span>
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+              EVOLUTION ENGINE
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className={`text-xs mt-1 leading-relaxed ${darkMode ? "text-[#c2bcb2]" : "text-[#575249]"}`}>
             Track Architecture Decision Records (ADRs), evaluate proposed changes, and review pre-deployment release gates.
           </p>
         </div>
 
         {/* Tab Buttons */}
-        <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-950/80 border border-slate-800">
+        <div className={`flex items-center gap-1.5 p-1 rounded-xl border ${
+          darkMode ? "bg-[#141312] border-[#2e2a24]" : "bg-[#f5efe4] border-[#ded4c0]"
+        }`}>
           <button
             onClick={() => setActiveTab("decisions")}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               activeTab === "decisions"
-                ? "bg-emerald-500 text-slate-950 shadow-sm"
-                : "text-slate-400 hover:text-white"
+                ? "bg-gradient-to-r from-[#c59b27] to-[#a37d1d] text-[#181716] shadow-sm font-bold"
+                : darkMode
+                ? "text-[#a69f93] hover:text-[#f5f2eb]"
+                : "text-[#6e675f] hover:text-[#181716]"
             }`}
           >
             <span>Decision Records (ADR)</span>
@@ -54,8 +68,10 @@ export const WorkspaceImprove: React.FC<WorkspaceImproveProps> = ({
             onClick={() => setActiveTab("release")}
             className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               activeTab === "release"
-                ? "bg-emerald-500 text-slate-950 shadow-sm"
-                : "text-slate-400 hover:text-white"
+                ? "bg-gradient-to-r from-[#c59b27] to-[#a37d1d] text-[#181716] shadow-sm font-bold"
+                : darkMode
+                ? "text-[#a69f93] hover:text-[#f5f2eb]"
+                : "text-[#6e675f] hover:text-[#181716]"
             }`}
           >
             <span>Release Impact & Gate</span>

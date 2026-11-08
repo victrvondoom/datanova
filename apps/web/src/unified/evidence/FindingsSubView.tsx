@@ -3,6 +3,7 @@
  *
  * Centralized registry of all findings across architecture, runtime drift,
  * security boundaries, latency bottlenecks, and release readiness.
+ * Styled in luxury creamy white and creamy black aesthetic with cursive typography.
  */
 
 import React, { useState } from "react";
@@ -11,6 +12,7 @@ import type { FindingItem } from "../types";
 
 interface FindingsSubViewProps {
   onNavigateWorkspace: (subview: string) => void;
+  darkMode?: boolean;
 }
 
 const SAMPLE_FINDINGS: FindingItem[] = [
@@ -74,6 +76,7 @@ const SAMPLE_FINDINGS: FindingItem[] = [
 
 export const FindingsSubView: React.FC<FindingsSubViewProps> = ({
   onNavigateWorkspace,
+  darkMode = true,
 }) => {
   const [filterQuery, setFilterQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
@@ -88,31 +91,40 @@ export const FindingsSubView: React.FC<FindingsSubViewProps> = ({
   });
 
   return (
-    <div className="space-y-6">
+    <div className={`space-y-6 transition-colors ${darkMode ? "text-[#f5f2eb]" : "text-[#181716]"}`}>
       {/* Header and Filter */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-md">
+      <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border backdrop-blur-md shadow-lg ${
+        darkMode ? "border-[#2e2a24] bg-[#1c1a17]/90" : "border-[#e5dec9] bg-[#fdfcf9]"
+      }`}>
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-white tracking-tight">Active Findings Ledger</h2>
-            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-rose-500/10 text-rose-300 border border-rose-500/30">
+            <h2 className="text-lg font-bold tracking-tight">Active Findings Ledger</h2>
+            <span className="font-cursive text-xl text-[#b8860b] dark:text-[#dfba49]">
+              Reconciled Intelligence
+            </span>
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/25">
               {SAMPLE_FINDINGS.length} DISCOVERIES
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+          <p className={`text-xs mt-1 max-w-2xl leading-relaxed ${darkMode ? "text-[#c2bcb2]" : "text-[#575249]"}`}>
             All findings discovered by DataNova specialist engines and telemetry reconciliation, linked to affected components and evidence.
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-lg border border-slate-800 text-[10px] font-mono">
+          <div className={`flex items-center gap-1 p-1 rounded-xl border text-[10px] font-mono ${
+            darkMode ? "bg-[#141312] border-[#2e2a24]" : "bg-[#f5efe4] border-[#ded4c0]"
+          }`}>
             {["all", "runtime", "reliability", "security", "change"].map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-2 py-0.5 rounded capitalize ${
+                className={`px-2.5 py-1 rounded-lg capitalize transition-all font-semibold ${
                   selectedCategory === cat
-                    ? "bg-sky-500 text-white font-bold"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-gradient-to-r from-[#c59b27] to-[#a37d1d] text-[#181716] font-bold shadow-sm"
+                    : darkMode
+                    ? "text-[#a69f93] hover:text-[#f5f2eb]"
+                    : "text-[#6e675f] hover:text-[#181716]"
                 }`}
               >
                 {cat}
@@ -121,13 +133,17 @@ export const FindingsSubView: React.FC<FindingsSubViewProps> = ({
           </div>
 
           <div className="relative">
-            <Search size={13} className="absolute left-2.5 top-2.5 text-slate-500" />
+            <Search size={13} className="absolute left-2.5 top-2.5 text-stone-400" />
             <input
               type="text"
               placeholder="Search findings, components..."
               value={filterQuery}
               onChange={(e) => setFilterQuery(e.target.value)}
-              className="rounded-lg border border-slate-700 bg-slate-950 pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-sky-500"
+              className={`rounded-xl border pl-8 pr-3 py-1.5 text-xs placeholder-stone-400 focus:outline-none focus:border-[#c59b27] transition-all shadow-inner ${
+                darkMode
+                  ? "border-[#332f29] bg-[#141312] text-[#f5f2eb]"
+                  : "border-[#ded3bd] bg-[#fdfcf9] text-[#181716]"
+              }`}
             />
           </div>
         </div>
@@ -138,45 +154,59 @@ export const FindingsSubView: React.FC<FindingsSubViewProps> = ({
         {filtered.map((f) => (
           <div
             key={f.id}
-            className={`p-5 rounded-2xl border text-xs space-y-3 transition-all ${
+            className={`p-5 rounded-2xl border text-xs space-y-3 transition-all shadow-md ${
               f.severity === "critical"
-                ? "border-rose-500/40 bg-gradient-to-r from-rose-950/20 via-slate-900/80 to-slate-900/60 shadow-lg shadow-rose-950/10"
-                : "border-amber-500/40 bg-gradient-to-r from-amber-950/20 via-slate-900/80 to-slate-900/60 shadow-lg shadow-amber-950/10"
+                ? darkMode
+                  ? "border-rose-500/40 bg-gradient-to-r from-rose-950/20 via-[#1c1a17] to-[#181614]"
+                  : "border-rose-200 bg-gradient-to-r from-rose-50/70 via-[#fdfcf9] to-[#faf7f2]"
+                : darkMode
+                ? "border-amber-500/40 bg-gradient-to-r from-amber-950/20 via-[#1c1a17] to-[#181614]"
+                : "border-amber-200 bg-gradient-to-r from-amber-50/70 via-[#fdfcf9] to-[#faf7f2]"
             }`}
           >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+            <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b pb-3 ${
+              darkMode ? "border-[#2e2a24]" : "border-[#e5dec9]"
+            }`}>
               <div className="flex items-center gap-2.5">
                 <span
                   className={`px-2.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider ${
                     f.severity === "critical"
-                      ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
-                      : "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                      ? "bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/30"
+                      : "bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/30"
                   }`}
                 >
                   {f.severity}
                 </span>
-                <h3 className="font-bold text-white text-sm tracking-tight">{f.title}</h3>
+                <h3 className="font-bold text-sm tracking-tight">{f.title}</h3>
               </div>
-              <span className="font-mono text-slate-300 text-xs font-semibold px-2 py-0.5 rounded bg-slate-950/80 border border-slate-800">
+              <span className={`font-mono text-xs font-semibold px-2 py-0.5 rounded border ${
+                darkMode
+                  ? "bg-[#141312] border-[#2e2a24] text-[#dfba49]"
+                  : "bg-[#f5efe4] border-[#ded4c0] text-[#856514]"
+              }`}>
                 Component: {f.affectedComponent}
               </span>
             </div>
 
-            <p className="text-slate-200 leading-relaxed text-xs">{f.plainSummary}</p>
+            <p className={`leading-relaxed text-xs ${darkMode ? "text-[#c2bcb2]" : "text-[#575249]"}`}>{f.plainSummary}</p>
 
-            <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800/80 space-y-1">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-amber-400 font-bold block">
+            <div className={`p-3 rounded-xl border space-y-1 ${
+              darkMode ? "bg-[#141312] border-[#2e2a24]" : "bg-[#f8f4ec] border-[#e5dec9]"
+            }`}>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[#b8860b] dark:text-[#dfba49] font-bold block">
                 Why this matters:
               </span>
-              <p className="text-slate-300 text-[11px] leading-relaxed">{f.whyItMatters}</p>
+              <p className={`text-[11px] leading-relaxed ${darkMode ? "text-[#c2bcb2]" : "text-[#575249]"}`}>{f.whyItMatters}</p>
             </div>
 
             <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2 font-mono text-[11px] text-slate-400">
+              <div className={`flex items-center gap-2 font-mono text-[11px] ${
+                darkMode ? "text-[#a69f93]" : "text-[#78716c]"
+              }`}>
                 <span>Technical:</span>
-                <span className="text-slate-200 font-semibold">{f.technicalTerm}</span>
+                <span className={`font-semibold ${darkMode ? "text-[#f5f2eb]" : "text-[#181716]"}`}>{f.technicalTerm}</span>
                 <span>&bull;</span>
-                <span className="text-sky-400">Proof: {f.evidenceRef}</span>
+                <span className="text-[#b8860b] dark:text-[#dfba49] font-semibold">Proof: {f.evidenceRef}</span>
               </div>
 
               <button
@@ -185,7 +215,7 @@ export const FindingsSubView: React.FC<FindingsSubViewProps> = ({
                   else if (f.category === "reliability") onNavigateWorkspace("analyze");
                   else onNavigateWorkspace("improve");
                 }}
-                className="px-3.5 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs transition-colors shadow-sm flex items-center gap-1.5 self-start sm:self-auto"
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#c59b27] to-[#a37d1d] hover:from-[#dfba49] hover:to-[#b8860b] text-[#181716] font-bold text-xs transition-all shadow-md shadow-[#c59b27]/25 flex items-center gap-1.5 self-start sm:self-auto active:scale-95"
               >
                 <span>Take Action in Workspace</span>
                 <ArrowRight size={13} />

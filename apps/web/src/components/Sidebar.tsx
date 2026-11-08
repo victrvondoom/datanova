@@ -142,9 +142,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
   ];
 
   return (
-    <aside className="w-64 border-r flex flex-col justify-between p-4 bg-[#fbfbfa] dark:bg-navy-900 border-zinc-200 dark:border-white/10 transition-colors">
+    <aside className="w-64 border-r flex flex-col justify-between p-4 bg-[#faf7f2] dark:bg-[#181716] border-[#e8e2d4] dark:border-[#2e2a24] transition-colors">
       <div className="space-y-1.5 ultra-stagger">
-        <div className="px-3 py-2 text-[11px] font-display font-bold tracking-wider uppercase text-zinc-600 dark:text-zinc-300">
+        <div className="px-3 py-2 text-[11px] font-display font-bold tracking-wider uppercase text-[#6e675f] dark:text-[#a69f93]">
           Core Laboratories
         </div>
 
@@ -163,25 +163,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
               style={{ animationDelay: `${staggerDelayMs(index + 1)}ms` }}
               className={`relative w-full flex items-center justify-between h-9 px-2.5 rounded-lg text-[13px] font-medium transition-colors ${
                 isActive
-                  ? "bg-meadow-soft text-meadow-ink dark:bg-[#30341b] dark:text-meadow-dark"
-                  : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-zinc-100"
+                  ? "bg-[#181716] text-[#faf7f2] dark:bg-[#282520] dark:text-[#dfba49] shadow-sm font-semibold"
+                  : "text-[#575249] hover:bg-[#ede5d5] hover:text-[#181716] dark:text-[#a69f93] dark:hover:bg-[#22201d] dark:hover:text-[#f5f2eb]"
               }`}
             >
               {isActive && (
                 <span
                   aria-hidden
-                  className="absolute left-0 top-1/2 -tranzinc-y-1/2 h-5 w-1 rounded-r-full bg-meadow dark:bg-meadow-dark"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-[#c59b27]"
                 />
               )}
               <div className="flex items-center space-x-3">
-                <Icon className={`w-4 h-4 ${isActive ? "text-cyan-700 dark:text-accent-teal" : "text-zinc-600 dark:text-zinc-300"}`} />
+                <Icon className={`w-4 h-4 ${isActive ? "text-[#c59b27] dark:text-[#dfba49]" : "text-[#78716c] dark:text-[#8c857b]"}`} />
                 <span>{item.label}</span>
               </div>
               <span
                 className={`text-[10px] font-mono px-2 py-0.5 rounded-md ${
                   isActive
-                    ? "bg-meadow/15 text-meadow-ink dark:bg-meadow-dark/15 dark:text-meadow-dark font-semibold"
-                    : "bg-zinc-100 dark:bg-white/5 text-zinc-500 dark:text-zinc-400"
+                    ? "bg-[#c59b27]/20 text-[#181716] dark:text-[#dfba49] font-semibold"
+                    : "bg-[#ece3d3] dark:bg-[#22201d] text-[#78716c] dark:text-[#8c857b]"
                 }`}
               >
                 {item.badge}

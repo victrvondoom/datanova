@@ -192,7 +192,11 @@ export const DataNovaApp: React.FC<DataNovaAppProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-950 text-slate-100 select-none">
+    <div className={`flex flex-col h-screen w-screen overflow-hidden select-none transition-colors duration-300 ${
+      darkMode
+        ? "bg-[#141312] text-[#f5f2eb]"
+        : "bg-[#faf7f2] text-[#181716]"
+    }`}>
       <AAnnouncer message={announce} />
       {/* Universal Top Header */}
       <UnifiedHeader
@@ -221,6 +225,7 @@ export const DataNovaApp: React.FC<DataNovaAppProps> = ({
               onNavigateEvidence={navigateEvidenceSubview}
               onOpenOrchestrator={handleOpenOrchestrator}
               onCreateNewProject={() => setNewProjectOpen(true)}
+              darkMode={darkMode}
             />
           </div>
         )}
@@ -241,6 +246,7 @@ export const DataNovaApp: React.FC<DataNovaAppProps> = ({
             onNavigateAtlas={handleAtlasSectionNavigate}
             onOpenOrchestrator={handleOpenOrchestrator}
             setAnnounce={setAnnounce}
+            darkMode={darkMode}
           />
         )}
 
@@ -259,6 +265,7 @@ export const DataNovaApp: React.FC<DataNovaAppProps> = ({
             onAdoptModel={setModel}
             onNavigateWorkspace={navigateWorkspaceSubview}
             setAnnounce={setAnnounce}
+            darkMode={darkMode}
           />
         )}
       </main>
@@ -272,6 +279,7 @@ export const DataNovaApp: React.FC<DataNovaAppProps> = ({
         projectVersion={project.version}
         initialPrompt={orchestratorPrompt}
         onNavigate={handleOrchestratorNavigate}
+        darkMode={darkMode}
       />
 
       {/* Command Palette */}
@@ -287,13 +295,22 @@ export const DataNovaApp: React.FC<DataNovaAppProps> = ({
 
       {/* Settings Modal */}
       {settingsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-          <div className="w-full max-w-2xl max-h-[85vh] rounded-2xl border border-slate-800 bg-slate-900 p-6 shadow-2xl overflow-y-auto space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-800/80 pb-3">
-              <h3 className="text-base font-bold text-white">Project & Workspace Settings</h3>
+        <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn ${
+          darkMode ? "bg-[#141312]/80" : "bg-[#141312]/40"
+        }`}>
+          <div className={`w-full max-w-2xl max-h-[85vh] rounded-2xl border p-6 shadow-2xl overflow-y-auto space-y-4 ${
+            darkMode ? "border-[#332f29] bg-[#1c1a17] text-[#f5f2eb]" : "border-[#e5dec9] bg-[#faf7f2] text-[#181716]"
+          }`}>
+            <div className={`flex items-center justify-between border-b pb-3 ${
+              darkMode ? "border-[#2e2a24]" : "border-[#e5dec9]"
+            }`}>
+              <div className="flex items-center gap-2">
+                <h3 className="text-base font-bold">Project & Workspace Settings</h3>
+                <span className="font-cursive text-lg text-[#b8860b] dark:text-[#dfba49]">preferences</span>
+              </div>
               <button
                 onClick={() => setSettingsOpen(false)}
-                className="text-slate-400 hover:text-white text-sm"
+                className={`text-sm ${darkMode ? "text-[#a69f93] hover:text-[#f5f2eb]" : "text-[#6e675f] hover:text-[#181716]"}`}
               >
                 &times;
               </button>

@@ -3,6 +3,7 @@
  *
  * Real execution phases, transparent specialist activities,
  * and unified evidence-linked final reports.
+ * Styled in luxury creamy white and creamy black aesthetic with cursive typography.
  */
 
 import React, { useState } from "react";
@@ -22,6 +23,7 @@ interface OrchestratorModalProps {
   projectVersion?: number;
   initialPrompt?: string;
   onNavigate: (view: string) => void;
+  darkMode?: boolean;
 }
 
 const EXAMPLE_PROMPTS = [
@@ -49,6 +51,7 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
   projectVersion = 1,
   initialPrompt = "",
   onNavigate,
+  darkMode = true,
 }) => {
   const [prompt, setPrompt] = useState(initialPrompt);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -92,24 +95,35 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn">
-      <div className="w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl overflow-hidden">
+    <div className={`fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md animate-fadeIn transition-colors ${
+      darkMode ? "bg-[#141312]/80" : "bg-[#141312]/40"
+    }`}>
+      <div className={`w-full max-w-4xl max-h-[90vh] flex flex-col rounded-2xl border shadow-2xl overflow-hidden transition-all ${
+        darkMode
+          ? "border-[#332f29] bg-[#1c1a17] text-[#f5f2eb]"
+          : "border-[#e5dec9] bg-[#faf7f2] text-[#181716]"
+      }`}>
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-800/80 bg-slate-950/80 flex items-center justify-between">
+        <div className={`px-6 py-4 border-b flex items-center justify-between transition-colors ${
+          darkMode ? "border-[#2e2a24] bg-[#161513]/90" : "border-[#e5dec9] bg-[#f5efe4]"
+        }`}>
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-gradient-to-tr from-sky-500/20 to-blue-600/30 border border-sky-500/40 text-sky-400">
-              <Bot size={20} />
+            <div className="p-2.5 rounded-xl bg-gradient-to-tr from-[#c59b27]/25 to-[#dfba49]/30 border border-[#c59b27]/40 text-[#c59b27] dark:text-[#dfba49] shadow-sm">
+              <Bot size={22} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-base font-bold text-white tracking-wide">
+                <h2 className="text-base font-bold tracking-wide">
                   What would you like to understand or improve?
                 </h2>
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-sky-500/10 text-sky-400 border border-sky-500/30">
+                <span className="font-cursive text-xl text-[#b8860b] dark:text-[#dfba49] font-normal">
+                  Studio
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-[#c59b27]/20 text-[#856514] dark:text-[#dfba49] border border-[#c59b27]/40">
                   DataNova Orchestrator
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className={`text-xs mt-0.5 ${darkMode ? "text-[#a69f93]" : "text-[#6e675f]"}`}>
                 Describe a problem, ask a question, or tell DataNova what to investigate.
               </p>
             </div>
@@ -117,7 +131,9 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
 
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+            className={`p-1.5 rounded-lg transition-colors ${
+              darkMode ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#25221e]" : "text-[#6e675f] hover:text-[#181716] hover:bg-[#eae3d4]"
+            }`}
             title="Close Orchestrator"
           >
             <X size={18} />
@@ -125,7 +141,9 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
         </div>
 
         {/* Input Bar & Examples */}
-        <div className="p-6 border-b border-slate-800/80 bg-slate-900/40 space-y-4">
+        <div className={`p-6 border-b space-y-4 transition-colors ${
+          darkMode ? "border-[#2e2a24] bg-[#181614]/80" : "border-[#e5dec9] bg-[#f8f4ec]/80"
+        }`}>
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <input
@@ -134,28 +152,40 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleRun()}
                 placeholder="Describe a problem, ask a question about your architecture, or tell DataNova what you want to change..."
-                className="w-full px-4 py-3 rounded-xl border border-slate-700/80 bg-slate-950 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 font-sans shadow-inner"
+                className={`w-full px-4 py-3 rounded-xl border text-xs placeholder-stone-400 focus:outline-none focus:border-[#c59b27] transition-all shadow-inner ${
+                  darkMode
+                    ? "border-[#332f29] bg-[#141312] text-[#f5f2eb]"
+                    : "border-[#ded3bd] bg-[#fdfcf9] text-[#181716]"
+                }`}
               />
             </div>
             <button
               onClick={() => handleRun()}
               disabled={isExecuting || !prompt.trim()}
-              className="px-5 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-bold text-xs transition-all shadow-md shadow-sky-500/20 shrink-0 flex items-center gap-2"
+              className="px-5 py-3 rounded-xl bg-gradient-to-r from-[#c59b27] to-[#a37d1d] hover:from-[#dfba49] hover:to-[#b8860b] disabled:opacity-40 disabled:cursor-not-allowed text-[#181716] font-bold text-xs transition-all shadow-md shadow-[#c59b27]/25 shrink-0 flex items-center gap-2 active:scale-95"
             >
-              {isExecuting ? <RefreshCw size={14} className="animate-spin" /> : <Sparkles size={14} />}
+              {isExecuting ? <RefreshCw size={14} className="animate-spin text-[#181716]" /> : <Sparkles size={14} className="text-[#181716]" />}
               <span>{isExecuting ? "Investigating..." : "Coordinate Agents"}</span>
             </button>
           </div>
 
           {/* Quick prompt suggestions */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[11px] text-slate-400 font-medium">Examples:</span>
+            <span className={`text-[11px] font-medium font-mono uppercase tracking-wider ${
+              darkMode ? "text-[#857d72]" : "text-[#857d72]"
+            }`}>
+              Examples:
+            </span>
             {EXAMPLE_PROMPTS.map((ex, i) => (
               <button
                 key={i}
                 onClick={() => handleSelectExample(ex)}
                 disabled={isExecuting}
-                className="text-[11px] px-2.5 py-1 rounded-lg border border-slate-800 bg-slate-950/60 text-slate-300 hover:text-sky-300 hover:border-slate-700 transition-colors"
+                className={`text-[11px] px-2.5 py-1 rounded-lg border transition-colors shadow-sm ${
+                  darkMode
+                    ? "border-[#2e2a24] bg-[#161513] text-[#c2bcb2] hover:text-[#dfba49] hover:border-[#c59b27]"
+                    : "border-[#e5dec9] bg-[#fdfcf9] text-[#575249] hover:text-[#181716] hover:border-[#c59b27]"
+                }`}
               >
                 {ex}
               </button>
@@ -167,13 +197,17 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Real Execution Steps Display */}
           {isExecuting && (
-            <div className="p-6 rounded-xl border border-sky-500/30 bg-sky-500/5 space-y-4 animate-fadeIn">
-              <div className="flex items-center justify-between text-xs font-semibold text-sky-300">
+            <div className={`p-6 rounded-xl border space-y-4 animate-fadeIn ${
+              darkMode
+                ? "border-[#c59b27]/40 bg-[#c59b27]/10"
+                : "border-[#c59b27]/30 bg-[#fbf6ea]"
+            }`}>
+              <div className="flex items-center justify-between text-xs font-semibold text-[#b8860b] dark:text-[#dfba49]">
                 <span className="flex items-center gap-2">
-                  <RefreshCw size={14} className="animate-spin text-sky-400" />
+                  <RefreshCw size={14} className="animate-spin text-[#c59b27]" />
                   <span>Orchestrator Execution in Progress</span>
                 </span>
-                <span className="font-mono text-[10px] text-slate-400">
+                <span className={`font-mono text-[10px] ${darkMode ? "text-[#a69f93]" : "text-[#6e675f]"}`}>
                   Step {currentStepIndex + 1} of {EXECUTION_STEPS.length}
                 </span>
               </div>
@@ -187,18 +221,22 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
                       key={s.id}
                       className={`p-2.5 rounded-lg border text-xs flex items-center gap-2 ${
                         isDone
-                          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+                          ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 font-semibold"
                           : isCurrent
-                          ? "border-sky-500/60 bg-sky-500/20 text-white font-bold ring-1 ring-sky-500/30"
-                          : "border-slate-800 bg-slate-950/60 text-slate-500"
+                          ? darkMode
+                            ? "border-[#c59b27] bg-[#c59b27]/20 text-[#f5f2eb] font-bold ring-1 ring-[#c59b27]/40"
+                            : "border-[#c59b27] bg-[#f5ede0] text-[#181716] font-bold ring-1 ring-[#c59b27]/30"
+                          : darkMode
+                          ? "border-[#2e2a24] bg-[#161513] text-[#857d72]"
+                          : "border-[#e5dec9] bg-[#faf7f2] text-[#857d72]"
                       }`}
                     >
                       {isDone ? (
-                        <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
+                        <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
                       ) : isCurrent ? (
-                        <span className="w-2 h-2 rounded-full bg-sky-400 animate-ping shrink-0" />
+                        <span className="w-2 h-2 rounded-full bg-[#c59b27] animate-ping shrink-0" />
                       ) : (
-                        <span className="w-2 h-2 rounded-full bg-slate-700 shrink-0" />
+                        <span className="w-2 h-2 rounded-full bg-stone-400 dark:bg-stone-600 shrink-0" />
                       )}
                       <span className="truncate text-[11px]">{s.label}</span>
                     </div>
@@ -212,16 +250,22 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
           {report && !isExecuting && (
             <div className="space-y-6 animate-fadeIn">
               {/* Executive Summary Card */}
-              <div className="p-5 rounded-xl border border-slate-800/90 bg-slate-950/80 space-y-3">
-                <div className="flex items-center justify-between border-b border-slate-800/80 pb-2.5">
-                  <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-sky-400">
+              <div className={`p-5 rounded-xl border space-y-3 shadow-md ${
+                darkMode ? "border-[#2e2a24] bg-[#181614]" : "border-[#e5dec9] bg-[#fdfcf9]"
+              }`}>
+                <div className={`flex items-center justify-between border-b pb-2.5 ${
+                  darkMode ? "border-[#2e2a24]" : "border-[#e5dec9]"
+                }`}>
+                  <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#b8860b] dark:text-[#dfba49]">
                     What DataNova Understood
                   </span>
-                  <span className="text-[10px] font-mono text-slate-500">
+                  <span className={`text-[10px] font-mono ${darkMode ? "text-[#a69f93]" : "text-[#78716c]"}`}>
                     Scope: {report.scope.projectName} (v{report.scope.version}) &bull; {report.scope.componentsExamined.length} components
                   </span>
                 </div>
-                <p className="text-sm font-semibold text-slate-100 leading-relaxed">
+                <p className={`text-sm font-semibold leading-relaxed ${
+                  darkMode ? "text-[#f5f2eb]" : "text-[#181716]"
+                }`}>
                   {report.understoodGoal}
                 </p>
               </div>
@@ -229,22 +273,35 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
               {/* Key Findings Ledger */}
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold text-slate-200 uppercase tracking-wider font-mono">
-                    Key Findings ({report.findings.length})
-                  </h3>
-                  <span className="text-[11px] text-slate-500">Evidence-linked discoveries</span>
+                  <div className="flex items-center gap-2">
+                    <h3 className={`text-xs font-bold uppercase tracking-wider font-mono ${
+                      darkMode ? "text-[#f5f2eb]" : "text-[#181716]"
+                    }`}>
+                      Key Findings ({report.findings.length})
+                    </h3>
+                    <span className="font-cursive text-base text-[#b8860b] dark:text-[#dfba49]">evidence-linked</span>
+                  </div>
+                  <span className={`text-[11px] ${darkMode ? "text-[#a69f93]" : "text-[#78716c]"}`}>
+                    Grounded discoveries
+                  </span>
                 </div>
 
                 <div className="space-y-3">
                   {report.findings.map((f) => (
                     <div
                       key={f.id}
-                      className={`p-4 rounded-xl border text-xs space-y-2 transition-all ${
+                      className={`p-4 rounded-xl border text-xs space-y-2 transition-all shadow-sm ${
                         f.severity === "critical"
-                          ? "border-rose-500/40 bg-gradient-to-r from-rose-950/20 to-slate-950"
+                          ? darkMode
+                            ? "border-rose-500/40 bg-gradient-to-r from-rose-950/20 to-[#181614]"
+                            : "border-rose-200 bg-gradient-to-r from-rose-50/70 to-[#fdfcf9]"
                           : f.severity === "warning"
-                          ? "border-amber-500/40 bg-gradient-to-r from-amber-950/20 to-slate-950"
-                          : "border-sky-500/40 bg-slate-950"
+                          ? darkMode
+                            ? "border-amber-500/40 bg-gradient-to-r from-amber-950/20 to-[#181614]"
+                            : "border-amber-200 bg-gradient-to-r from-amber-50/70 to-[#fdfcf9]"
+                          : darkMode
+                          ? "border-[#c59b27]/40 bg-[#181614]"
+                          : "border-[#e5dec9] bg-[#fdfcf9]"
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -252,26 +309,30 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
                           <span
                             className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
                               f.severity === "critical"
-                                ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
+                                ? "bg-rose-500/20 text-rose-600 dark:text-rose-300 border border-rose-500/40"
                                 : f.severity === "warning"
-                                ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
-                                : "bg-sky-500/20 text-sky-300 border border-sky-500/40"
+                                ? "bg-amber-500/20 text-amber-600 dark:text-amber-300 border border-amber-500/40"
+                                : "bg-[#c59b27]/20 text-[#856514] dark:text-[#dfba49] border border-[#c59b27]/40"
                             }`}
                           >
                             {f.severity}
                           </span>
-                          <span className="font-bold text-white text-sm tracking-tight">{f.title}</span>
+                          <span className={`font-bold text-sm tracking-tight ${
+                            darkMode ? "text-[#f5f2eb]" : "text-[#181716]"
+                          }`}>{f.title}</span>
                         </div>
-                        <span className="text-[11px] font-mono text-slate-400">{f.affectedComponent}</span>
+                        <span className={`text-[11px] font-mono ${darkMode ? "text-[#a69f93]" : "text-[#78716c]"}`}>{f.affectedComponent}</span>
                       </div>
 
-                      <p className="text-slate-300 leading-relaxed">{f.plainSummary}</p>
+                      <p className={`leading-relaxed ${darkMode ? "text-[#c2bcb2]" : "text-[#575249]"}`}>{f.plainSummary}</p>
 
-                      <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px]">
-                        <span className="text-slate-400">
-                          Technical term: <strong className="text-slate-300">{f.technicalTerm}</strong>
+                      <div className={`pt-2 border-t flex flex-wrap items-center justify-between gap-2 text-[11px] ${
+                        darkMode ? "border-[#2e2a24]" : "border-[#e5dec9]"
+                      }`}>
+                        <span className={darkMode ? "text-[#a69f93]" : "text-[#78716c]"}>
+                          Technical term: <strong className={darkMode ? "text-[#f5f2eb]" : "text-[#181716]"}>{f.technicalTerm}</strong>
                         </span>
-                        <span className="text-sky-300 font-mono">
+                        <span className="text-[#b8860b] dark:text-[#dfba49] font-mono font-semibold">
                           Evidence: {f.evidenceRef}
                         </span>
                       </div>
@@ -281,14 +342,21 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
               </div>
 
               {/* Why It Matters */}
-              <div className="p-4 rounded-xl border border-slate-800 bg-slate-950/60 space-y-2">
-                <span className="text-xs font-bold text-slate-200 font-mono uppercase tracking-wider block">
-                  Why These Findings Matter:
-                </span>
+              <div className={`p-4 rounded-xl border space-y-2 ${
+                darkMode ? "border-[#2e2a24] bg-[#161513]" : "border-[#e5dec9] bg-[#f8f4eb]"
+              }`}>
+                <div className="flex items-center gap-2">
+                  <span className={`text-xs font-bold font-mono uppercase tracking-wider block ${
+                    darkMode ? "text-[#f5f2eb]" : "text-[#181716]"
+                  }`}>
+                    Why These Findings Matter:
+                  </span>
+                  <span className="font-cursive text-sm text-[#b8860b] dark:text-[#dfba49]">impact assessment</span>
+                </div>
                 <div className="space-y-1.5">
                   {report.whyItMatters.map((w, i) => (
-                    <div key={i} className="text-xs text-slate-300 flex items-start gap-2">
-                      <span className="text-amber-400 font-bold">&bull;</span>
+                    <div key={i} className={`text-xs flex items-start gap-2 ${darkMode ? "text-[#c2bcb2]" : "text-[#575249]"}`}>
+                      <span className="text-[#c59b27] font-bold">&bull;</span>
                       <span className="leading-snug">{w}</span>
                     </div>
                   ))}
@@ -296,15 +364,19 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
               </div>
 
               {/* Uncertainties & Limitations */}
-              <div className="p-4 rounded-xl border border-slate-800/80 bg-slate-950/40 space-y-2">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-slate-400 font-mono uppercase tracking-wider">
-                  <AlertTriangle size={13} className="text-amber-400" />
+              <div className={`p-4 rounded-xl border space-y-2 ${
+                darkMode ? "border-[#2e2a24] bg-[#161513]/60" : "border-[#e5dec9] bg-[#fdfcf9]/80"
+              }`}>
+                <div className={`flex items-center gap-1.5 text-xs font-bold font-mono uppercase tracking-wider ${
+                  darkMode ? "text-[#a69f93]" : "text-[#78716c]"
+                }`}>
+                  <AlertTriangle size={13} className="text-amber-500" />
                   <span>Uncertainties & Known Limits (Zero False Certainty)</span>
                 </div>
                 <div className="space-y-1">
                   {report.uncertainties.map((u, i) => (
-                    <div key={i} className="text-[11px] text-slate-400 flex items-start gap-2">
-                      <span className="text-slate-600">&bull;</span>
+                    <div key={i} className={`text-[11px] flex items-start gap-2 ${darkMode ? "text-[#857d72]" : "text-[#78716c]"}`}>
+                      <span className="text-stone-400">&bull;</span>
                       <span>{u}</span>
                     </div>
                   ))}
@@ -313,7 +385,9 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
 
               {/* Recommended Next Actions */}
               <div className="space-y-2.5">
-                <span className="text-xs font-bold text-slate-200 font-mono uppercase tracking-wider block">
+                <span className={`text-xs font-bold font-mono uppercase tracking-wider block ${
+                  darkMode ? "text-[#f5f2eb]" : "text-[#181716]"
+                }`}>
                   Recommended Next Actions:
                 </span>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -321,28 +395,38 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
                     <button
                       key={i}
                       onClick={() => handleActionClick(act.targetView)}
-                      className="p-3.5 rounded-xl border border-slate-800 bg-slate-950 hover:border-sky-500/60 hover:bg-slate-900 transition-all text-left flex items-center justify-between group"
+                      className={`p-3.5 rounded-xl border text-left flex items-center justify-between group transition-all shadow-sm ${
+                        darkMode
+                          ? "border-[#2e2a24] bg-[#181614] hover:border-[#c59b27] hover:bg-[#201d19]"
+                          : "border-[#e5dec9] bg-[#fdfcf9] hover:border-[#c59b27] hover:bg-[#f6efe2]"
+                      }`}
                     >
                       <div className="flex items-center gap-2.5">
-                        <ArrowRight size={14} className="text-sky-400 group-hover:translate-x-1 transition-transform" />
-                        <span className="text-xs font-semibold text-slate-200 group-hover:text-white">
+                        <ArrowRight size={14} className="text-[#c59b27] group-hover:translate-x-1 transition-transform" />
+                        <span className={`text-xs font-semibold group-hover:text-[#c59b27] transition-colors ${
+                          darkMode ? "text-[#f5f2eb]" : "text-[#181716]"
+                        }`}>
                           {act.label}
                         </span>
                       </div>
-                      <ChevronRight size={13} className="text-slate-500" />
+                      <ChevronRight size={13} className={darkMode ? "text-[#857d72]" : "text-[#857d72]"} />
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Expandable Technical Activity Log */}
-              <div className="border border-slate-800 rounded-xl overflow-hidden">
+              <div className={`border rounded-xl overflow-hidden ${
+                darkMode ? "border-[#2e2a24]" : "border-[#e5dec9]"
+              }`}>
                 <button
                   onClick={() => setShowTechnicalDetails(!showTechnicalDetails)}
-                  className="w-full px-4 py-3 bg-slate-950/80 hover:bg-slate-900 transition-colors flex items-center justify-between text-xs text-slate-400"
+                  className={`w-full px-4 py-3 transition-colors flex items-center justify-between text-xs ${
+                    darkMode ? "bg-[#181614] hover:bg-[#201d19] text-[#a69f93]" : "bg-[#f5efe4] hover:bg-[#ece3d4] text-[#6e675f]"
+                  }`}
                 >
                   <span className="flex items-center gap-2 font-mono">
-                    <Terminal size={14} className="text-sky-400" />
+                    <Terminal size={14} className="text-[#c59b27]" />
                     <span>Specialist Agent Technical Details ({report.specialistActivities.length} Tasks)</span>
                   </span>
                   <ChevronDown
@@ -352,15 +436,19 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
                 </button>
 
                 {showTechnicalDetails && (
-                  <div className="p-4 bg-slate-950/90 border-t border-slate-800 space-y-2.5 text-xs font-mono">
+                  <div className={`p-4 border-t space-y-2.5 text-xs font-mono ${
+                    darkMode ? "bg-[#141312] border-[#2e2a24]" : "bg-[#fdfcf9] border-[#e5dec9]"
+                  }`}>
                     {report.specialistActivities.map((act) => (
-                      <div key={act.id} className="p-3 rounded bg-slate-900 border border-slate-800 space-y-1">
-                        <div className="flex items-center justify-between text-sky-300 font-bold">
+                      <div key={act.id} className={`p-3 rounded border space-y-1 ${
+                        darkMode ? "bg-[#181614] border-[#2e2a24]" : "bg-[#faf7f2] border-[#e5dec9]"
+                      }`}>
+                        <div className="flex items-center justify-between text-[#b8860b] dark:text-[#dfba49] font-bold">
                           <span>[{act.specialist.toUpperCase()}] {act.task}</span>
-                          <span className="text-slate-500 text-[10px]">{act.durationMs}ms</span>
+                          <span className={`text-[10px] ${darkMode ? "text-[#857d72]" : "text-[#857d72]"}`}>{act.durationMs}ms</span>
                         </div>
-                        <div className="text-slate-300 text-[11px]">{act.outputSummary}</div>
-                        <div className="text-[10px] text-slate-500">
+                        <div className={darkMode ? "text-[#c2bcb2]" : "text-[#575249]"}>{act.outputSummary}</div>
+                        <div className={`text-[10px] ${darkMode ? "text-[#857d72]" : "text-[#857d72]"}`}>
                           Evidence: {act.evidenceRefs.join(", ")}
                         </div>
                       </div>
@@ -373,12 +461,17 @@ export const OrchestratorModal: React.FC<OrchestratorModalProps> = ({
 
           {/* Empty / Initial state when opened without prompt */}
           {!report && !isExecuting && (
-            <div className="p-12 text-center text-xs text-slate-400 space-y-3">
-              <Bot size={36} className="text-slate-600 mx-auto" />
-              <div className="font-bold text-slate-200 text-sm">
+            <div className="p-12 text-center text-xs space-y-3">
+              <Bot size={38} className="text-[#c59b27] mx-auto opacity-70 animate-bounce" />
+              <div className="font-bold text-sm">
                 Describe your engineering goal above
               </div>
-              <p className="max-w-md mx-auto text-slate-500 leading-relaxed text-[11px]">
+              <div className="font-cursive text-xl text-[#b8860b] dark:text-[#dfba49]">
+                "One query activates architecture, runtime, and validation specialists"
+              </div>
+              <p className={`max-w-md mx-auto leading-relaxed text-[11px] ${
+                darkMode ? "text-[#a69f93]" : "text-[#6e675f]"
+              }`}>
                 The DataNova Orchestrator will analyze your request, formulate an execution plan across specialized agents, and present one evidence-backed report with recommended actions.
               </p>
             </div>

@@ -16,20 +16,18 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, online, o
   const metrics: any = metricsLive.data;
 
   return (
-    <header className="sticky top-0 z-50 relative flex items-center justify-between px-6 py-3 border-b transition-colors bg-white dark:bg-navy-950 border-zinc-200/80 dark:border-white/10">
-      {/* moa inheritance: flat header, single zinc hairline (no glass blur). */}
-
+    <header className="sticky top-0 z-50 relative flex items-center justify-between px-6 py-3 border-b transition-colors bg-[#faf7f2]/95 dark:bg-[#181716]/95 border-[#e8e2d4] dark:border-[#2e2a24] backdrop-blur-md">
       {/* Brand & Problem Statement */}
       <div className="flex items-center space-x-3.5">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-meadow text-white ring-1 ring-black/5">
+        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-tr from-[#c59b27] via-[#a37d1d] to-[#181716] text-[#faf7f2] shadow-md shadow-[#c59b27]/25 ring-1 ring-[#c59b27]/40">
           <Shield className="w-5 h-5" />
         </div>
         <div>
           <div className="flex items-center space-x-2">
             <span className="text-xl font-display font-bold tracking-tight text-zinc-900 dark:text-white">
-              AEGIS-Fraud <span className="ultra-shimmer-text">X</span>
+              AEGIS-Fraud <span className="font-cursive text-2xl text-[#b8860b] dark:text-[#dfba49] font-normal">X</span>
             </span>
-            <span className="px-2 py-0.5 text-xs font-mono font-semibold rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20">
+            <span className="px-2 py-0.5 text-xs font-mono font-semibold rounded-full bg-[#c59b27]/10 text-[#8f6d14] dark:text-[#dfba49] border border-[#c59b27]/30">
               DN-FN-01
             </span>
           </div>
@@ -65,10 +63,10 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, online, o
         {/* DataNova Unified Flagship Launcher */}
         <button
           onClick={() => { window.location.hash = "#/home"; }}
-          className="flex items-center space-x-1.5 h-8 px-3 rounded-lg text-xs font-bold text-sky-300 bg-sky-950/80 hover:bg-sky-900 border border-sky-500/40 hover:border-sky-400 transition-all shadow-sm shadow-sky-500/20"
+          className="flex items-center space-x-1.5 h-8 px-3 rounded-lg text-xs font-bold text-[#181716] dark:text-[#f5f2eb] bg-gradient-to-r from-[#dfba49] to-[#c59b27] dark:from-[#2e2a24] dark:to-[#1e1c19] hover:from-[#edd685] hover:to-[#dfba49] border border-[#c59b27]/40 transition-all shadow-sm shadow-[#c59b27]/20 active:scale-95"
           title="Open DataNova Flagship Studio"
         >
-          <Boxes className="w-3.5 h-3.5 text-sky-400" />
+          <Boxes className="w-3.5 h-3.5 text-[#181716] dark:text-[#dfba49]" />
           <span>DataNova Studio</span>
         </button>
 

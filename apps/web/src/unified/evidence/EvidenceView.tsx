@@ -8,6 +8,8 @@
  * 4. Reviews (Multi-party reviewer room and formal sign-offs)
  * 5. Share & Exchange (Evidence package export/import with SHA-256 integrity)
  * 6. Quality & Benchmarks (Benchmark runs, validation coverage, limitations)
+ *
+ * Styled in luxury creamy white and creamy black aesthetic with cursive typography.
  */
 
 import React from "react";
@@ -39,6 +41,7 @@ interface EvidenceViewProps {
   onAdoptModel: (model: ArchitectureModel) => void;
   onNavigateWorkspace: (subview: string) => void;
   setAnnounce?: (msg: string) => void;
+  darkMode?: boolean;
 }
 
 export const EvidenceView: React.FC<EvidenceViewProps> = ({
@@ -52,18 +55,27 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
   onAdoptModel,
   onNavigateWorkspace,
   setAnnounce = () => {},
+  darkMode = true,
 }) => {
   return (
-    <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden bg-slate-950">
+    <div className={`flex-1 flex flex-col h-full min-h-0 overflow-hidden transition-colors ${
+      darkMode ? "bg-[#141312] text-[#f5f2eb]" : "bg-[#faf7f2] text-[#181716]"
+    }`}>
       {/* Evidence & Review Sub-Navigation Rail */}
-      <div className="h-11 shrink-0 border-b border-slate-800/80 bg-slate-900/70 px-4 lg:px-6 flex items-center justify-between gap-4">
+      <div className={`h-11 shrink-0 border-b px-4 lg:px-6 flex items-center justify-between gap-4 transition-colors ${
+        darkMode ? "border-[#2a2723] bg-[#1a1816]/90" : "border-[#e5dec9] bg-[#f5efe3]/90"
+      }`}>
         <nav aria-label="Evidence Sections" className="flex items-center gap-1 overflow-x-auto py-1">
           <button
             onClick={() => onChangeSubview("findings")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               subview === "findings"
-                ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                ? darkMode
+                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
+                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                : darkMode
+                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
+                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
             }`}
           >
             <ShieldCheck size={13} />
@@ -74,8 +86,12 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
             onClick={() => onChangeSubview("sources")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               subview === "sources"
-                ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                ? darkMode
+                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
+                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                : darkMode
+                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
+                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
             }`}
           >
             <BookOpen size={13} />
@@ -86,8 +102,12 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
             onClick={() => onChangeSubview("evidence")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               subview === "evidence"
-                ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                ? darkMode
+                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
+                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                : darkMode
+                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
+                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
             }`}
           >
             <FileText size={13} />
@@ -98,8 +118,12 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
             onClick={() => onChangeSubview("reviews")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               subview === "reviews"
-                ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                ? darkMode
+                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
+                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                : darkMode
+                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
+                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
             }`}
           >
             <Award size={13} />
@@ -110,8 +134,12 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
             onClick={() => onChangeSubview("exchange")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               subview === "exchange"
-                ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                ? darkMode
+                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
+                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                : darkMode
+                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
+                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
             }`}
           >
             <Send size={13} />
@@ -122,8 +150,12 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
             onClick={() => onChangeSubview("quality")}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
               subview === "quality"
-                ? "bg-sky-500/15 text-sky-300 border border-sky-500/30"
-                : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                ? darkMode
+                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
+                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                : darkMode
+                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
+                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
             }`}
           >
             <Gauge size={13} />
@@ -131,9 +163,11 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
           </button>
         </nav>
 
-        <div className="hidden sm:flex items-center gap-2 text-xs text-slate-500 font-mono">
+        <div className={`hidden sm:flex items-center gap-2 text-xs font-mono ${
+          darkMode ? "text-[#a69f93]" : "text-[#78716c]"
+        }`}>
           <span>Integrity:</span>
-          <span className="text-emerald-400 font-semibold flex items-center gap-1">
+          <span className="text-emerald-500 font-semibold flex items-center gap-1">
             <CheckCircle2 size={12} />
             <span>SHA-256 Attested</span>
           </span>
@@ -143,7 +177,7 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
       {/* Main Viewport Content Area */}
       <div className="flex-1 min-h-0 overflow-y-auto p-6 lg:p-8">
         {subview === "findings" && (
-          <FindingsSubView onNavigateWorkspace={onNavigateWorkspace} />
+          <FindingsSubView onNavigateWorkspace={onNavigateWorkspace} darkMode={darkMode} />
         )}
 
         {subview === "sources" && (
