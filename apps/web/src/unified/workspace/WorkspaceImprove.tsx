@@ -31,47 +31,51 @@ export const WorkspaceImprove: React.FC<WorkspaceImproveProps> = ({
     }`}>
       {/* Header and Sub-Tab Switcher */}
       <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border backdrop-blur-md shadow-lg ${
-        darkMode ? "border-[#2e2a24] bg-[#1c1a17]/90" : "border-[#e5dec9] bg-[#fdfcf9]"
+        darkMode ? "border-[#27272a] bg-[#121214]" : "border-[#e4e2dd] bg-[#ffffff]"
       }`}>
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <h2 className="text-lg font-bold tracking-tight">Improve & Compare</h2>
-            <span className="font-cursive text-xl text-[#b8860b] dark:text-[#dfba49]">
-              Architecture Evolution
+            <span className="text-[10px] font-mono tracking-widest uppercase font-semibold text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
+              Evolution Studio
             </span>
             <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-              EVOLUTION ENGINE
+              Verified Engine
             </span>
           </div>
-          <p className={`text-xs mt-1 leading-relaxed ${darkMode ? "text-[#c2bcb2]" : "text-[#575249]"}`}>
+          <p className={`text-xs mt-1 leading-relaxed ${darkMode ? "text-[#a1a1aa]" : "text-[#52525b]"}`}>
             Track Architecture Decision Records (ADRs), evaluate proposed changes, and review pre-deployment release gates.
           </p>
         </div>
 
         {/* Tab Buttons */}
         <div className={`flex items-center gap-1.5 p-1 rounded-xl border ${
-          darkMode ? "bg-[#141312] border-[#2e2a24]" : "bg-[#f5efe4] border-[#ded4c0]"
+          darkMode ? "bg-[#09090b] border-[#27272a]" : "bg-[#f4f4f5] border-[#e4e4e7]"
         }`}>
           <button
             onClick={() => setActiveTab("decisions")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeTab === "decisions"
-                ? "bg-gradient-to-r from-[#c59b27] to-[#a37d1d] text-[#181716] shadow-sm font-bold"
+                ? darkMode
+                  ? "bg-[#18181b] text-amber-400 border border-amber-500/30 shadow-sm font-bold"
+                  : "bg-white text-zinc-900 border border-zinc-200 shadow-sm font-bold"
                 : darkMode
-                ? "text-[#a69f93] hover:text-[#f5f2eb]"
-                : "text-[#6e675f] hover:text-[#181716]"
+                ? "text-zinc-400 hover:text-zinc-200"
+                : "text-zinc-600 hover:text-zinc-900"
             }`}
           >
             <span>Decision Records (ADR)</span>
           </button>
           <button
             onClick={() => setActiveTab("release")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               activeTab === "release"
-                ? "bg-gradient-to-r from-[#c59b27] to-[#a37d1d] text-[#181716] shadow-sm font-bold"
+                ? darkMode
+                  ? "bg-[#18181b] text-amber-400 border border-amber-500/30 shadow-sm font-bold"
+                  : "bg-white text-zinc-900 border border-zinc-200 shadow-sm font-bold"
                 : darkMode
-                ? "text-[#a69f93] hover:text-[#f5f2eb]"
-                : "text-[#6e675f] hover:text-[#181716]"
+                ? "text-zinc-400 hover:text-zinc-200"
+                : "text-zinc-600 hover:text-zinc-900"
             }`}
           >
             <span>Release Impact & Gate</span>

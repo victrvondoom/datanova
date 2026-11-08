@@ -59,23 +59,23 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
 }) => {
   return (
     <div className={`flex-1 flex flex-col h-full min-h-0 overflow-hidden transition-colors ${
-      darkMode ? "bg-[#141312] text-[#f5f2eb]" : "bg-[#faf7f2] text-[#181716]"
+      darkMode ? "bg-[#0c0c0e] text-[#f4f4f5]" : "bg-[#fbfaf8] text-[#111113]"
     }`}>
       {/* Evidence & Review Sub-Navigation Rail */}
       <div className={`h-11 shrink-0 border-b px-4 lg:px-6 flex items-center justify-between gap-4 transition-colors ${
-        darkMode ? "border-[#2a2723] bg-[#1a1816]/90" : "border-[#e5dec9] bg-[#f5efe3]/90"
+        darkMode ? "border-[#27272a] bg-[#121214]/95" : "border-[#e4e2dd] bg-[#ffffff]/95"
       }`}>
         <nav aria-label="Evidence Sections" className="flex items-center gap-1 overflow-x-auto py-1">
           <button
             onClick={() => onChangeSubview("findings")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               subview === "findings"
                 ? darkMode
-                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
-                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                  ? "bg-[#18181b] text-amber-400 border border-amber-500/30 shadow-sm font-bold"
+                  : "bg-white text-zinc-900 border border-zinc-200 shadow-sm font-bold"
                 : darkMode
-                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
-                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
+                  ? "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
             }`}
           >
             <ShieldCheck size={13} />
@@ -84,14 +84,14 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
 
           <button
             onClick={() => onChangeSubview("sources")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               subview === "sources"
                 ? darkMode
-                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
-                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                  ? "bg-[#18181b] text-amber-400 border border-amber-500/30 shadow-sm font-bold"
+                  : "bg-white text-zinc-900 border border-zinc-200 shadow-sm font-bold"
                 : darkMode
-                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
-                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
+                  ? "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
             }`}
           >
             <BookOpen size={13} />
@@ -100,14 +100,14 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
 
           <button
             onClick={() => onChangeSubview("evidence")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               subview === "evidence"
                 ? darkMode
-                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
-                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                  ? "bg-[#18181b] text-amber-400 border border-amber-500/30 shadow-sm font-bold"
+                  : "bg-white text-zinc-900 border border-zinc-200 shadow-sm font-bold"
                 : darkMode
-                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
-                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
+                  ? "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
             }`}
           >
             <FileText size={13} />
@@ -116,14 +116,14 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
 
           <button
             onClick={() => onChangeSubview("reviews")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               subview === "reviews"
                 ? darkMode
-                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
-                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                  ? "bg-[#18181b] text-amber-400 border border-amber-500/30 shadow-sm font-bold"
+                  : "bg-white text-zinc-900 border border-zinc-200 shadow-sm font-bold"
                 : darkMode
-                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
-                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
+                  ? "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
             }`}
           >
             <Award size={13} />
@@ -132,14 +132,14 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
 
           <button
             onClick={() => onChangeSubview("exchange")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               subview === "exchange"
                 ? darkMode
-                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
-                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                  ? "bg-[#18181b] text-amber-400 border border-amber-500/30 shadow-sm font-bold"
+                  : "bg-white text-zinc-900 border border-zinc-200 shadow-sm font-bold"
                 : darkMode
-                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
-                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
+                  ? "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
             }`}
           >
             <Send size={13} />
@@ -148,14 +148,14 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
 
           <button
             onClick={() => onChangeSubview("quality")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               subview === "quality"
                 ? darkMode
-                  ? "bg-[#282520] text-[#dfba49] border border-[#3e3930] shadow-sm font-bold"
-                  : "bg-[#181716] text-[#faf7f2] shadow-sm font-bold"
+                  ? "bg-[#18181b] text-amber-400 border border-amber-500/30 shadow-sm font-bold"
+                  : "bg-white text-zinc-900 border border-zinc-200 shadow-sm font-bold"
                 : darkMode
-                  ? "text-[#a69f93] hover:text-[#f5f2eb] hover:bg-[#22201c]"
-                  : "text-[#6e675f] hover:text-[#181716] hover:bg-[#ece4d4]"
+                  ? "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                  : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
             }`}
           >
             <Gauge size={13} />
@@ -164,7 +164,7 @@ export const EvidenceView: React.FC<EvidenceViewProps> = ({
         </nav>
 
         <div className={`hidden sm:flex items-center gap-2 text-xs font-mono ${
-          darkMode ? "text-[#a69f93]" : "text-[#78716c]"
+          darkMode ? "text-zinc-400" : "text-zinc-600"
         }`}>
           <span>Integrity:</span>
           <span className="text-emerald-500 font-semibold flex items-center gap-1">

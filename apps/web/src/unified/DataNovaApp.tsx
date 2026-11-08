@@ -306,7 +306,7 @@ export const DataNovaApp: React.FC<DataNovaAppProps> = ({
             }`}>
               <div className="flex items-center gap-2">
                 <h3 className="text-base font-bold">Project & Workspace Settings</h3>
-                <span className="font-cursive text-lg text-[#b8860b] dark:text-[#dfba49]">preferences</span>
+                <span className="text-[10px] font-mono tracking-wider uppercase text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 font-semibold">PREFERENCES</span>
               </div>
               <button
                 onClick={() => setSettingsOpen(false)}

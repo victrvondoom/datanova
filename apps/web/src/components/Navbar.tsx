@@ -25,9 +25,9 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, online, o
         <div>
           <div className="flex items-center space-x-2">
             <span className="text-xl font-display font-bold tracking-tight text-zinc-900 dark:text-white">
-              AEGIS-Fraud <span className="font-cursive text-2xl text-[#b8860b] dark:text-[#dfba49] font-normal">X</span>
+              AEGIS-Fraud <span className="font-mono text-xl text-amber-500 font-bold ml-0.5">X</span>
             </span>
-            <span className="px-2 py-0.5 text-xs font-mono font-semibold rounded-full bg-[#c59b27]/10 text-[#8f6d14] dark:text-[#dfba49] border border-[#c59b27]/30">
+            <span className="px-2 py-0.5 text-xs font-mono font-semibold rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
               DN-FN-01
             </span>
           </div>
@@ -63,10 +63,10 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, online, o
         {/* DataNova Unified Flagship Launcher */}
         <button
           onClick={() => { window.location.hash = "#/home"; }}
-          className="flex items-center space-x-1.5 h-8 px-3 rounded-lg text-xs font-bold text-[#181716] dark:text-[#f5f2eb] bg-gradient-to-r from-[#dfba49] to-[#c59b27] dark:from-[#2e2a24] dark:to-[#1e1c19] hover:from-[#edd685] hover:to-[#dfba49] border border-[#c59b27]/40 transition-all shadow-sm shadow-[#c59b27]/20 active:scale-95"
+          className="flex items-center space-x-1.5 h-8 px-3 rounded-lg text-xs font-semibold text-zinc-100 bg-[#18181b] hover:bg-[#27272a] border border-[#27272a] hover:border-amber-500/40 transition-all shadow-sm active:scale-95"
           title="Open DataNova Flagship Studio"
         >
-          <Boxes className="w-3.5 h-3.5 text-[#181716] dark:text-[#dfba49]" />
+          <Boxes className="w-3.5 h-3.5 text-amber-400" />
           <span>DataNova Studio</span>
         </button>
 

@@ -163,24 +163,24 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, setCurrentView })
               style={{ animationDelay: `${staggerDelayMs(index + 1)}ms` }}
               className={`relative w-full flex items-center justify-between h-9 px-2.5 rounded-lg text-[13px] font-medium transition-colors ${
                 isActive
-                  ? "bg-[#181716] text-[#faf7f2] dark:bg-[#282520] dark:text-[#dfba49] shadow-sm font-semibold"
-                  : "text-[#575249] hover:bg-[#ede5d5] hover:text-[#181716] dark:text-[#a69f93] dark:hover:bg-[#22201d] dark:hover:text-[#f5f2eb]"
+                  ? "bg-[#181716] text-[#faf7f2] dark:bg-[#18181b] dark:text-amber-400 shadow-sm font-semibold"
+                  : "text-[#575249] hover:bg-[#ede5d5] hover:text-[#181716] dark:text-[#a69f93] dark:hover:bg-[#1f1f23] dark:hover:text-[#f5f2eb]"
               }`}
             >
               {isActive && (
                 <span
                   aria-hidden
-                  className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-[#c59b27]"
+                  className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 rounded-r-full bg-amber-500"
                 />
               )}
               <div className="flex items-center space-x-3">
-                <Icon className={`w-4 h-4 ${isActive ? "text-[#c59b27] dark:text-[#dfba49]" : "text-[#78716c] dark:text-[#8c857b]"}`} />
+                <Icon className={`w-4 h-4 ${isActive ? "text-amber-600 dark:text-amber-400" : "text-[#78716c] dark:text-[#8c857b]"}`} />
                 <span>{item.label}</span>
               </div>
               <span
                 className={`text-[10px] font-mono px-2 py-0.5 rounded-md ${
                   isActive
-                    ? "bg-[#c59b27]/20 text-[#181716] dark:text-[#dfba49] font-semibold"
+                    ? "bg-amber-500/15 text-[#181716] dark:text-amber-400 font-semibold"
                     : "bg-[#ece3d3] dark:bg-[#22201d] text-[#78716c] dark:text-[#8c857b]"
                 }`}
               >

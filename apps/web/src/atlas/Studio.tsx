@@ -416,10 +416,10 @@ export const StudioView: React.FC<{
       {/* ——— Center column ——— */}
       <div className="flex-1 flex flex-col min-w-0 min-h-0">
         {/* Canvas toolbar (Task 5.1 spec) */}
-        <div role="toolbar" aria-label="Canvas tools" className="h-10 shrink-0 border-b border-slate-800/80 bg-slate-900/60 flex items-center gap-1 px-2 overflow-x-auto">
+        <div role="toolbar" aria-label="Canvas tools" className="h-10 shrink-0 border-b border-[#27272a] bg-[#121214] flex items-center gap-1.5 px-3 overflow-x-auto">
           <label htmlFor="mode-select" className="sr-only">Map mode</label>
           <select id="mode-select" value={mode} onChange={(e) => { setMode(e.target.value as MapMode); onPanels((p) => ({ ...p, mode: e.target.value as MapMode })); }}
-            className="rounded-md border border-slate-600 bg-slate-800/80 px-2 py-1 text-xs text-slate-100">
+            className="rounded-lg border border-[#3f3f46] bg-[#18181b] px-2.5 py-1 text-xs text-[#f4f4f5] font-medium focus:outline-none focus:border-amber-500">
             <optgroup label="Architecture Modes">
               {MAP_MODES.map((m) => <option key={m.mode} value={m.mode}>{m.label}</option>)}
             </optgroup>
@@ -427,19 +427,19 @@ export const StudioView: React.FC<{
               {REALITY_MAP_MODES.map((m) => <option key={m.mode} value={m.mode}>{m.label}</option>)}
             </optgroup>
           </select>
-          <span className="w-px h-5 bg-slate-700 mx-1" />
+          <span className="w-px h-5 bg-[#27272a] mx-1" />
           <AButton aria-label="Focus selection" disabled={!selection} onClick={() => selection && sceneRef.current?.focusNode(selection.id)}><Crosshair size={12} aria-hidden /></AButton>
           <AButton aria-label="Fit to view" onClick={() => sceneRef.current?.fitToView()}><MaximizeIcon /></AButton>
           <AButton aria-label="Isometric view" onClick={() => { sceneRef.current?.preset("iso"); onPanels((p) => ({ ...p, cameraPreset: "iso" })); }}><Camera size={12} aria-hidden /></AButton>
           <AButton aria-label="Top-down view" onClick={() => { sceneRef.current?.preset("top"); onPanels((p) => ({ ...p, cameraPreset: "top" })); }}><LayoutGrid size={12} aria-hidden /></AButton>
-          <span className="w-px h-5 bg-slate-700 mx-1" />
+          <span className="w-px h-5 bg-[#27272a] mx-1" />
           <AButton variant={connectFrom ? "primary" : "default"} onClick={() => setConnectFrom(connectFrom ? null : (selection?.kind === "node" ? selection.id : graph.nodes[0]?.id ?? null))}
             title="Connect: select a source node, then pick the target">
             <span className="inline-flex items-center gap-1"><MousePointer2 size={11} aria-hidden /> {connectFrom ? `Connect from ${connectFrom}…` : "Connect"}</span>
           </AButton>
           <AButton aria-label={historyState.undo > 0 ? "Undo" : "Undo (nothing)"} disabled={historyState.undo === 0} onClick={undo}><Undo2 size={12} aria-hidden /></AButton>
           <AButton aria-label={historyState.redo > 0 ? "Redo" : "Redo (nothing)"} disabled={historyState.redo === 0} onClick={redo}><Redo2 size={12} aria-hidden /></AButton>
-          <span className="w-px h-5 bg-slate-700 mx-1" />
+          <span className="w-px h-5 bg-[#27272a] mx-1" />
           <AButton variant="primary" onClick={runBurst}><span className="inline-flex items-center gap-1"><Play size={11} aria-hidden /> Run scenario</span></AButton>
           <AButton onClick={takeSnapshot}><span className="inline-flex items-center gap-1"><Sparkles size={11} aria-hidden /> Snapshot</span></AButton>
           <AButton disabled={!snapshot} onClick={compareSnapshot}><span className="inline-flex items-center gap-1"><GitCompare size={11} aria-hidden /> Compare</span></AButton>
@@ -455,7 +455,7 @@ export const StudioView: React.FC<{
         </div>
 
         {/* Viewport */}
-        <div className="flex-1 min-h-0 relative bg-slate-950">
+        <div className="flex-1 min-h-0 relative bg-[#09090b]">
           {is2D ? (
             <div role="img" aria-label={`2D architecture map — ${graph.nodes.length} components, ${graph.edges.length} connections`}
               className="absolute inset-0 overflow-auto p-4">
@@ -501,12 +501,13 @@ export const StudioView: React.FC<{
           )}
 
           {/* status strip */}
-          <div className="absolute left-2 bottom-2 right-2 flex items-center gap-2 pointer-events-none">
-            <span className="rounded bg-slate-900/90 border border-slate-700 px-2 py-1 text-[10px] text-slate-300 max-w-[60%] truncate">
-              {layer.summary}{hoverInfo ? ` · hovering: ${hoverInfo}` : ""}
+          <div className="absolute left-3 bottom-3 right-3 flex items-center gap-2 pointer-events-none">
+            <span className="rounded-lg bg-[#141416]/95 border border-[#27272a] px-3 py-1.5 text-[11px] text-[#f4f4f5] max-w-[65%] truncate backdrop-blur-md shadow-lg flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span>{layer.summary}{hoverInfo ? ` · hovering: ${hoverInfo}` : ""}</span>
             </span>
             {!is2D && (
-              <span className="ml-auto rounded bg-slate-900/90 border border-slate-700 px-2 py-1 text-[10px] text-slate-400">
+              <span className="ml-auto rounded-lg bg-[#141416]/95 border border-[#27272a] px-3 py-1.5 text-[10px] font-mono text-[#a1a1aa] backdrop-blur-md shadow-lg">
                 {diagnostics.webgl ? `WebGL · ${diagnostics.drawCalls} calls · ${diagnostics.triangles.toLocaleString()} tris` : "WebGL unavailable — switch to 2D"}
               </span>
             )}
@@ -514,7 +515,7 @@ export const StudioView: React.FC<{
 
           {/* ——— Synchronized 2D minimap (Task 23) ——— */}
           {panels.minimap && (
-            <div className="absolute right-2 top-2 rounded-lg border border-slate-700 bg-slate-900/90 p-1.5 z-10"
+            <div className="absolute right-3 top-3 rounded-xl border border-[#27272a] bg-[#141416]/95 p-2 z-10 backdrop-blur-md shadow-xl"
               aria-label="Minimap — synchronized overview of the architecture">
               <svg width={148} height={104} role="img"
                 aria-label={`Minimap: ${graph.nodes.length} components — click a dot to focus it`}>
