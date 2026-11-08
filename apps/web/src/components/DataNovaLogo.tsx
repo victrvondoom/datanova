@@ -153,3 +153,4 @@ export const DataNovaLogo: React.FC<DataNovaLogoProps> = ({
     </div>
   );
 };
+

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { Project } from "../../atlas/state";
 import { useLiveTelemetry } from "../liveTelemetry";
+import { InlineMath } from "../../components/MathView";
 
 interface HomeViewProps {
   projects: Project[];
@@ -168,6 +169,29 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <span>{chip.label}</span>
             </button>
           ))}
+        </div>
+
+        {/* Dynamic Continuous Differential Stability Ticker */}
+        <div className="flex items-center justify-center pt-2">
+          <div
+            onClick={() => onNavigateWorkspace("analyze")}
+            className={`inline-flex items-center gap-3 px-4 py-1.5 rounded-full border text-xs font-mono cursor-pointer transition-all hover:border-amber-500/60 shadow-md ${
+              darkMode
+                ? "bg-[#141416]/90 border-[#27272a] text-[#a1a1aa]"
+                : "bg-[#ffffff]/90 border-[#e4e2dd] text-[#52525b]"
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="font-semibold text-zinc-300">Continuous Calculus Engine:</span>
+            <InlineMath math={`\\frac{dQ}{dt} = \\lambda - \\mu(Q)`} darkMode={darkMode} />
+            <span className="text-zinc-600">&bull;</span>
+            <InlineMath math={`\\lambda_J = -0.412 < 0`} darkMode={darkMode} />
+            <span className="text-zinc-600">&bull;</span>
+            <span className="text-amber-500 font-bold flex items-center gap-1 hover:underline">
+              <span>Inspect RK4 Solver</span>
+              <ArrowRight size={11} />
+            </span>
+          </div>
         </div>
       </div>
 

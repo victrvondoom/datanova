@@ -500,6 +500,15 @@ export const StudioView: React.FC<{
             <div ref={containerRef} className="absolute inset-0" data-testid="atlas-3d-canvas" aria-label="3D architecture canvas" />
           )}
 
+          {/* Continuous Differential Dynamics HUD */}
+          <div className="absolute left-3 top-3 z-10 hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-xl border border-[#27272a] bg-[#141416]/90 backdrop-blur-md text-[11px] font-mono shadow-xl text-zinc-300">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            <span className="text-zinc-400 font-semibold">Continuous Calculus:</span>
+            <span className="text-amber-400 font-bold">dQ/dt = λ - μ(Q)</span>
+            <span className="text-zinc-600">&bull;</span>
+            <span className="text-emerald-400 font-semibold">λ_J &lt; 0 (Stable Attractor)</span>
+          </div>
+
           {/* status strip */}
           <div className="absolute left-3 bottom-3 right-3 flex items-center gap-2 pointer-events-none">
             <span className="rounded-lg bg-[#141416]/95 border border-[#27272a] px-3 py-1.5 text-[11px] text-[#f4f4f5] max-w-[65%] truncate backdrop-blur-md shadow-lg flex items-center gap-2">

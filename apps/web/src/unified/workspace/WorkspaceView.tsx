@@ -53,7 +53,7 @@ export const WorkspaceView: React.FC<WorkspaceViewProps> = ({
   onNavigateAtlas,
   onOpenOrchestrator,
   setAnnounce,
-  darkMode = false,
+  darkMode = true,
 }) => {
   return (
     <div className={`flex-1 flex flex-col h-full min-h-0 overflow-hidden transition-colors ${
