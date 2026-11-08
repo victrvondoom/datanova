@@ -1,5 +1,5 @@
 import React from "react";
-import { Shield, Sun, Moon, Download } from "lucide-react";
+import { Shield, Sun, Moon, Download, Boxes } from "lucide-react";
 import { fetchMetrics } from "../api";
 import { useLive, formatUptime } from "../lib/useLive";
 
@@ -61,6 +61,16 @@ export const Navbar: React.FC<NavbarProps> = ({ darkMode, setDarkMode, online, o
               : "Local Engine Mode"}
           </span>
         </div>
+
+        {/* DataNova Unified Flagship Launcher */}
+        <button
+          onClick={() => { window.location.hash = "#/home"; }}
+          className="flex items-center space-x-1.5 h-8 px-3 rounded-lg text-xs font-bold text-sky-300 bg-sky-950/80 hover:bg-sky-900 border border-sky-500/40 hover:border-sky-400 transition-all shadow-sm shadow-sky-500/20"
+          title="Open DataNova Flagship Studio"
+        >
+          <Boxes className="w-3.5 h-3.5 text-sky-400" />
+          <span>DataNova Studio</span>
+        </button>
 
         {/* Presentation Deck Button */}
         <button

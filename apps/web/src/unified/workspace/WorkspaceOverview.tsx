@@ -7,7 +7,8 @@
 
 import React from "react";
 import {
-  Boxes, Activity, ShieldAlert, GitBranch, ArrowRight, Zap
+  Boxes, Activity, ShieldAlert, GitBranch, ArrowRight, Zap,
+  ShieldCheck, CheckCircle2, Radio
 } from "lucide-react";
 import type { Project } from "../../atlas/state";
 import type { ArchitectureModel } from "../../lab/model";
@@ -28,13 +29,19 @@ export const WorkspaceOverview: React.FC<WorkspaceOverviewProps> = ({
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Overview Top Welcome Card */}
-      <div className="p-6 rounded-2xl border border-slate-800/90 bg-gradient-to-r from-slate-900/80 via-slate-900/60 to-slate-950 p-6 space-y-4 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-4">
+      <div className="p-6 rounded-2xl border border-slate-800/90 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-950 p-6 space-y-5 shadow-2xl relative overflow-hidden">
+        {/* Subtle background glow */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-20 -top-20 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl"
+        />
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4 relative z-10">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+            <div className="flex items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
               <h2 className="text-xl font-bold text-white tracking-tight">{project.name}</h2>
-              <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300">
+              <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
                 v{project.version}
               </span>
             </div>
@@ -43,24 +50,27 @@ export const WorkspaceOverview: React.FC<WorkspaceOverviewProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => onOpenOrchestrator(`Investigate architecture health for ${project.name}`)}
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs transition-all shadow-md shadow-sky-500/20 flex items-center gap-2"
+              className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs transition-all shadow-lg shadow-sky-500/25 flex items-center gap-2 active:scale-95"
             >
-              <Zap size={14} />
+              <Zap size={14} className="text-amber-300" />
               <span>Ask Orchestrator</span>
             </button>
           </div>
         </div>
 
-        {/* 4 Plain-Language Status Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
-          <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
-            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500">
-              System Components
+        {/* 4 Plain-Language Status Cards with Visual Polish */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1 relative z-10">
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800/90 hover:border-sky-500/40 transition-colors group">
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                System Components
+              </div>
+              <Boxes size={14} className="text-sky-400 group-hover:scale-110 transition-transform" />
             </div>
-            <div className="text-2xl font-bold font-mono text-white mt-1">
+            <div className="text-2xl font-bold font-mono text-white mt-1.5">
               {model.components.length} Services
             </div>
             <div className="text-xs text-slate-400 mt-1 flex items-center gap-1">
@@ -68,36 +78,46 @@ export const WorkspaceOverview: React.FC<WorkspaceOverviewProps> = ({
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
-            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500">
-              Runtime Telemetry
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800/90 hover:border-emerald-500/40 transition-colors group">
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                Runtime Telemetry
+              </div>
+              <Radio size={14} className="text-emerald-400 animate-pulse" />
             </div>
-            <div className="text-2xl font-bold font-mono text-emerald-400 mt-1">
-              Live Stream
+            <div className="text-2xl font-bold font-mono text-emerald-400 mt-1.5 flex items-center gap-2">
+              <span>Live Stream</span>
             </div>
             <div className="text-xs text-slate-400 mt-1 flex items-center gap-1">
               <span>120 spans/s &bull; p95 185ms</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
-            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500">
-              Active Findings
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800/90 hover:border-rose-500/40 transition-colors group">
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                Active Findings
+              </div>
+              <ShieldAlert size={14} className="text-rose-400 group-hover:scale-110 transition-transform" />
             </div>
-            <div className="text-2xl font-bold font-mono text-rose-400 mt-1">
+            <div className="text-2xl font-bold font-mono text-rose-400 mt-1.5">
               1 Critical Drift
             </div>
-            <div className="text-xs text-slate-400 mt-1 flex items-center gap-1">
+            <div className="text-xs text-rose-300/80 mt-1 flex items-center gap-1">
               <span>Pricing Service undocumented</span>
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800">
-            <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500">
-              Review Status
+          <div className="p-4 rounded-xl bg-slate-950/80 border border-slate-800/90 hover:border-sky-500/40 transition-colors group">
+            <div className="flex items-center justify-between">
+              <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                Review Status
+              </div>
+              <ShieldCheck size={14} className="text-sky-400 group-hover:scale-110 transition-transform" />
             </div>
-            <div className="text-2xl font-bold font-mono text-sky-400 mt-1">
-              1 Ready Package
+            <div className="text-2xl font-bold font-mono text-sky-400 mt-1.5 flex items-center gap-1.5">
+              <CheckCircle2 size={18} className="text-sky-400 inline" />
+              <span>1 Ready</span>
             </div>
             <div className="text-xs text-slate-400 mt-1 flex items-center gap-1">
               <span>SHA-256 seal verified</span>
@@ -155,7 +175,7 @@ export const WorkspaceOverview: React.FC<WorkspaceOverviewProps> = ({
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => onNavigateSubView("map")}
-              className="p-3.5 rounded-xl border border-slate-800 bg-slate-950 hover:border-sky-500 hover:bg-slate-900 transition-all text-left space-y-1.5 group"
+              className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-sky-500/70 hover:bg-slate-900 hover:shadow-[0_0_20px_rgba(14,165,233,0.15)] hover:-translate-y-0.5 transition-all text-left space-y-1.5 group"
             >
               <Boxes size={16} className="text-sky-400 group-hover:scale-110 transition-transform" />
               <div className="text-xs font-bold text-white group-hover:text-sky-300">System Map</div>
@@ -164,7 +184,7 @@ export const WorkspaceOverview: React.FC<WorkspaceOverviewProps> = ({
 
             <button
               onClick={() => onNavigateSubView("analyze")}
-              className="p-3.5 rounded-xl border border-slate-800 bg-slate-950 hover:border-amber-500 hover:bg-slate-900 transition-all text-left space-y-1.5 group"
+              className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-amber-500/70 hover:bg-slate-900 hover:shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:-translate-y-0.5 transition-all text-left space-y-1.5 group"
             >
               <Activity size={16} className="text-amber-400 group-hover:scale-110 transition-transform" />
               <div className="text-xs font-bold text-white group-hover:text-amber-300">Analyze</div>
@@ -173,7 +193,7 @@ export const WorkspaceOverview: React.FC<WorkspaceOverviewProps> = ({
 
             <button
               onClick={() => onNavigateSubView("investigate")}
-              className="p-3.5 rounded-xl border border-slate-800 bg-slate-950 hover:border-rose-500 hover:bg-slate-900 transition-all text-left space-y-1.5 group"
+              className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-rose-500/70 hover:bg-slate-900 hover:shadow-[0_0_20px_rgba(244,63,94,0.15)] hover:-translate-y-0.5 transition-all text-left space-y-1.5 group"
             >
               <ShieldAlert size={16} className="text-rose-400 group-hover:scale-110 transition-transform" />
               <div className="text-xs font-bold text-white group-hover:text-rose-300">Investigate</div>
@@ -182,7 +202,7 @@ export const WorkspaceOverview: React.FC<WorkspaceOverviewProps> = ({
 
             <button
               onClick={() => onNavigateSubView("improve")}
-              className="p-3.5 rounded-xl border border-slate-800 bg-slate-950 hover:border-emerald-500 hover:bg-slate-900 transition-all text-left space-y-1.5 group"
+              className="p-3.5 rounded-xl border border-slate-800 bg-slate-950/80 hover:border-emerald-500/70 hover:bg-slate-900 hover:shadow-[0_0_20px_rgba(16,185,129,0.15)] hover:-translate-y-0.5 transition-all text-left space-y-1.5 group"
             >
               <GitBranch size={16} className="text-emerald-400 group-hover:scale-110 transition-transform" />
               <div className="text-xs font-bold text-white group-hover:text-emerald-300">Improve & Compare</div>

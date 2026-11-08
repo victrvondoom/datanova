@@ -27,9 +27,28 @@ const ViewSuspense: React.FC = () => (
 );
 
 export const App: React.FC = () => {
-  // moa inheritance: light-first product (moa's app is `color-scheme: only light`);
-  // dark remains available via the navbar toggle.
-  const [darkMode, setDarkMode] = useState<boolean>(false);
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    try {
+      const saved = window.localStorage.getItem("datanova-theme");
+      if (saved) return saved === "dark";
+    } catch {
+      // ignore
+    }
+    return true;
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("datanova-theme", darkMode ? "dark" : "light");
+    } catch {
+      // ignore
+    }
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
   // Deep-link support: a fresh load (or navigation) to a #/trail/... URL
   // opens the TRACEN learning trail view directly.
   const [currentView, setCurrentView] = useState<ViewType>(() => {

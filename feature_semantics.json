@@ -1,7 +1,7 @@
 {
-  "run_id": "bench_20261031T081621_42_10000",
-  "model_id": "xgboost_fraud_detector",
-  "feature_count": 33,
+  "run_id": "bench_20261104T083846_42_10000",
+  "model_id": "lightgbm_fraud_detector",
+  "feature_count": 39,
   "features": [
     {
       "name": "log_amount",
@@ -298,6 +298,60 @@
       "family": "categorical-indicator",
       "derived_from": [
         "packages/features/pipeline.py: _encode_categoricals"
+      ]
+    },
+    {
+      "name": "g_out_degree",
+      "definition": "Count of outbound transaction edges initiated by the sender in the trailing 24 hours.",
+      "unit": "count",
+      "family": "graph",
+      "derived_from": [
+        "packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_sender_out_degree)"
+      ]
+    },
+    {
+      "name": "g_in_degree",
+      "definition": "Count of inbound transaction edges received by the receiver in the trailing 24 hours.",
+      "unit": "count",
+      "family": "graph",
+      "derived_from": [
+        "packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_receiver_in_degree)"
+      ]
+    },
+    {
+      "name": "g_dev_shared",
+      "definition": "Number of distinct accounts that have transacted from the current device identifier in the trailing graph window.",
+      "unit": "count",
+      "family": "graph",
+      "derived_from": [
+        "packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_device_shared_accounts)"
+      ]
+    },
+    {
+      "name": "g_cycle",
+      "definition": "1 when a directed cycle / circular flow of length 1 to 3 hops exists from receiver back to sender, closing a laundering ring; else 0.",
+      "unit": "binary {0, 1}",
+      "family": "graph",
+      "derived_from": [
+        "packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_cycle_detected)"
+      ]
+    },
+    {
+      "name": "g_recip",
+      "definition": "1 when a direct reciprocal flow exists (receiver previously sent funds to sender in graph history); else 0.",
+      "unit": "binary {0, 1}",
+      "family": "graph",
+      "derived_from": [
+        "packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_is_reciprocal)"
+      ]
+    },
+    {
+      "name": "g_pagerank",
+      "definition": "Temporal PageRank centrality score of the sender in the transaction graph.",
+      "unit": "score [0, 1]",
+      "family": "graph",
+      "derived_from": [
+        "packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_sender_pagerank)"
       ]
     }
   ]

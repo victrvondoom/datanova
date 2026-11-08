@@ -1,15 +1,15 @@
 # Model Card — AEGIS-Fraud X Champion
 
-Generated 2026-10-31T09:08:10.106593+00:00 by `scripts/generate_model_card.py` from recorded artifacts. Every figure below is read from the champion manifest and benchmark run at generation time.
+Generated 2026-11-08T10:47:20.028363+00:00 by `scripts/generate_model_card.py` from recorded artifacts. Every figure below is read from the champion manifest and benchmark run at generation time.
 
 ## Model details
 
-- Model: **xgboost_fraud_detector** (version 1.1.0)
+- Model: **lightgbm_fraud_detector** (version 1.3.0)
 - Calibrator: isotonic
-- Policy: Cost-Aware-Optimized (tau_allow=0.2222, solver=exact-distinct-value-sweep)
-- Artifact run id: `bench_20261031T081621_42_10000`
-- Artifact payload SHA-256: `09a63ad8cec09eedd86dd93446ffb4f5cc7b4e76e38b47fd0917e6e6f44fb4fd`
-- Feature schema: 33 features (see FEATURE_SEMANTICS.md)
+- Policy: Cost-Aware-Optimized (tau_allow=0.1818, solver=exact-distinct-value-sweep)
+- Artifact run id: `bench_20261104T083846_42_10000`
+- Artifact payload SHA-256: `0168563e6706feb2770edd9c9689d53370c4fcc98935733146548147c2781f20`
+- Feature schema: 39 features (see FEATURE_SEMANTICS.md)
 
 ## Intended use
 
@@ -29,19 +29,19 @@ Real-time payment-transaction fraud screening as a DECISION-SUPPORT system: scor
 
 ## Metrics (honest test partition, single final evaluation)
 
-- PR-AUC (validation, selection): 0.8111
-- PR-AUC (test, honest): **0.7147**
-- ROC-AUC: 0.9915
-- Precision / Recall / F1: 0.9200 / 0.5349 / 0.6765
-- False-positive rate: 0.0010
-- Brier score / ECE: 0.0091 / 0.0048
-- Inference latency: 0.0010 ms/tx
+- PR-AUC (validation, selection): 0.7880
+- PR-AUC (test, honest): **0.8513**
+- ROC-AUC: 0.9943
+- Precision / Recall / F1: 0.9630 / 0.6047 / 0.7429
+- False-positive rate: 0.0005
+- Brier score / ECE: 0.0063 / 0.0039
+- Inference latency: 0.0020 ms/tx
 
 ## Economic outcomes (SIMULATED, not realized bank savings)
 
 - Baseline cost with no detection: $38,577.83
-- Total operational cost under the AEGIS policy: $7,442.83
-- Simulated net savings vs. baseline: $31,135.00
+- Total operational cost under the AEGIS policy: $6,556.41
+- Simulated net savings vs. baseline: $32,021.42
 - These figures are produced by the shared cost engine under documented assumptions on this benchmark run; they are simulated estimates, not measured financial results.
 
 ## External validation
@@ -58,5 +58,5 @@ Real-time payment-transaction fraud screening as a DECISION-SUPPORT system: scor
 
 ## Provenance
 
-- Manifest: `experiments/champion_bundle.pkl.manifest.json` (benchmark artifact SHA-256 `8e448b9305f72ff5aa0e96e373606cfe8e5d0667408fafdb46a0e1610085460a`)
+- Manifest: `experiments/champion_bundle.pkl.manifest.json` (benchmark artifact SHA-256 `d2accb868f6836de64f6fa065f19b339fe7be6e110dd518e261ff6f6344e806d`)
 - Generation is deterministic from the artifacts; regenerate after any champion promotion.

@@ -9,7 +9,7 @@ export default defineConfig({
       output: {
         // Code-split heavy vendor libs so the initial bundle stays lean:
         // three.js (Atlas 3D studio) and recharts/lucide (charts + icons).
-        advancedChunks: {
+        codeSplitting: {
           groups: [
             { name: 'vendor-three', test: /node_modules[\\/]three/ },
             { name: 'vendor-charts', test: /node_modules[\\/](recharts|lucide-react)/ },

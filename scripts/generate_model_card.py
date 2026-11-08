@@ -38,10 +38,18 @@ def build_card(manifest, benchmark, ulb):
     meta = manifest["metadata"]
     champ_name = manifest.get("model_id", "unknown")
     champ_metrics = None
-    for name, m in benchmark.get("benchmark_summary", {}).items():
-        if champ_name.lower().startswith(name.split(" ")[0].lower()):
-            champ_metrics = m
-            break
+    meta_champ = meta.get("champion_name")
+    if meta_champ and meta_champ in benchmark.get("benchmark_summary", {}):
+        if "lightgbm" in meta_champ.lower() and "lightgbm" in champ_name.lower():
+            champ_metrics = benchmark["benchmark_summary"][meta_champ]
+        elif meta_champ.split(" ")[0].lower() in champ_name.lower():
+            champ_metrics = benchmark["benchmark_summary"][meta_champ]
+
+    if champ_metrics is None:
+        for name, m in benchmark.get("benchmark_summary", {}).items():
+            if champ_name.lower().startswith(name.split(" ")[0].lower()):
+                champ_metrics = m
+                break
     if champ_metrics is None:
         raise ValueError(f"Champion '{champ_name}' not found in benchmark artifact; refusing to fabricate metrics.")
     fin = champ_metrics.get("financial_outcomes", {})

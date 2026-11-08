@@ -170,6 +170,48 @@ FEATURE_SEMANTICS: Dict[str, FeatureSemantics] = {
         "velocity",
         ["packages/features/temporal.py: (tx_count_1h >= 3) | (distinct_devices_24h >= 2)"],
     ),
+    "g_out_degree": FeatureSemantics(
+        "g_out_degree",
+        "Count of outbound transaction edges initiated by the sender in the trailing 24 hours.",
+        "count",
+        "graph",
+        ["packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_sender_out_degree)"],
+    ),
+    "g_in_degree": FeatureSemantics(
+        "g_in_degree",
+        "Count of inbound transaction edges received by the receiver in the trailing 24 hours.",
+        "count",
+        "graph",
+        ["packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_receiver_in_degree)"],
+    ),
+    "g_dev_shared": FeatureSemantics(
+        "g_dev_shared",
+        "Number of distinct accounts that have transacted from the current device identifier in the trailing graph window.",
+        "count",
+        "graph",
+        ["packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_device_shared_accounts)"],
+    ),
+    "g_cycle": FeatureSemantics(
+        "g_cycle",
+        "1 when a directed cycle / circular flow of length 1 to 3 hops exists from receiver back to sender, closing a laundering ring; else 0.",
+        "binary {0, 1}",
+        "graph",
+        ["packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_cycle_detected)"],
+    ),
+    "g_recip": FeatureSemantics(
+        "g_recip",
+        "1 when a direct reciprocal flow exists (receiver previously sent funds to sender in graph history); else 0.",
+        "binary {0, 1}",
+        "graph",
+        ["packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_is_reciprocal)"],
+    ),
+    "g_pagerank": FeatureSemantics(
+        "g_pagerank",
+        "Temporal PageRank centrality score of the sender in the transaction graph.",
+        "score [0, 1]",
+        "graph",
+        ["packages/graph/features.py: GraphFeatureExtractor.extract_features_for_transaction (graph_sender_pagerank)"],
+    ),
 }
 
 

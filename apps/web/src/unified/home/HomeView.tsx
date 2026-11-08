@@ -44,11 +44,17 @@ export const HomeView: React.FC<HomeViewProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-10 py-6 px-4">
+    <div className="relative max-w-6xl mx-auto space-y-10 py-6 px-4">
+      {/* Ambient Cybernetic Lighting */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 w-[700px] h-[320px] bg-gradient-to-b from-sky-500/12 via-indigo-500/8 to-transparent blur-[100px] rounded-full z-0"
+      />
+
       {/* A. Welcome Area */}
-      <div className="text-center space-y-4 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-semibold">
-          <Sparkles size={13} />
+      <div className="relative z-10 text-center space-y-4 max-w-3xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-xs font-semibold shadow-sm">
+          <Sparkles size={13} className="animate-pulse" />
           <span>Architecture Intelligence Studio</span>
         </div>
 
@@ -68,7 +74,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
         <div className="flex items-center justify-center gap-3 pt-2">
           <button
             onClick={() => onNavigateWorkspace("overview")}
-            className="px-6 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-sky-500/20 flex items-center gap-2 active:scale-[0.98]"
+            className="px-6 py-3 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold text-xs sm:text-sm transition-all shadow-lg shadow-sky-500/25 flex items-center gap-2 active:scale-[0.98]"
           >
             <span>Start a workspace</span>
             <ArrowRight size={15} />
@@ -76,7 +82,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
           <button
             onClick={() => onNavigateWorkspace("map")}
-            className="px-6 py-3 rounded-xl border border-slate-700 bg-slate-900/80 hover:bg-slate-800 text-slate-200 font-bold text-xs sm:text-sm transition-all flex items-center gap-2"
+            className="px-6 py-3 rounded-xl border border-slate-700/80 bg-slate-900/80 hover:bg-slate-800 hover:border-slate-600 text-slate-200 font-bold text-xs sm:text-sm transition-all flex items-center gap-2 shadow-sm"
           >
             <Boxes size={15} className="text-sky-400" />
             <span>Explore an example</span>
@@ -85,26 +91,47 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
         {/* Inline Orchestrator Prompt Box */}
         <form onSubmit={handlePromptSubmit} className="pt-4 max-w-2xl mx-auto">
-          <div className="relative flex items-center shadow-xl rounded-2xl border border-sky-500/30 bg-slate-900/90 p-1.5 focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-500/20 transition-all">
+          <div className="relative flex items-center shadow-xl rounded-2xl border border-sky-500/40 bg-slate-900/95 p-1.5 focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-500/30 transition-all">
             <div className="pl-3.5 pr-2 text-sky-400">
-              <Bot size={18} />
+              <Bot size={18} className="animate-pulse" />
             </div>
             <input
               type="text"
               value={homePrompt}
               onChange={(e) => setHomePrompt(e.target.value)}
               placeholder="What would you like to understand or improve today? Type any question or problem..."
-              className="w-full bg-transparent px-2 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none"
+              className="w-full bg-transparent px-2 py-2.5 text-xs sm:text-sm text-slate-100 placeholder-slate-400 focus:outline-none"
             />
             <button
               type="submit"
               disabled={!homePrompt.trim()}
-              className="px-4 py-2 rounded-xl bg-sky-600 hover:bg-sky-500 disabled:opacity-40 text-white text-xs font-bold transition-colors shrink-0"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 disabled:opacity-40 text-white text-xs font-bold transition-all shrink-0 shadow-sm shadow-sky-500/20"
             >
               Ask
             </button>
           </div>
         </form>
+
+        {/* Suggested Quick Prompts */}
+        <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-[11px]">
+          <span className="text-slate-500 font-mono text-[10px] uppercase tracking-wider font-semibold">Suggested:</span>
+          {[
+            { label: "Investigate Pricing Service Drift", icon: "🔍" },
+            { label: "Simulate 1,500 RPS Capacity Peak", icon: "⚡" },
+            { label: "Check Trust Boundary Security", icon: "🔒" },
+            { label: "Verify Evidence Package Integrity", icon: "📑" },
+          ].map((chip) => (
+            <button
+              key={chip.label}
+              type="button"
+              onClick={() => onOpenOrchestrator(chip.label)}
+              className="px-2.5 py-1 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-800/90 hover:border-sky-500/50 text-slate-300 hover:text-white transition-all duration-150 flex items-center gap-1.5 shadow-sm active:scale-95"
+            >
+              <span>{chip.icon}</span>
+              <span>{chip.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* B. What can I do with DataNova? (4 Core Capabilities) */}
@@ -120,10 +147,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* 1. Map my system */}
           <div
             onClick={() => onNavigateWorkspace("map")}
-            className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/50 hover:border-sky-500/60 hover:bg-slate-900/80 cursor-pointer transition-all duration-200 group flex flex-col justify-between space-y-4 shadow-sm"
+            className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-sm hover:border-sky-500/70 hover:bg-slate-900/90 hover:shadow-[0_4px_30px_rgba(14,165,233,0.18)] hover:-translate-y-1 cursor-pointer transition-all duration-200 group flex flex-col justify-between space-y-4 shadow-sm"
           >
             <div className="space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-sky-500/20 transition-all">
                 <Compass size={20} />
               </div>
               <h3 className="text-sm font-bold text-white group-hover:text-sky-300 transition-colors">
@@ -133,7 +160,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 See how the parts of my software connect in interactive 2D and 3D space with layered analytical views.
               </p>
             </div>
-            <div className="text-[11px] font-semibold text-sky-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+            <div className="text-[11px] font-semibold text-sky-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>Open System Map</span>
               <ArrowRight size={12} />
             </div>
@@ -142,10 +169,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* 2. Understand problems */}
           <div
             onClick={() => onNavigateWorkspace("investigate")}
-            className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/50 hover:border-amber-500/60 hover:bg-slate-900/80 cursor-pointer transition-all duration-200 group flex flex-col justify-between space-y-4 shadow-sm"
+            className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-sm hover:border-amber-500/70 hover:bg-slate-900/90 hover:shadow-[0_4px_30px_rgba(245,158,11,0.18)] hover:-translate-y-1 cursor-pointer transition-all duration-200 group flex flex-col justify-between space-y-4 shadow-sm"
           >
             <div className="space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500/20 transition-all">
                 <ShieldAlert size={20} />
               </div>
               <h3 className="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">
@@ -155,7 +182,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 Find undocumented dependencies, latency bottlenecks, runtime failures, and trust boundary risks.
               </p>
             </div>
-            <div className="text-[11px] font-semibold text-amber-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+            <div className="text-[11px] font-semibold text-amber-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>Start Investigation</span>
               <ArrowRight size={12} />
             </div>
@@ -164,10 +191,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* 3. Test improvements */}
           <div
             onClick={() => onNavigateWorkspace("improve")}
-            className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/50 hover:border-emerald-500/60 hover:bg-slate-900/80 cursor-pointer transition-all duration-200 group flex flex-col justify-between space-y-4 shadow-sm"
+            className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-sm hover:border-emerald-500/70 hover:bg-slate-900/90 hover:shadow-[0_4px_30px_rgba(16,185,129,0.18)] hover:-translate-y-1 cursor-pointer transition-all duration-200 group flex flex-col justify-between space-y-4 shadow-sm"
           >
             <div className="space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500/20 transition-all">
                 <GitBranch size={20} />
               </div>
               <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">
@@ -177,7 +204,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 Explore architectural changes, test release readiness, and simulate alternative design outcomes.
               </p>
             </div>
-            <div className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+            <div className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>Compare Alternatives</span>
               <ArrowRight size={12} />
             </div>
@@ -186,10 +213,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
           {/* 4. Review evidence */}
           <div
             onClick={() => onNavigateEvidence("findings")}
-            className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/50 hover:border-purple-500/60 hover:bg-slate-900/80 cursor-pointer transition-all duration-200 group flex flex-col justify-between space-y-4 shadow-sm"
+            className="p-5 rounded-2xl border border-slate-800/80 bg-slate-900/60 backdrop-blur-sm hover:border-purple-500/70 hover:bg-slate-900/90 hover:shadow-[0_4px_30px_rgba(168,85,247,0.18)] hover:-translate-y-1 cursor-pointer transition-all duration-200 group flex flex-col justify-between space-y-4 shadow-sm"
           >
             <div className="space-y-2.5">
-              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-500/20 transition-all">
                 <ShieldCheck size={20} />
               </div>
               <h3 className="text-sm font-bold text-white group-hover:text-purple-300 transition-colors">
@@ -199,7 +226,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 Understand why a conclusion was reached, inspect supporting telemetry, and share findings with peers.
               </p>
             </div>
-            <div className="text-[11px] font-semibold text-purple-400 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+            <div className="text-[11px] font-semibold text-purple-400 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
               <span>Inspect Evidence</span>
               <ArrowRight size={12} />
             </div>

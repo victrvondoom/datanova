@@ -64,7 +64,7 @@ def test_semantics_generator_output_is_complete():
     md, registry = build_semantics(
         manifest["feature_names"], manifest["model_id"], manifest["run_id"]
     )
-    assert len(registry) == len(manifest["feature_names"]) == 33
+    assert len(registry) == len(manifest["feature_names"])
     names = {r["name"] for r in registry}
     assert set(manifest["feature_names"]) == names
     assert "Feature Semantic Registry" in md
@@ -92,9 +92,9 @@ def test_model_card_reads_only_real_artifacts():
         _load(os.path.join(ROOT, "benchmarks/runs/ulb_evaluation.json")),
     )
     manifest = _manifest()
-    champ = _load(os.path.join(ROOT, "benchmarks/runs/benchmark_summary.json"))[
-        "benchmark_summary"
-    ]["XGBoost"]
+    benchmark = _load(os.path.join(ROOT, "benchmarks/runs/benchmark_summary.json"))
+    champ_name = manifest.get("metadata", {}).get("champion_name", "XGBoost")
+    champ = benchmark["benchmark_summary"].get(champ_name) or benchmark["benchmark_summary"]["XGBoost"]
 
     assert manifest["run_id"] in card
     assert manifest["payload_sha256"] in card

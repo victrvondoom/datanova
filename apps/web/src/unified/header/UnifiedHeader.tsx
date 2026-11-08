@@ -49,21 +49,22 @@ export const UnifiedHeader: React.FC<UnifiedHeaderProps> = ({
           onClick={() => onNavigateDestination("home")}
           className="flex items-center gap-2.5 cursor-pointer group"
         >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/20 group-hover:scale-105 transition-transform">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-sky-500/30 ring-1 ring-sky-400/30 group-hover:scale-105 transition-transform">
             <Boxes size={18} />
           </div>
           <div>
             <div className="text-sm font-black tracking-wide text-white group-hover:text-sky-300 transition-colors">
               DATANOVA
             </div>
-            <div className="text-[10px] text-slate-500 font-medium">Architecture Intelligence</div>
+            <div className="text-[10px] text-slate-400 font-medium">Architecture Intelligence</div>
           </div>
         </div>
 
         <div className="h-5 w-px bg-slate-800 hidden sm:block" />
 
-        {/* Project Selector */}
+        {/* Project Selector with Live Telemetry indicator */}
         <div className="hidden sm:flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" title="Telemetry Active" />
           <label htmlFor="header-project-select" className="sr-only">Active Project</label>
           <select
             id="header-project-select"
